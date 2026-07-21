@@ -55,7 +55,7 @@ export function buildDefaultUserConfig(
   }));
   const defaultGroup: DrawConfigGroup = {
     id: generateGroupId(),
-    name: "默认方案",
+    name: "雨露均沾",
     entries,
   };
   return {

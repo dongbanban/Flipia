@@ -36,7 +36,7 @@ const config: DrawConfigEntry[] = [
 const groups: DrawConfigGroup[] = [
   {
     id: "grp-1",
-    name: "默认方案",
+    name: "雨露均沾",
     entries: [
       { categoryId: MEAT, categoryName: "荤菜", count: 2 },
       { categoryId: VEG, categoryName: "素菜", count: 1 },
@@ -274,12 +274,12 @@ describe("validateGroupName", () => {
   });
 
   it("returns error when name already exists", () => {
-    const { error } = validateGroupName("默认方案", ["默认方案", "周末"]);
+    const { error } = validateGroupName("雨露均沾", ["雨露均沾", "周末"]);
     expect(error).toBe("方案名已存在");
   });
 
   it("returns no error when name equals excludeName (rename case)", () => {
-    const { error } = validateGroupName("默认方案", ["默认方案", "周末"], "默认方案");
+    const { error } = validateGroupName("雨露均沾", ["雨露均沾", "周末"], "雨露均沾");
     expect(error).toBeNull();
   });
 

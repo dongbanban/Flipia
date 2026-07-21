@@ -236,7 +236,7 @@ Page({
         drawConfigGroups: [
           {
             id: drawGroupId,
-            name: "默认方案",
+            name: "雨露均沾",
             entries: drawEntries,
           },
         ],

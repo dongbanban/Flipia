@@ -44,7 +44,7 @@ describe("buildDefaultUserConfig", () => {
   it("has exactly one default draw config group", () => {
     const cfg = buildDefaultUserConfig(GROUP_ID, OPENID);
     expect(cfg.drawConfigGroups).toHaveLength(1);
-    expect(cfg.drawConfigGroups[0].name).toBe("默认方案");
+    expect(cfg.drawConfigGroups[0].name).toBe("雨露均沾");
   });
 
   it("default group entries match categories 1-to-1 with count 1", () => {

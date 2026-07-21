@@ -56,7 +56,7 @@ drawConfigGroups: DrawConfigGroup[];
 
 ## 数据迁移
 
-- [x] `buildDefaultUserConfig`：创建 `DrawConfigGroup[]` 含一个"默认方案"（4 分类各 count=1）
+- [x] `buildDefaultUserConfig`：创建 `DrawConfigGroup[]` 含一个"雨露均沾"（4 分类各 count=1）
 - [x] `init-data` 类型更新：`UserConfig` 新增 `drawConfigGroups`，移除 `drawConfig`
 - [x] `category-manage.ts` `deleteCategory` 遍历所有 group 的 `entries` 清理对应分类，并保证每组至少一条
 - [x] `draw-engine.ts` 签名不变；调用方传入当前生效 group 的 `entries`
@@ -69,7 +69,7 @@ drawConfigGroups: DrawConfigGroup[];
 - [x] Modal 正确展示 entries、调数量、增删 entry（重复检测、至少一条约束生效）
 - [x] Modal 内编辑仅本地暂存，点击"确认"后一次性写入云端
 - [x] 分类删除后所有方案中对应 entry 移除，每组至少保留一条
-- [x] 首次初始化生成"默认方案"且设为生效方案
+- [x] 首次初始化生成"雨露均沾"且设为生效方案
 - [x] 纯函数全部有单元测试覆盖（52 tests）
 
 ## Comments

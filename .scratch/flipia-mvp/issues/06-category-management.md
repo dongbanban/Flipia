@@ -11,5 +11,5 @@
 - [x] 支持新增分类：输入分类名（不可为空，不可与已有分类重名），写入 `user_config.categories`
 - [x] 支持重命名分类：点击分类名进入编辑状态，保存后更新 `user_config.categories` 中对应条目
 - [x] 支持删除分类：需二次确认；删除后同步遍历 `user_config.drawConfigGroups` 中所有方案的 `entries` 清理该分类条目，保证每组至少一条；同时级联删除 `dishes` 集合中 `categoryId` 匹配的所有菜品
-- [x] 删除后若所有方案的 entries 均为空，自动将剩余第一个分类加入默认方案（count: 1），保证至少一条
+- [x] 删除后若所有方案的 entries 均为空，自动将剩余第一个分类加入雨露均沾（count: 1），保证至少一条
 - [x] 分类列表变更后，菜品池页面的分类 tab 同步更新
