@@ -1,0 +1,12 @@
+{
+  "name": "flipia",
+  "private": true,
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "~4.1.10",
+    "vite": "~6.4.3",
+    "typescript": "~6.0.3"
+  }
+}

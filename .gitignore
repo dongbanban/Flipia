@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.js.map
+
+# pnpm
+.pnpm-store/
+
+# WeChat devtools — generated JS from TS compilation
+miniprogram/pages/**/*.js
+
+# WeChat devtools — contains appid and local settings, each dev maintains their own
+project.config.json
+project.private.config.json
+
+# macOS / IDE
+.DS_Store
+miniprogram/.idea/

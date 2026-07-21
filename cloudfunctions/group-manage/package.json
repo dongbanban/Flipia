@@ -1,0 +1,9 @@
+{
+  "name": "@flipia/cf-group-manage",
+  "version": "1.0.0",
+  "description": "群组管理操作：重命名/邀请码/加入/退出/踢人/解散",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

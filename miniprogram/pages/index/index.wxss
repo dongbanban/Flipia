@@ -1,0 +1,352 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 88rpx;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-bg);
+  overflow-y: auto;
+}
+
+/* ── Idle / Loading ─────────────────────────────────────────────────── */
+
+.idle-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 24rpx;
+}
+
+.loading-hint {
+  color: var(--color-text-secondary);
+  font-size: 28rpx;
+}
+
+.draw-btn {
+  width: 360rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 34rpx;
+  font-weight: 600;
+  border-radius: var(--radius-btn);
+  border: none;
+  padding: 0;
+  text-align: center;
+}
+
+.draw-btn--disabled {
+  background-color: var(--color-disabled);
+  color: #fff;
+}
+
+.draw-btn::after {
+  border: none;
+}
+
+.validation-error {
+  color: #e8866e;
+  font-size: 26rpx;
+  text-align: center;
+  padding: 0 48rpx;
+  line-height: 1.6;
+}
+
+/* ── Config switcher ────────────────────────────────────────────────── */
+
+.config-switcher {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx 32rpx;
+}
+
+.config-label {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.config-name {
+  font-size: 26rpx;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.config-arrow {
+  font-size: 26rpx;
+  color: var(--color-primary);
+}
+
+/* ── Drawing / Cards ────────────────────────────────────────────────── */
+
+.drawing-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 32rpx;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* ── Auto-flip ──────────────────────────────────────────────────────── */
+
+.auto-flip-bar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 16rpx 0;
+  flex-shrink: 0;
+}
+
+.auto-flip-btn {
+  width: 200rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+  font-size: 26rpx;
+  font-weight: 500;
+  border-radius: var(--radius-btn);
+  border: 2rpx solid var(--color-primary);
+  padding: 0;
+  text-align: center;
+}
+
+.auto-flip-btn--disabled {
+  color: var(--color-disabled);
+  border-color: var(--color-disabled);
+}
+
+.auto-flip-btn::after {
+  border: none;
+}
+
+.cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24rpx;
+  width: 100%;
+  padding-bottom: 180rpx;
+}
+
+/* ── 3D Flip Card ───────────────────────────────────────────────────── */
+
+.card-container {
+  width: 300rpx;
+  height: 400rpx;
+  perspective: 1200rpx;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.card-inner--redrawing {
+  transition: transform 0.3s ease;
+}
+
+.card-inner--flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.card-back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #c8815e 0%, #d9a98c 100%);
+  gap: 16rpx;
+}
+
+.card-back-icon {
+  font-size: 64rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-back-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.card-front {
+  transform: rotateY(180deg);
+  background-color: var(--color-primary-light);
+  border: 2rpx solid var(--color-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-image {
+  width: 100%;
+  height: 220rpx;
+}
+
+.card-name-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx;
+}
+
+.card-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: center;
+  word-break: break-all;
+}
+
+/* ── Re-draw button ─────────────────────────────────────────────────── */
+
+.redraw-btn {
+  position: absolute;
+  right: 12rpx;
+  bottom: 12rpx;
+  background-color: var(--color-primary);
+  border-radius: 40rpx;
+  padding: 8rpx 20rpx;
+  display: flex;
+}
+
+.redraw-text {
+  font-size: 22rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* ── Drawing actions ────────────────────────────────────────────────── */
+
+.drawing-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  background-color: var(--color-bg);
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.drawing-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.back-btn {
+  font-size: 28rpx;
+  color: var(--color-primary);
+}
+
+.confirm-btn {
+  width: 280rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: var(--radius-btn);
+  border: none;
+  padding: 0;
+  text-align: center;
+}
+
+.confirm-btn--disabled {
+  background-color: var(--color-disabled);
+  color: #fff;
+}
+
+.confirm-btn::after {
+  border: none;
+}
+
+.redraw-all-btn {
+  width: 160rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: var(--radius-btn);
+  border: 2rpx solid var(--color-primary);
+  padding: 0;
+  text-align: center;
+}
+
+.redraw-all-btn::after {
+  border: none;
+}
+
+.redraw-all-btn--disabled {
+  color: var(--color-disabled);
+  border-color: var(--color-disabled);
+}
+
+/* ── Guide placeholder ──────────────────────────────────────────────── */
+
+.guide-placeholder {
+  width: 100%;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.guide-text {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+}
+
+/* ── Summary bar ────────────────────────────────────────────────────── */
+
+.summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 24rpx 32rpx;
+  background-color: var(--color-primary-light);
+  box-sizing: border-box;
+}
+
+.summary-text {
+  font-size: 26rpx;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.summary-arrow {
+  font-size: 28rpx;
+  color: var(--color-primary);
+  font-weight: 600;
+}

@@ -1,0 +1,117 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text class="loading-hint">加载中…</text>
+  </view>
+
+  <view wx:else class="content">
+    <view class="section-title">抽取方案（{{drawConfigGroups.length}}/10）</view>
+
+    <view class="group-grid">
+      <block wx:for="{{drawConfigGroups}}" wx:key="id">
+        <view class="group-card" data-id="{{item.id}}" bind:tap="onTapGroup">
+          <view class="group-card-inner">
+            <view class="group-name-row">
+              <text class="group-name">{{item.name}}</text>
+            </view>
+          </view>
+
+          <view wx:if="{{item.id === activeDrawConfigGroupId}}" class="card-active-row">
+            <text class="group-active-badge">生效中</text>
+            <text
+              class="card-cancel-btn"
+              data-id="{{item.id}}"
+              catch:tap="onUnsetActive"
+            >取消</text>
+          </view>
+          <text
+            wx:else
+            class="card-set-btn"
+            data-id="{{item.id}}"
+            catch:tap="onSetActive"
+          >设为当前</text>
+
+          <view
+            wx:if="{{drawConfigGroups.length > 1}}"
+            class="remove-badge card-remove"
+            data-id="{{item.id}}"
+            catch:tap="onDelete"
+          >×</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 添加 -->
+    <view wx:if="{{drawConfigGroups.length < 10}}" class="add-row" bind:tap="onStartAdd">
+      <text class="add-icon">＋</text>
+      <text class="add-label">新建方案</text>
+    </view>
+
+    <!-- Modal -->
+    <view wx:if="{{modalVisible}}" class="modal-mask" bind:tap="onCloseModal">
+      <view class="modal-panel" catch:tap="noop">
+        <view class="modal-header">
+          <text class="modal-title">{{modalTitle}}</text>
+          <text class="modal-close" bind:tap="onConfirmModal">确认</text>
+        </view>
+
+        <view class="modal-body">
+          <view class="modal-field">
+            <text class="modal-label">方案名称</text>
+            <input
+              class="modal-input {{modalNameError ? 'modal-input--error' : ''}}"
+              value="{{modalName}}"
+              maxlength="100"
+              bind:input="onModalNameInput"
+            />
+          </view>
+          <text wx:if="{{modalNameError}}" class="modal-error">{{modalNameError}}</text>
+
+          <view class="modal-divider"></view>
+
+          <view class="modal-field">
+            <text class="modal-label">分类数量配置</text>
+          </view>
+
+          <view wx:if="{{modalEntries.length > 0}}" class="modal-entries">
+            <view wx:for="{{modalEntries}}" wx:key="categoryId" class="modal-entry">
+              <text class="modal-entry-name">{{item.categoryName}}</text>
+              <view class="stepper">
+                <text
+                  class="stepper-btn {{item.count <= 1 ? 'stepper-btn--disabled' : ''}}"
+                  data-id="{{item.categoryId}}"
+                  bind:tap="onModalDecrement"
+                >−</text>
+                <text class="stepper-value">{{item.count}}</text>
+                <text
+                  class="stepper-btn {{item.count >= 5 ? 'stepper-btn--disabled' : ''}}"
+                  data-id="{{item.categoryId}}"
+                  bind:tap="onModalIncrement"
+                >＋</text>
+              </view>
+              <view
+                wx:if="{{modalEntries.length > 1}}"
+                class="remove-badge modal-entry-remove"
+                data-id="{{item.categoryId}}"
+                bind:tap="onModalRemove"
+              >×</view>
+            </view>
+          </view>
+
+          <view wx:if="{{modalAvailable.length > 0}}" class="modal-add-entry" bind:tap="onModalAdd">
+            <text class="modal-add-icon">＋</text>
+            <text class="modal-add-text">添加分类</text>
+          </view>
+        </view>
+
+        <view class="modal-footer">
+          <view wx:if="{{!modalIsActive}}" class="modal-btn modal-btn--primary" bind:tap="onModalSetActive">
+            设为当前
+          </view>
+          <view wx:else class="modal-btn modal-btn--muted" bind:tap="onModalUnsetActive">
+            取消生效
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

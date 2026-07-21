@@ -1,0 +1,77 @@
+<view class="page">
+  <view wx:if="{{joining}}" class="join-loading">
+    <text class="join-loading__text">加入中…</text>
+  </view>
+
+  <block wx:elif="{{showJoinPrompt}}">
+    <view class="join-card">
+      <text class="join-card__title">你被邀请加入</text>
+      <text class="join-card__name">{{joinPromptGroupName}}</text>
+      <text class="join-card__desc">邀请码：{{joinCode}}</text>
+      <view class="btn btn--primary" bind:tap="onConfirmJoin">
+        {{joinBtnText}}
+      </view>
+      <text wx:if="{{joinError}}" class="form-error">{{joinError}}</text>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="section">
+      <view class="section-title">厨房信息</view>
+      <view class="info-row" bind:tap="onTapName">
+        <text class="info-label">厨房名</text>
+        <view class="info-value-row">
+          <input
+            wx:if="{{editingName}}"
+            class="name-input"
+            value="{{editValue}}"
+            maxlength="12"
+            focus
+            bind:input="onNameInput"
+            bind:blur="onCancelName"
+            bind:confirm="onConfirmName"
+          />
+          <text wx:else class="info-value">{{groupName}}</text>
+          <text class="info-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">
+        <text>成员 · {{members.length}}/5</text>
+      </view>
+      <view wx:for="{{members}}" wx:key="openid" class="member-row">
+        <view class="member-avatar">
+          <text class="member-avatar__text">{{item.initial}}</text>
+        </view>
+        <text class="member-name">{{item.nickName}}</text>
+        <text wx:if="{{item.isOwner}}" class="member-tag">厨师长</text>
+        <view
+          wx:if="{{isOwner && item.openid !== myOpenid}}"
+          class="member-remove"
+          data-openid="{{item.openid}}"
+          data-name="{{item.nickName}}"
+          bind:tap="onKick"
+        >
+          <text class="member-remove__icon">×</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <button class="action-btn action-btn--invite" open-type="share">
+        邀请成员
+      </button>
+    </view>
+
+    <view class="section section--danger">
+      <view wx:if="{{!isOwner}}" class="action-btn action-btn--leave" bind:tap="onLeave">
+        <text>退出厨房</text>
+      </view>
+      <view wx:if="{{isOwner}}" class="action-btn action-btn--dissolve" bind:tap="onDissolve">
+        <text>解散厨房</text>
+      </view>
+    </view>
+  </block>
+</view>

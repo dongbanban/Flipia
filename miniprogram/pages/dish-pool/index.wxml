@@ -1,0 +1,209 @@
+<group-switcher
+  groups="{{groups}}"
+  active-group-id="{{activeGroupId}}"
+  openid="{{openid}}"
+  bind:change="onGroupChange"
+  bind:create="onGroupCreate"
+/>
+<view class="page">
+  <!-- 分类 tab 横向滚动 -->
+  <view class="tab-bar-wrap">
+    <scroll-view class="tab-bar" scroll-x enable-flex>
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="tab-item {{index === activeTab ? 'tab-item--active' : ''}}"
+        data-idx="{{index}}"
+        bind:tap="onTabChange"
+      >{{item.name}}</view>
+    </scroll-view>
+    <view wx:if="{{groups.length > 1}}" class="import-entry" bind:tap="onOpenImport">
+      <text class="import-entry__text">导入菜品</text>
+    </view>
+  </view>
+
+  <!-- 加载骨架屏 / 菜品列表 / 空状态 -->
+  <view class="dish-area">
+    <view wx:if="{{loading}}" class="skeleton-list">
+      <view wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="skeleton-card" />
+    </view>
+
+    <scroll-view wx:elif="{{dishes.length > 0}}" scroll-y class="dish-list">
+      <view
+        wx:for="{{dishes}}"
+        wx:key="_id"
+        class="dish-card {{item.enabled ? '' : 'dish-card--disabled'}}"
+        data-dish="{{item}}"
+        data-idx="{{index}}"
+        bind:tap="onOpenEdit"
+      >
+        <image
+          wx:if="{{item.images && item.images.length > 0}}"
+          class="dish-thumb"
+          src="{{item.images[0]}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="dish-thumb dish-thumb--placeholder" />
+        <view class="dish-info">
+          <text class="dish-name">{{item.name}}</text>
+          <text
+            wx:if="{{memberCount > 1 && item.creatorName}}"
+            class="dish-creator"
+          >大厨：{{item.creatorName}}</text>
+        </view>
+        <view class="dish-card-actions">
+          <view
+            class="dish-toggle-text {{item.enabled ? 'dish-toggle-text--on' : 'dish-toggle-text--off'}}"
+            data-dish="{{item}}"
+            data-idx="{{index}}"
+            catchtap="onToggleEnabled"
+          >{{item.enabled ? '已启用' : '已禁用'}}</view>
+          <view
+            class="dish-delete-btn"
+            data-dish="{{item}}"
+            catchtap="onCardDeleteDish"
+          >下架</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view wx:elif="{{categories.length > 0}}" class="empty-state">
+      <text class="empty-hint">还没有菜品，快去添加吧~</text>
+    </view>
+
+    <view wx:else class="empty-state">
+      <text class="empty-hint">暂无分类</text>
+    </view>
+  </view>
+
+  <!-- 浮动添加按钮 -->
+  <view wx:if="{{categories.length > 0}}" class="fab" bind:tap="onOpenAdd">+</view>
+
+  <!-- 添加/编辑表单弹层 -->
+  <view wx:if="{{formVisible}}" class="form-mask" bind:tap="onCloseForm" />
+  <view wx:if="{{formVisible}}" class="form-sheet">
+    <view class="form-header">
+      <text class="form-title">{{formMode === 'add' ? '添加菜品' : '编辑菜品'}}</text>
+      <view class="form-close" bind:tap="onCloseForm">✕</view>
+    </view>
+
+    <!-- 菜品名 -->
+    <view class="form-field">
+      <text class="form-label">菜品名</text>
+      <input
+        class="form-input {{formNameError ? 'form-input--error' : ''}}"
+        value="{{formData.name}}"
+        placeholder="最多 20 字"
+        maxlength="20"
+        bind:input="onFormNameInput"
+      />
+      <text wx:if="{{formNameError}}" class="form-error">{{formNameError}}</text>
+    </view>
+
+    <!-- 分类 -->
+    <view class="form-field">
+      <text class="form-label">分类</text>
+      <picker
+        mode="selector"
+        range="{{categories}}"
+        range-key="name"
+        value="{{formCategoryIdx}}"
+        bind:change="onFormCategoryChange"
+      >
+        <view class="form-picker">{{categories[formCategoryIdx].name}}</view>
+      </picker>
+    </view>
+
+    <!-- 图片上传 -->
+    <view class="form-field">
+      <text class="form-label">图片（最多 3 张）</text>
+      <view class="image-list">
+        <view
+          wx:for="{{formData.images}}"
+          wx:key="*this"
+          class="image-item"
+        >
+          <image class="image-preview" src="{{item}}" mode="aspectFill" />
+          <view class="remove-badge image-remove" data-idx="{{index}}" bind:tap="onRemoveImage">×</view>
+        </view>
+        <view
+          wx:if="{{formData.images.length < 3}}"
+          class="image-add {{formUploading ? 'image-add--uploading' : ''}}"
+          bind:tap="onChooseImages"
+        >
+          <text wx:if="{{formUploading}}">上传中…</text>
+          <text wx:else>+</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-submit {{formDirty ? '' : 'form-submit--disabled'}}" bind:tap="onSaveDish">保存</view>
+
+    <!-- 编辑模式：启用/禁用 + 下架 -->
+    <view wx:if="{{formMode === 'edit'}}" class="form-secondary-actions">
+      <view
+        class="form-toggle-btn {{formData.enabled ? 'form-toggle-btn--on' : 'form-toggle-btn--off'}}"
+        bind:tap="onFormToggleEnabled"
+      >{{formData.enabled ? '✓ 已启用' : '○ 已禁用'}}</view>
+      <view class="form-delete-btn" bind:tap="onFormDeleteDish">下架菜品</view>
+    </view>
+  </view>
+
+  <!-- 导入菜品弹层 -->
+  <view wx:if="{{importVisible}}" class="form-mask" bind:tap="onCloseImport" />
+  <view wx:if="{{importVisible}}" class="form-sheet">
+    <view class="form-header">
+      <text class="form-title">导入菜品</text>
+      <view class="form-close" bind:tap="onCloseImport">✕</view>
+    </view>
+
+    <!-- 第一步：选择源厨房 -->
+    <block wx:if="{{importStep === 'selectGroup'}}">
+      <view class="form-field">
+        <text class="form-label">选择源厨房</text>
+        <picker
+          mode="selector"
+          range="{{importSourceGroups}}"
+          range-key="name"
+          value="{{importSourceGroupIdx}}"
+          bind:change="onImportSourceGroupChange"
+        >
+          <view class="form-picker">{{importSourceGroups[importSourceGroupIdx].name}}</view>
+        </picker>
+      </view>
+      <view class="form-submit" bind:tap="onImportNextStep">
+        <text wx:if="{{importLoadingCategories}}">加载中…</text>
+        <text wx:else>下一步</text>
+      </view>
+    </block>
+
+    <!-- 第二步：勾选分类 -->
+    <block wx:elif="{{importStep === 'selectCategories'}}">
+      <view class="form-field">
+        <text class="form-label">勾选要导入的分类</text>
+      </view>
+      <scroll-view scroll-y class="import-category-list">
+        <view
+          wx:for="{{importSourceCategories}}"
+          wx:key="id"
+          class="import-cat-item"
+          data-idx="{{index}}"
+          bind:tap="onImportToggleCategory"
+        >
+          <view class="import-cat-check {{item.checked ? 'import-cat-check--on' : ''}}">
+            <text wx:if="{{item.checked}}">✓</text>
+          </view>
+          <text class="import-cat-name">{{item.name}}</text>
+          <text class="import-cat-count">{{item.dishCount}}道</text>
+        </view>
+      </scroll-view>
+      <view class="import-actions">
+        <view class="import-prev-btn" bind:tap="onImportPrevStep">返回选择</view>
+        <view class="import-confirm-btn {{importing ? 'import-confirm-btn--loading' : ''}}" bind:tap="onConfirmImport">
+          <text wx:if="{{importing}}">导入中…</text>
+          <text wx:else>确认导入</text>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

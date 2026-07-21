@@ -1,0 +1,13 @@
+page {
+  --color-primary: #c8815e; /* 暖陶色，强调色 */
+  --color-primary-light: #faf0e9; /* 暖陶色极淡背景 */
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f6faf7;
+  --color-text: #1a1a1a;
+  --color-text-secondary: #888888;
+  --color-disabled: #c8c8c8;
+  --radius-card: 16rpx;
+  --radius-btn: 48rpx;
+  --spacing-md: 24rpx;
+  --spacing-lg: 40rpx;
+}

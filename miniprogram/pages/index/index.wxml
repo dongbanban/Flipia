@@ -1,0 +1,92 @@
+<group-switcher
+  groups="{{groups}}"
+  active-group-id="{{activeGroupId}}"
+  openid="{{openid}}"
+  bind:change="onGroupChange"
+  bind:create="onGroupCreate"
+/>
+<view class="page">
+  <view wx:if="{{phase === 'idle' || phase === ''}}" class="idle-area">
+    <view wx:if="{{loadingConfig}}" class="loading-hint">
+      <text>加载中…</text>
+    </view>
+    <block wx:else>
+      <view wx:if="{{activeConfigName}}" class="config-switcher" bind:tap="onSwitchConfig">
+        <text class="config-label">抽取方案:</text>
+        <text class="config-name">{{activeConfigName}}</text>
+        <text wx:if="{{configGroupNames.length > 1}}" class="config-arrow"> ›</text>
+      </view>
+      <button
+        class="draw-btn {{validationError ? 'draw-btn--disabled' : ''}}"
+        disabled="{{!!validationError}}"
+        bind:tap="onStartDraw"
+      >开始抽取</button>
+      <text wx:if="{{validationError}}" class="validation-error">{{validationError}}</text>
+    </block>
+  </view>
+
+  <view wx:elif="{{phase === 'drawing'}}" class="drawing-area">
+    <view class="auto-flip-bar">
+      <button
+        class="auto-flip-btn {{autoFlipping ? 'auto-flip-btn--disabled' : ''}}"
+        disabled="{{autoFlipping}}"
+        bind:tap="onAutoFlip"
+      >一键翻牌</button>
+    </view>
+    <view class="cards-grid">
+      <view
+        wx:for="{{drawCards}}"
+        wx:key="id"
+        data-idx="{{index}}"
+        class="card-container"
+      >
+        <view class="card-inner {{item.flipped ? 'card-inner--flipped' : ''}} {{item.redrawing ? 'card-inner--redrawing' : ''}}" bind:tap="onFlipCard" data-idx="{{index}}">
+          <view class="card-face card-back">
+            <text class="card-back-icon">?</text>
+            <text class="card-back-label">{{item.categoryName}}</text>
+          </view>
+          <view class="card-face card-front">
+            <image
+              wx:if="{{item.imageUrl}}"
+              class="card-image"
+              src="{{item.imageUrl}}"
+              mode="aspectFill"
+            />
+            <view class="card-name-wrap">
+              <text class="card-name">{{item.dishName}}</text>
+            </view>
+            <view
+              wx:if="{{item.flipped && !item.redrawing}}"
+              class="redraw-btn"
+              data-idx="{{index}}"
+              catch:tap="onRedrawCard"
+            >
+              <text class="redraw-text">换一道</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="drawing-actions">
+      <text class="back-btn" bind:tap="onBackToIdle">返回</text>
+      <view class="drawing-actions-right">
+        <button class="redraw-all-btn {{flippedCount > 0 ? '' : 'redraw-all-btn--disabled'}}" disabled="{{flippedCount === 0}}" bind:tap="onStartDraw">重抽</button>
+        <button
+          class="confirm-btn {{flippedCount === drawCards.length ? '' : 'confirm-btn--disabled'}}"
+          disabled="{{flippedCount < drawCards.length}}"
+          bind:tap="onConfirmDraw"
+        >就吃这个</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{!todaySummary && (phase === 'idle' || phase === '') && !loadingConfig}}" class="guide-placeholder">
+    <text class="guide-text">随手一抽，决定当餐</text>
+  </view>
+
+  <view wx:if="{{todaySummary}}" class="summary-bar" bind:tap="onGoHistory">
+    <text class="summary-text">{{todaySummary}}</text>
+    <text class="summary-arrow"> ›</text>
+  </view>
+</view>

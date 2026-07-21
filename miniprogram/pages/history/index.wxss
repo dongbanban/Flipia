@@ -1,0 +1,134 @@
+.page {
+  position: absolute;
+  top: 88rpx;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-bg-secondary);
+  overflow-y: auto;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.loading-hint {
+  color: var(--color-text-secondary);
+  font-size: 28rpx;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  gap: 16rpx;
+}
+
+.empty-hint {
+  color: var(--color-text-secondary);
+  font-size: 28rpx;
+}
+
+.empty-sub {
+  color: var(--color-text-secondary);
+  font-size: 24rpx;
+  opacity: 0.6;
+}
+
+.list {
+  padding: 24rpx 32rpx;
+}
+
+.day-group {
+  margin-bottom: 32rpx;
+}
+
+.day-header {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  margin-bottom: 16rpx;
+  padding-left: 4rpx;
+}
+
+.record-card {
+  background-color: var(--color-bg);
+  border-radius: var(--radius-card);
+  padding: 28rpx;
+  margin-bottom: 16rpx;
+}
+
+.record-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.record-time {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}
+
+.record-drawer {
+  font-size: 22rpx;
+  color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  border-radius: 24rpx;
+  padding: 4rpx 16rpx;
+  margin-left: 16rpx;
+}
+
+.record-group {
+  margin-top: 8rpx;
+  font-size: 28rpx;
+  color: var(--color-text);
+  line-height: 1.8;
+}
+
+.record-category {
+  font-weight: 600;
+}
+
+.record-dish {
+  margin-right: 12rpx;
+}
+
+.record-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+
+.record-photo-item {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.record-photo-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-card);
+}
+
+.record-photo-add {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed #d9d9d9;
+  border-radius: var(--radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56rpx;
+  color: #bbb;
+}
+
+.record-photo-add--uploading {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+}

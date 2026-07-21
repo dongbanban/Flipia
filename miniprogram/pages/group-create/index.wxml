@@ -1,0 +1,65 @@
+<view class="page">
+  <view class="form">
+    <view class="form-field">
+      <text class="form-label">厨房名</text>
+      <input
+        class="form-input {{nameError ? 'form-input--error' : ''}}"
+        value="{{groupName}}"
+        placeholder="起个名字吧～"
+        maxlength="12"
+        bind:input="onNameInput"
+      />
+      <text wx:if="{{nameError}}" class="form-error">{{nameError}}</text>
+    </view>
+
+    <view class="import-toggle" bind:tap="onToggleImport">
+      <view class="toggle-box {{importEnabled ? 'toggle-box--checked' : ''}}">
+        <text wx:if="{{importEnabled}}" class="toggle-check">✓</text>
+      </view>
+      <text class="toggle-label">从已有厨房导入</text>
+    </view>
+
+    <block wx:if="{{importEnabled}}">
+      <view class="form-field">
+        <text class="form-label">选择源厨房</text>
+        <picker
+          mode="selector"
+          range="{{sourceGroups}}"
+          range-key="name"
+          bind:change="onSelectSourceGroup"
+        >
+          <view class="form-picker {{sourceGroupIdx >= 0 ? '' : 'form-picker--placeholder'}}">
+            {{sourceGroupIdx >= 0 ? sourceGroupName : '请选择厨房'}}
+          </view>
+        </picker>
+      </view>
+
+      <view wx:if="{{sourceGroupIdx >= 0}}" class="category-section">
+        <text class="form-label">勾选要导入的分类</text>
+        <view wx:if="{{sourceLoading}}" class="loading-row">
+          <text class="loading-hint">加载中…</text>
+        </view>
+        <view wx:elif="{{sourceCategories.length > 0}}" class="category-grid">
+          <view
+            wx:for="{{sourceCategories}}"
+            wx:key="id"
+            class="category-chip {{selectedCategoryIds.indexOf(item.id) !== -1 ? 'category-chip--selected' : ''}}"
+            data-id="{{item.id}}"
+            bind:tap="onToggleCategory"
+          >
+            <text class="category-chip__text">{{item.name}}</text>
+            <text wx:if="{{selectedCategoryIds.indexOf(item.id) !== -1}}" class="category-chip__check">✓</text>
+          </view>
+        </view>
+        <view wx:else class="loading-row">
+          <text class="loading-hint">该厨房暂无分类</text>
+        </view>
+      </view>
+    </block>
+
+    <view
+      class="submit-btn {{submitting ? 'submit-btn--disabled' : ''}}"
+      bind:tap="onSubmit"
+    >{{submitting ? '创建中…' : '创建厨房'}}</view>
+  </view>
+</view>

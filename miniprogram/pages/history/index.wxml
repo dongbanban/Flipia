@@ -1,0 +1,61 @@
+<group-switcher
+  groups="{{groups}}"
+  active-group-id="{{activeGroupId}}"
+  openid="{{openid}}"
+  bind:change="onGroupChange"
+  bind:create="onGroupCreate"
+/>
+<view class="page">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text class="loading-hint">加载中…</text>
+  </view>
+
+  <view wx:elif="{{empty}}" class="empty-state">
+    <text class="empty-hint">暂无记录</text>
+    <text class="empty-sub">抽取确认后记录将出现在这里</text>
+  </view>
+
+  <view wx:else class="list">
+    <view wx:for="{{dayGroups}}" wx:key="date" class="day-group">
+      <view class="day-header">{{item.label}}</view>
+      <view wx:for="{{item.records}}" wx:key="_id" wx:for-item="record" class="record-card">
+        <view class="record-head">
+          <text class="record-time">{{record.time}}</text>
+          <text wx:if="{{memberCount > 1 && record.drawerLabel}}" class="record-drawer">{{record.drawerLabel}}</text>
+        </view>
+        <view wx:for="{{record.results}}" wx:key="categoryId" wx:for-item="group" class="record-group">
+          <text class="record-category">{{group.categoryName}}：</text>
+          <block wx:for="{{group.dishes}}" wx:key="dishId" wx:for-item="dish">
+            <text class="record-dish">{{dish.dishName}}</text>
+          </block>
+        </view>
+        <view class="record-photos">
+          <view
+            wx:for="{{record.images}}"
+            wx:key="*this"
+            wx:for-item="img"
+            class="record-photo-item"
+          >
+            <image
+              class="record-photo-thumb"
+              src="{{img}}"
+              mode="aspectFill"
+              data-images="{{record.images}}"
+              data-current="{{img}}"
+              bind:tap="onPreviewRecordImage"
+            />
+          </view>
+          <view
+            wx:if="{{!record.images || record.images.length < 3}}"
+            class="record-photo-add {{uploadingRecordId === record._id ? 'record-photo-add--uploading' : ''}}"
+            data-record-id="{{record._id}}"
+            bind:tap="onRecordChooseImage"
+          >
+            <text wx:if="{{uploadingRecordId === record._id}}">上传中…</text>
+            <text wx:else>+</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,11 @@
+@import "styles/variables.wxss";
+@import "styles/badge.wxss";
+
+page {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue",
+    sans-serif;
+  box-sizing: border-box;
+}

@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "group-switcher": "/components/group-switcher/index"
+  }
+}

@@ -1,0 +1,69 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="loading-state">
+    <text class="loading-hint">加载中…</text>
+  </view>
+
+  <view wx:else class="content">
+    <view class="section-title">当前分类</view>
+
+    <view class="tag-grid">
+      <block wx:for="{{categories}}" wx:key="id">
+
+        <!-- 普通展示态 -->
+        <view wx:if="{{editingId !== item.id}}" class="tag-item">
+          <text
+            class="tag-name"
+            data-id="{{item.id}}"
+            bind:tap="onStartRename"
+          >{{item.name}}</text>
+          <view
+            class="remove-badge tag-delete"
+            data-id="{{item.id}}"
+            catch:tap="onDelete"
+          >×</view>
+        </view>
+
+        <!-- 编辑态 -->
+        <view wx:else class="tag-edit-group">
+          <view class="tag-edit-row">
+            <input
+              class="tag-input {{editError ? 'tag-input--error' : ''}}"
+              value="{{editValue}}"
+              maxlength="10"
+              bind:input="onRenameInput"
+              focus
+            />
+            <text class="tag-edit-done" bind:tap="onConfirmRename">完成</text>
+            <text class="tag-edit-cancel" bind:tap="onCancelRename">取消</text>
+          </view>
+          <text wx:if="{{editError}}" class="tag-error">{{editError}}</text>
+        </view>
+      </block>
+
+      <!-- 添加按钮 / 添加输入 -->
+      <view wx:if="{{!adding}}" class="tag-item tag-item--add" bind:tap="onStartAdd">
+        <text class="tag-add-icon">＋</text>
+      </view>
+
+      <view wx:if="{{adding}}" class="tag-edit-group">
+        <view class="tag-edit-row">
+          <input
+            class="tag-input {{addError ? 'tag-input--error' : ''}}"
+            value="{{addValue}}"
+            placeholder="新分类名"
+            maxlength="10"
+            bind:input="onAddInput"
+            focus
+          />
+          <text class="tag-edit-done" bind:tap="onConfirmAdd">完成</text>
+          <text class="tag-edit-cancel" bind:tap="onCancelAdd">取消</text>
+        </view>
+        <text wx:if="{{addError}}" class="tag-error">{{addError}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{categories.length === 0 && !adding}}" class="empty-state">
+      <text class="empty-hint">点击 ＋ 新增分类</text>
+    </view>
+  </view>
+</view>

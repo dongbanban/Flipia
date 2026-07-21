@@ -1,0 +1,135 @@
+.group-switcher {
+  position: relative;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.group-switcher__bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  background-color: var(--color-bg);
+}
+
+.group-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--color-text);
+  max-width: 160rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow {
+  font-size: 20rpx;
+  color: var(--color-text-secondary);
+  margin-left: 8rpx;
+}
+
+.popup-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  z-index: 200;
+}
+
+.popup-panel {
+  position: fixed;
+  top: 88rpx;
+  left: 24rpx;
+  right: 24rpx;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-card);
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  z-index: 201;
+  overflow: hidden;
+}
+
+.popup-title {
+  font-size: 26rpx;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 24rpx 0 16rpx;
+  border-bottom: 1rpx solid var(--color-bg-secondary);
+}
+
+.popup-list {
+  max-height: 480rpx;
+}
+
+.popup-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  border-bottom: 1rpx solid var(--color-bg-secondary);
+}
+
+.popup-item:active {
+  background-color: var(--color-bg-secondary);
+}
+
+.popup-item--active {
+  background-color: var(--color-primary-light);
+}
+
+.popup-item__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-item__name {
+  font-size: 30rpx;
+  color: var(--color-text);
+}
+
+.popup-item__count {
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  margin-top: 4rpx;
+}
+
+.popup-item__check {
+  font-size: 32rpx;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.popup-empty {
+  padding: 48rpx 32rpx;
+  text-align: center;
+}
+
+.popup-empty__text {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+.popup-create {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 0;
+  border-top: 1rpx solid var(--color-bg-secondary);
+}
+
+.popup-create:active {
+  background-color: var(--color-bg-secondary);
+}
+
+.popup-create__icon {
+  font-size: 36rpx;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-right: 8rpx;
+}
+
+.popup-create__label {
+  font-size: 28rpx;
+  color: var(--color-primary);
+}

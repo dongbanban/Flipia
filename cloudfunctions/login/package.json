@@ -1,0 +1,15 @@
+{
+  "name": "@flipia/cf-login",
+  "version": "1.0.0",
+  "description": "获取用户 openid",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1"
+  }
+}

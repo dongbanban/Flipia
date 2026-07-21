@@ -1,0 +1,36 @@
+<view class="group-switcher">
+  <view class="group-switcher__bar" bind:tap="onToggle">
+    <text class="group-name">{{activeGroupName}}</text>
+    <text class="arrow">▼</text>
+  </view>
+
+  <view wx:if="{{showPopup}}" class="popup-mask" bind:tap="onClose" catchtouchmove="noop" />
+  <view wx:if="{{showPopup}}" class="popup-panel">
+    <view class="popup-title">切换厨房</view>
+
+    <scroll-view wx:if="{{groups.length > 0}}" class="popup-list" scroll-y>
+      <view
+        wx:for="{{groups}}"
+        wx:key="_id"
+        class="popup-item {{item._id === activeGroupId ? 'popup-item--active' : ''}}"
+        data-id="{{item._id}}"
+        bind:tap="onSelectGroup"
+      >
+        <view class="popup-item__info">
+          <text class="popup-item__name">{{item.name}}</text>
+          <text class="popup-item__count">{{item.members.length}} 名成员</text>
+        </view>
+        <text wx:if="{{item._id === activeGroupId}}" class="popup-item__check">✓</text>
+      </view>
+    </scroll-view>
+
+    <view wx:else class="popup-empty">
+      <text class="popup-empty__text">还没有厨房，快去创建一个吧</text>
+    </view>
+
+    <view class="popup-create" bind:tap="onCreateGroup">
+      <text class="popup-create__icon">+</text>
+      <text class="popup-create__label">新建厨房</text>
+    </view>
+  </view>
+</view>
