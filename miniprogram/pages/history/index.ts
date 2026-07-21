@@ -427,108 +427,248 @@ Page({
       query
         .select("#shareCanvas")
         .fields({ node: true, size: true })
-        .exec((res) => {
-          if (!res || !res[0] || !res[0].node) {
-            reject(new Error("Canvas node not found"));
-            return;
-          }
+        .exec(async () => {
+          try {
+            // Re-query to get the canvas node (exec callback is sync-only,
+            // so we use a second query inside the async wrapper)
+            const query2 = wx.createSelectorQuery();
+            const nodeRes = await new Promise<any>((res) => {
+              query2
+                .select("#shareCanvas")
+                .fields({ node: true, size: true })
+                .exec((r) => res(r));
+            });
 
-          const canvas = res[0].node as WechatMiniprogram.Canvas;
-          const ctx = canvas.getContext("2d") as any;
-          const dpr = wx.getSystemInfoSync().pixelRatio;
-          const sysInfo = wx.getSystemInfoSync();
-          const scale = sysInfo.windowWidth / 750; // px per rpx
-
-          // Layout constants (in rpx, converted to px)
-          const padding = 48 * scale;
-          const titleSize = 36 * scale;
-          const timeSize = 24 * scale;
-          const catSize = 30 * scale;
-          const dishSize = 26 * scale;
-          const indent = 24 * scale;
-          const lineHeightFactor = 1.6;
-          const sectionGap = 16 * scale;
-
-          // Calculate total height for a single record
-          let y = padding;
-
-          // Title (date label)
-          y += titleSize * lineHeightFactor;
-          y += sectionGap;
-
-          // Time
-          y += timeSize * lineHeightFactor;
-          y += 8 * scale;
-
-          // Result groups
-          for (const group of record.results) {
-            y += catSize * lineHeightFactor;
-            for (const _dish of group.dishes) {
-              y += dishSize * lineHeightFactor;
+            if (!nodeRes || !nodeRes[0] || !nodeRes[0].node) {
+              reject(new Error("Canvas node not found"));
+              return;
             }
-          }
 
-          y += padding; // bottom padding
+            const canvas = nodeRes[0].node as WechatMiniprogram.Canvas;
+            const ctx = canvas.getContext("2d") as any;
+            const dpr = wx.getSystemInfoSync().pixelRatio;
+            const sysInfo = wx.getSystemInfoSync();
+            const scale = sysInfo.windowWidth / 750;
 
-          const canvasWidth = sysInfo.windowWidth;
-          const canvasHeight = Math.ceil(y);
+            // ── Colors ──
+            const C_BG = "#ffffff";
+            const C_TEXT = "#1a1a1a";
+            const C_SECONDARY = "#888888";
+            const C_PRIMARY = "#c8815e";
+            const C_PRIMARY_LIGHT = "#faf0e9";
+            const C_PLACEHOLDER = "#d9d9d9";
+            const CARD_R = 16 * scale;
 
-          canvas.width = canvasWidth * dpr;
-          canvas.height = canvasHeight * dpr;
-          ctx.scale(dpr, dpr);
+            // ── Layout (px) ──
+            const MARGIN = 32 * scale;
+            const CARD_PAD = 20 * scale;
+            const BODY_GAP = 16 * scale;
+            const IMG_SIZE = 120 * scale;
+            const HEAD_MB = 10 * scale;
+            const GROUP_MT = 4 * scale;
 
-          // Draw white background
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-          // Draw content
-          ctx.textBaseline = "top";
-          y = padding;
+            // ── Fonts (px) ──
+            const FS_TIME = 24 * scale;
+            const FS_DRAWER = 20 * scale;
+            const FS_CAT = 28 * scale;
+            const FS_DISH = 28 * scale;
+            const FS_PLUS = 36 * scale;
+            const FS_PLACEHOLDER = 18 * scale;
+            const LH = 1.4;
+            const DR_PAD_V = 2 * scale;
+            const DR_PAD_H = 12 * scale;
+            const DR_R = 24 * scale;
 
-          // Title: date label
-          ctx.fillStyle = "#333333";
-          ctx.font = `bold ${titleSize}px sans-serif`;
-          ctx.fillText(dateLabel, padding, y);
-          y += titleSize * lineHeightFactor + sectionGap;
+            const canvasWidth = sysInfo.windowWidth;
+            const cardWidth = canvasWidth - 2 * MARGIN;
+            const bodyWidth = cardWidth - 2 * CARD_PAD;
+            const infoWidth = bodyWidth - IMG_SIZE - BODY_GAP;
 
-          // Time
-          ctx.fillStyle = "#999999";
-          ctx.font = `${timeSize}px sans-serif`;
-          ctx.fillText(record.time, padding, y);
-          y += timeSize * lineHeightFactor + 8 * scale;
+            // ── Helpers ──
+            const roundRect = (
+              x: number, y: number, w: number, h: number, r: number,
+            ) => {
+              ctx.beginPath();
+              ctx.moveTo(x + r, y);
+              ctx.lineTo(x + w - r, y);
+              ctx.arcTo(x + w, y, x + w, y + r, r);
+              ctx.lineTo(x + w, y + h - r);
+              ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+              ctx.lineTo(x + r, y + h);
+              ctx.arcTo(x, y + h, x, y + h - r, r);
+              ctx.lineTo(x, y + r);
+              ctx.arcTo(x, y, x + r, y, r);
+              ctx.closePath();
+            };
 
-          // Result groups
-          ctx.fillStyle = "#333333";
-          for (const group of record.results) {
-            // Category name
-            ctx.font = `bold ${catSize}px sans-serif`;
-            ctx.fillText(group.categoryName, padding, y);
-            y += catSize * lineHeightFactor;
+            const lineH = (fs: number) => fs * LH;
+            const measure = (text: string, fs: number, bold = false) => {
+              ctx.font = `${bold ? "bold " : ""}${fs}px sans-serif`;
+              return ctx.measureText(text).width;
+            };
 
-            // Dish names
-            ctx.font = `${dishSize}px sans-serif`;
-            for (const dish of group.dishes) {
-              ctx.fillText(dish.dishName, padding + indent, y);
-              y += dishSize * lineHeightFactor;
+            // ── Load image ──
+            let loadedImg: any = null;
+            if (record.images && record.images.length > 0) {
+              try {
+                const urlRes = await wx.cloud.getTempFileURL({
+                  fileList: [record.images[0]],
+                });
+                const tempUrl = urlRes.fileList[0]?.tempFileURL;
+                if (tempUrl) {
+                  loadedImg = canvas.createImage();
+                  loadedImg.src = tempUrl;
+                  await new Promise<void>((res, rej) => {
+                    loadedImg.onload = () => res();
+                    loadedImg.onerror = () => rej(new Error("img fail"));
+                  });
+                }
+              } catch {
+                loadedImg = null;
+              }
             }
-          }
+            const hasImage = loadedImg !== null;
 
-          // Convert to temp file
-          wx.canvasToTempFilePath({
-            canvas,
-            x: 0,
-            y: 0,
-            width: canvasWidth,
-            height: canvasHeight,
-            destWidth: canvasWidth * dpr,
-            destHeight: canvasHeight * dpr,
-            success: (fileRes) => {
-              resolve(fileRes.tempFilePath);
-            },
-            fail: (err) => {
-              reject(err);
-            },
-          });
+            // ── Height calculation ──
+            let infoH = lineH(FS_TIME);
+            infoH += HEAD_MB;
+            for (const group of record.results) {
+              infoH += GROUP_MT;
+              infoH += lineH(FS_CAT);
+            }
+            const bodyH = Math.max(IMG_SIZE, infoH);
+            const cardH = CARD_PAD + bodyH + CARD_PAD;
+            const canvasHeight = Math.ceil(MARGIN + cardH + MARGIN);
+
+            canvas.width = canvasWidth * dpr;
+            canvas.height = canvasHeight * dpr;
+            ctx.scale(dpr, dpr);
+            ctx.textBaseline = "top";
+
+            // ── Draw background ──
+            ctx.fillStyle = C_BG;
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            // ── Card background with shadow ──
+            let y = MARGIN;
+            const cardX = MARGIN;
+            const cardTop = y;
+            ctx.save();
+            ctx.shadowColor = "rgba(0,0,0,0.06)";
+            ctx.shadowBlur = 8 * scale;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 2 * scale;
+            ctx.fillStyle = C_BG;
+            roundRect(cardX, cardTop, cardWidth, cardH, CARD_R);
+            ctx.fill();
+            ctx.restore();
+
+            // ── Card content ──
+            y += CARD_PAD;
+            const bodyX = cardX + CARD_PAD;
+            const bodyTop = y;
+
+            // Left: image or placeholder
+            if (hasImage) {
+              ctx.save();
+              roundRect(bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
+              ctx.clip();
+              ctx.drawImage(loadedImg, bodyX, bodyTop, IMG_SIZE, IMG_SIZE);
+              ctx.restore();
+            } else {
+              ctx.setLineDash([4 * scale, 4 * scale]);
+              ctx.strokeStyle = C_PLACEHOLDER;
+              ctx.lineWidth = 2 * scale;
+              roundRect(bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
+              ctx.stroke();
+              ctx.setLineDash([]);
+
+              ctx.textAlign = "center";
+              const cx = bodyX + IMG_SIZE / 2;
+              ctx.fillStyle = C_PLACEHOLDER;
+              ctx.font = `${FS_PLUS}px sans-serif`;
+              ctx.fillText(
+                "+",
+                cx,
+                bodyTop + IMG_SIZE / 2 - FS_PLUS / 2 - 4 * scale,
+              );
+              ctx.fillStyle = C_PRIMARY;
+              ctx.font = `${FS_PLACEHOLDER}px sans-serif`;
+              ctx.fillText(
+                "Flipia时刻",
+                cx,
+                bodyTop + IMG_SIZE / 2 + 4 * scale,
+              );
+              ctx.textAlign = "left";
+            }
+
+            // Right: info
+            const infoX = bodyX + IMG_SIZE + BODY_GAP;
+            let iY = bodyTop;
+
+            ctx.fillStyle = C_SECONDARY;
+            ctx.font = `${FS_TIME}px sans-serif`;
+            ctx.fillText(record.time, infoX, iY);
+
+            if (record.drawerLabel) {
+              const tW = measure(record.time, FS_TIME);
+              const dW = measure(record.drawerLabel, FS_DRAWER);
+              const bX = infoX + tW + 10 * scale;
+              const bW = dW + DR_PAD_H * 2;
+              const bH = FS_DRAWER * LH + DR_PAD_V * 2;
+              ctx.fillStyle = C_PRIMARY_LIGHT;
+              roundRect(bX, iY, bW, bH, DR_R);
+              ctx.fill();
+              ctx.fillStyle = C_PRIMARY;
+              ctx.font = `${FS_DRAWER}px sans-serif`;
+              ctx.fillText(record.drawerLabel, bX + DR_PAD_H, iY + DR_PAD_V);
+            }
+
+            iY += lineH(FS_TIME) + HEAD_MB;
+
+            ctx.fillStyle = C_TEXT;
+            for (const group of record.results) {
+              iY += GROUP_MT;
+              const catText = `${group.categoryName}：`;
+              const dishText = group.dishes.map((d: typeof group.dishes[number]) => d.dishName).join(" ");
+              ctx.font = `bold ${FS_CAT}px sans-serif`;
+              ctx.fillText(catText, infoX, iY);
+              const catW = measure(catText, FS_CAT, true);
+              const remaining = infoWidth - catW;
+              if (remaining > 8 * scale && dishText) {
+                let drawText = dishText;
+                let dw = measure(drawText, FS_DISH);
+                while (dw > remaining - 4 * scale && drawText.length > 1) {
+                  drawText = drawText.slice(0, -1);
+                  dw = measure(drawText + "…", FS_DISH);
+                }
+                if (dw > remaining) drawText = drawText.slice(0, -1) + "…";
+                ctx.font = `${FS_DISH}px sans-serif`;
+                ctx.fillText(drawText, infoX + catW, iY);
+              }
+              iY += lineH(FS_CAT);
+            }
+
+            // ── Export ──
+            wx.canvasToTempFilePath({
+              canvas,
+              x: 0,
+              y: 0,
+              width: canvasWidth,
+              height: canvasHeight,
+              destWidth: canvasWidth * dpr,
+              destHeight: canvasHeight * dpr,
+              success: (fileRes) => {
+                resolve(fileRes.tempFilePath);
+              },
+              fail: (err) => {
+                reject(err);
+              },
+            });
+          } catch (err) {
+            reject(err);
+          }
         });
     });
   },
