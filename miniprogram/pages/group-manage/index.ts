@@ -318,6 +318,23 @@ Page({
       return;
     }
 
+    const confirmRes =
+      await new Promise<WechatMiniprogram.ShowModalSuccessCallbackResult>(
+        (resolve) => {
+          wx.showModal({
+            title: "修改厨房名",
+            content: `确定将厨房名改为「${name}」？`,
+            confirmColor: "#c8815e",
+            success: resolve,
+          });
+        },
+      );
+
+    if (!confirmRes.confirm) {
+      // Keep editing state open so user can adjust
+      return;
+    }
+
     if (!(await checkTextWithToast(name))) return;
 
     wx.showLoading({ title: "保存中…", mask: true });
