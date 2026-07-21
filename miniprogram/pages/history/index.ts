@@ -39,6 +39,7 @@ Page({
 
   _db: null as ReturnType<typeof wx.cloud.database> | null,
   _groupId: "",
+  _loaded: false,
   /** Swipe gesture tracking */
   _trackingSwipe: false,
   _swipeStartTranslatePx: 0,
@@ -53,8 +54,9 @@ Page({
     if (this._groupId !== groupId) {
       this._groupId = groupId;
       this._db = wx.cloud.database();
+      this._loaded = false;
       this._loadHistory();
-    } else {
+    } else if (!this._loaded) {
       this._loadHistory();
     }
   },
@@ -78,38 +80,29 @@ Page({
     return group ? group.members.length : 0;
   },
 
-  onRecordChooseImage(e: WechatMiniprogram.TouchEvent) {
+  onRecordUploadImage(e: WechatMiniprogram.TouchEvent) {
     const recordId = (e.currentTarget.dataset as { recordId: string }).recordId;
-    const record = this._findRecord(recordId);
-    if (!record) return;
-    const currentImages = record.images || [];
-    const remaining = 3 - currentImages.length;
-    if (remaining <= 0) return;
 
     wx.chooseImage({
-      count: remaining,
+      count: 1,
       sizeType: ["compressed"],
       sourceType: ["album", "camera"],
       success: async (res) => {
         this.setData({ uploadingRecordId: recordId });
         wx.showLoading({ title: "上传中…", mask: true });
         try {
-          // Content security: check each image before upload
-          const safePaths: string[] = [];
-          for (const path of res.tempFilePaths) {
-            const result = await checkImage(path);
-            if (result.pass) {
-              safePaths.push(path);
-            } else {
-              wx.showToast({ title: "图片不合规，请更换", icon: "none" });
-            }
-          }
-          if (safePaths.length === 0) {
+          const result = await checkImage(res.tempFilePaths[0]);
+          if (!result.pass) {
             wx.hideLoading();
+            wx.showToast({ title: "图片不合规，请更换", icon: "none" });
             return;
           }
-          const fileIDs = await this._uploadHistoryImages(safePaths);
-          const merged = [...currentImages, ...fileIDs].slice(0, 3);
+          const fileIDs = await this._uploadHistoryImages([
+            res.tempFilePaths[0],
+          ]);
+          const record = this._findRecord(recordId);
+          const currentImages = record?.images || [];
+          const merged = [fileIDs[0], ...currentImages].slice(0, 3);
           await this._db!.collection("draw_history")
             .doc(recordId)
             .update({ data: { images: merged } });
@@ -117,7 +110,7 @@ Page({
           wx.hideLoading();
           wx.showToast({ title: "上传成功", icon: "success" });
         } catch (err) {
-          console.error("[history] upload images failed", err);
+          console.error("[history] upload image failed", err);
           wx.hideLoading();
           wx.showToast({ title: "上传失败，请重试", icon: "none" });
         } finally {
@@ -228,6 +221,7 @@ Page({
       }));
 
       this.setData({ dayGroups, loading: false, empty: false });
+      this._loaded = true;
     } catch (err) {
       console.error("[history] load failed", err);
       this.setData({ loading: false, empty: true });

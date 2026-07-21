@@ -13,4 +13,4 @@
 - [x] `group-switcher` 组件本身无需任何修改——复用现有逻辑和能力
 
 ## Comments
-- SHA: (pending commit)
+- `0fa6ce5` — feat(group-manage): add group-switcher component to kitchen management page

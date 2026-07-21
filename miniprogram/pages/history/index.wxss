@@ -126,40 +126,66 @@
   margin-right: 12rpx;
 }
 
-.record-photos {
+/* ── Card body: horizontal image + info layout ── */
+
+.card-body {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 12rpx;
+  gap: 16rpx;
+  align-items: flex-start;
 }
 
-.record-photo-item {
-  position: relative;
-  width: 140rpx;
-  height: 140rpx;
+/* Left image (Mode 1: has image) */
+
+.card-image-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  flex-shrink: 0;
+  border-radius: var(--radius-card);
+  overflow: hidden;
 }
 
-.record-photo-thumb {
+.card-image {
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-card);
 }
 
-.record-photo-add {
-  width: 140rpx;
-  height: 140rpx;
+/* Left placeholder (Mode 2: no image) */
+
+.card-placeholder {
+  width: 120rpx;
+  height: 120rpx;
+  flex-shrink: 0;
   border: 2rpx dashed #d9d9d9;
   border-radius: var(--radius-card);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 48rpx;
-  color: #bbb;
+  gap: 4rpx;
 }
 
-.record-photo-add--uploading {
-  font-size: 24rpx;
+.card-placeholder-icon {
+  font-size: 36rpx;
+  color: #bbb;
+  line-height: 1;
+}
+
+.card-placeholder-text {
+  font-size: 18rpx;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.card-placeholder-uploading {
+  font-size: 20rpx;
   color: var(--color-text-secondary);
+}
+
+/* Right info area */
+
+.card-info {
+  flex: 1;
+  min-width: 0;
 }
 
 /* ── Bottom action buttons (share + save image) ─ */
@@ -176,9 +202,9 @@
   align-items: center;
   justify-content: center;
   gap: 6rpx;
-  padding: 16rpx 0;
-  font-size: 24rpx;
-  color: var(--color-text-secondary);
+  padding: 24rpx 0;
+  font-size: 28rpx;
+  color: var(--color-primary);
   background: none;
   border: none;
   line-height: 1;
@@ -193,7 +219,7 @@
 }
 
 .record-action-icon {
-  font-size: 24rpx;
+  font-size: 30rpx;
 }
 
 /* ── Hidden share image canvas ────────────────── */
