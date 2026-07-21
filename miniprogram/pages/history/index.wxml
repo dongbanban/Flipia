@@ -33,6 +33,7 @@
         <!-- Delete button revealed behind card on swipe -->
         <view
           class="swipe-delete"
+          style="visibility: {{swipedRecordId === record._id ? 'visible' : 'hidden'}};"
           catchtap="onDeleteRecord"
           data-record-id="{{record._id}}"
         >
