@@ -43,9 +43,6 @@ const EMPTY_FORM: FormData = {
 
 Page({
   data: {
-    openid: "",
-    groups: [] as Array<{ _id: string; name: string; members: string[] }>,
-    activeGroupId: "",
     memberCount: 0,
     categories: [] as Category[],
     activeTab: 0,
@@ -86,45 +83,14 @@ Page({
   _uploadedFileIDs: [] as string[],
   _searchTimer: null as number | null,
 
-  onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
-    const app = getApp<AppInstance>();
-    app.switchGroup(e.detail.groupId);
-    const memberCount = this._getMemberCount(
-      app.globalData.groups,
-      e.detail.groupId,
-    );
-    this.setData({
-      activeGroupId: e.detail.groupId,
-      memberCount,
-    });
-    this._groupId = e.detail.groupId;
-    this.setData({
-      loading: false,
-      formVisible: false,
-      dishes: [],
-      activeTab: 0,
-    });
-    this._init();
-  },
-
-  onGroupCreate() {
-    wx.navigateTo({ url: "/pages/group-create/index" });
-  },
-
   async onLoad() {
     const app = getApp<AppInstance>();
     await app.whenReady();
     this._groupId = app.globalData.groupId;
     this._openid = app.globalData.openid;
     this._db = wx.cloud.database();
-    const memberCount = this._getMemberCount(
-      app.globalData.groups,
-      app.globalData.groupId,
-    );
+    const memberCount = this._getMemberCount();
     this.setData({
-      openid: app.globalData.openid,
-      groups: app.globalData.groups,
-      activeGroupId: app.globalData.groupId,
       memberCount,
     });
     this._init();
@@ -133,13 +99,8 @@ Page({
   async onShow() {
     const app = getApp<AppInstance>();
     await app.whenReady();
-    const memberCount = this._getMemberCount(
-      app.globalData.groups,
-      app.globalData.groupId,
-    );
+    const memberCount = this._getMemberCount();
     this.setData({
-      groups: app.globalData.groups,
-      activeGroupId: app.globalData.groupId,
       memberCount,
     });
     if (!this._shown) {
@@ -986,11 +947,9 @@ Page({
 
   noop() {},
 
-  _getMemberCount(
-    groups: Array<{ _id: string; name: string; members: string[] }>,
-    groupId: string,
-  ): number {
-    const group = groups.find((g) => g._id === groupId);
+  _getMemberCount(): number {
+    const app = getApp<AppInstance>();
+    const group = app.globalData.groups.find((g) => g._id === app.globalData.groupId);
     return group ? group.members.length : 0;
   },
 

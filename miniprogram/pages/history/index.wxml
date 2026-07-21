@@ -1,10 +1,3 @@
-<group-switcher
-  groups="{{groups}}"
-  active-group-id="{{activeGroupId}}"
-  openid="{{openid}}"
-  bind:change="onGroupChange"
-  bind:create="onGroupCreate"
-/>
 <view class="page">
   <view wx:if="{{loading}}" class="loading-state">
     <text class="loading-hint">加载中…</text>

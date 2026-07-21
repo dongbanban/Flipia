@@ -19,9 +19,6 @@ interface AppInstance {
 
 Page({
   data: {
-    openid: "",
-    groups: [] as Array<{ _id: string; name: string; members: string[] }>,
-    activeGroupId: "",
     memberCount: 0,
     dayGroups: [] as (DayGroup & {
       records: Array<
@@ -50,15 +47,8 @@ Page({
     const app = getApp<AppInstance>();
     await app.whenReady();
     const groupId = app.globalData.groupId;
-    const memberCount = this._getMemberCount(
-      app.globalData.groups,
-      groupId,
-    );
     this.setData({
-      openid: app.globalData.openid,
-      groups: app.globalData.groups,
-      activeGroupId: groupId,
-      memberCount,
+      memberCount: this._getMemberCount(),
     });
     if (this._groupId !== groupId) {
       this._groupId = groupId;
@@ -74,49 +64,17 @@ Page({
     await app.whenReady();
     this._groupId = app.globalData.groupId;
     this._db = wx.cloud.database();
-    const groups = app.globalData.groups as Array<{
-      _id: string;
-      name: string;
-      members: string[];
-    }>;
     const sysInfo = wx.getSystemInfoSync();
     this.setData({
-      groups,
-      activeGroupId: app.globalData.groupId,
-      openid: app.globalData.openid,
-      memberCount: this._getMemberCount(groups, app.globalData.groupId),
+      memberCount: this._getMemberCount(),
       deleteBtnPx: Math.round(150 * sysInfo.windowWidth / 750),
     });
     this._loadHistory();
   },
 
-  onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
+  _getMemberCount(): number {
     const app = getApp<AppInstance>();
-    app.switchGroup(e.detail.groupId);
-    const memberCount = this._getMemberCount(
-      app.globalData.groups,
-      e.detail.groupId,
-    );
-    this.setData({
-      activeGroupId: e.detail.groupId,
-      memberCount,
-      dayGroups: [],
-      loading: true,
-      empty: false,
-    });
-    this._groupId = e.detail.groupId;
-    this._loadHistory();
-  },
-
-  onGroupCreate() {
-    wx.navigateTo({ url: "/pages/group-create/index" });
-  },
-
-  _getMemberCount(
-    groups: Array<{ _id: string; name: string; members: string[] }>,
-    groupId: string,
-  ): number {
-    const group = groups.find((g) => g._id === groupId);
+    const group = app.globalData.groups.find((g) => g._id === app.globalData.groupId);
     return group ? group.members.length : 0;
   },
 
@@ -348,6 +306,7 @@ Page({
       wx.showModal({
         title: "确认删除",
         content: "确认删除该条记录？删除后不可恢复",
+        confirmColor: "#c8815e",
         success: resolve,
       });
     });

@@ -15,8 +15,6 @@ Page({
     openid: "",
     nickName: "微信用户",
     avatarUrl: "",
-    groups: [] as Array<{ _id: string; name: string; members: string[] }>,
-    activeGroupId: "",
     activeGroupName: "",
   },
 
@@ -32,26 +30,8 @@ Page({
       openid: app.globalData.openid,
       nickName,
       avatarUrl,
-      groups,
-      activeGroupId,
       activeGroupName: activeGroup ? activeGroup.name : "",
     });
-  },
-
-  onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
-    const app = getApp<AppInstance>();
-    app.switchGroup(e.detail.groupId);
-    const activeGroup = app.globalData.groups.find(
-      (g) => g._id === e.detail.groupId,
-    );
-    this.setData({
-      activeGroupId: e.detail.groupId,
-      activeGroupName: activeGroup ? activeGroup.name : "",
-    });
-  },
-
-  onGroupCreate() {
-    wx.navigateTo({ url: "/pages/group-create/index" });
   },
 
   onTapGroupManage() {
