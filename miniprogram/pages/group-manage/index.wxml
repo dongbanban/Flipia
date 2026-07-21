@@ -16,6 +16,14 @@
   </block>
 
   <block wx:else>
+    <group-switcher
+      groups="{{groups}}"
+      active-group-id="{{activeGroupId}}"
+      openid="{{openid}}"
+      bind:change="onGroupChange"
+      bind:create="onGroupCreate"
+    />
+
     <view class="section">
       <view class="section-title">厨房信息</view>
       <view class="info-row" bind:tap="onTapName">

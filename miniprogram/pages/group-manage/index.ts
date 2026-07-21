@@ -43,6 +43,9 @@ Page({
     members: [] as MemberInfo[],
     isOwner: false,
     myOpenid: "",
+    groups: [] as Array<{ _id: string; name: string; members: string[] }>,
+    activeGroupId: "",
+    openid: "",
     editingName: false,
     editValue: "",
     joinCode: "",
@@ -63,7 +66,12 @@ Page({
 
     const db = wx.cloud.database();
     this._db = db;
-    this.setData({ myOpenid: app.globalData.openid });
+    this.setData({
+      myOpenid: app.globalData.openid,
+      groups: app.globalData.groups,
+      activeGroupId: app.globalData.groupId,
+      openid: app.globalData.openid,
+    });
 
     if (options.joinCode) {
       this.setData({ joinCode: options.joinCode, joining: true });
@@ -134,6 +142,31 @@ Page({
     await this._loadGroupDetail(groupId);
     await this._loadMembers(groupId);
     this.setData({ loading: false });
+  },
+
+  onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
+    const app = getApp<AppInstance>();
+    app.switchGroup(e.detail.groupId);
+
+    const groups = app.globalData.groups;
+    const group = groups.find((g) => g._id === e.detail.groupId);
+    this._group = (group as GroupInfo | undefined) || null;
+
+    this.setData({
+      activeGroupId: e.detail.groupId,
+      groupId: e.detail.groupId,
+      groupName: group?.name || "",
+      members: [],
+      isOwner: false,
+      loading: true,
+    });
+
+    this._loadGroupDetail(e.detail.groupId);
+    this._loadMembers(e.detail.groupId);
+  },
+
+  onGroupCreate() {
+    wx.navigateTo({ url: "/pages/group-create/index" });
   },
 
   async _loadGroupDetail(groupId: string) {
