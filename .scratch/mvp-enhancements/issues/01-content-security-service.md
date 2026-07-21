@@ -4,7 +4,7 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] 新增云函数 `content-security`，`main` 方法接收 `{action, content}`，action 为 `'textCheck'` 时依次调用 `cloud.openapi.security.msgSecCheck` 和 `urlSecCheck`，返回 `{pass, reason}`
 - [ ] 新增客户端模块 `lib/content-security.ts`，暴露 `checkText(text)` 方法（调用云函数 `content-security` 的 `textCheck` action），返回 `{pass, reason}`

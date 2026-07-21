@@ -1,0 +1,9 @@
+{
+  "name": "@flipia/cf-content-security",
+  "version": "1.0.0",
+  "description": "内容安全检测：文本敏感词过滤 + URL 检测 + 图片鉴黄",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
