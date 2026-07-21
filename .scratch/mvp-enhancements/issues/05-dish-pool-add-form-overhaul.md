@@ -13,3 +13,7 @@
 - [x] 编辑模式新增烹饪描述：图片区域下方新增 textarea 组件，`maxlength="200"`，placeholder "烹饪要点、备注…"，双向绑定 `cookingDescription`。`dishes` 集合写入时带此字段。新增模式不显示此字段
 - [x] 移除列表页上的独立"导入菜品"入口（`import-entry` 所在 view 块）
 - [x] 新建分类不提供改名和删除能力（仅新增），新分类会被写入 `user_config.categories`
+
+## Comments
+
+`9c6bb57` — feat(dish-pool): overhaul add form with tabs, inline category creation, and cooking description

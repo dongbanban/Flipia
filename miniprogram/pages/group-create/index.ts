@@ -96,28 +96,45 @@ Page({
           ? (res.data[0] as { categories: Category[] }).categories
           : [];
 
-      this.setData({ sourceCategories: categories });
+      this.setData({
+        sourceCategories: categories,
+        selectedCategoryIds: categories.map((c) => c.id),
+        sourceLoading: false,
+      });
     } catch (err) {
       console.error("[group-create] load source categories failed", err);
       wx.showToast({ title: "加载分类失败", icon: "none" });
-    } finally {
       this.setData({ sourceLoading: false });
     }
   },
 
   onToggleCategory(e: WechatMiniprogram.TouchEvent) {
-    const id = (e.currentTarget.dataset as { id: string }).id;
+    const index = Number((e.currentTarget.dataset as { index: string }).index);
+    const cat = (this.data.sourceCategories as Category[])[index];
+    if (!cat) {
+      console.warn("[group-create] toggle miss, index:", index);
+      return;
+    }
     const selected = [...this.data.selectedCategoryIds];
-    const idx = selected.indexOf(id);
-    if (idx === -1) {
-      selected.push(id);
+    const pos = selected.indexOf(cat.id);
+    const wasSelected = pos !== -1;
+    if (wasSelected) {
+      selected.splice(pos, 1);
     } else {
-      selected.splice(idx, 1);
+      selected.push(cat.id);
     }
     this.setData({ selectedCategoryIds: selected });
+    console.log(
+      "[group-create] toggle category:",
+      cat.name,
+      wasSelected ? "→ unchecked" : "→ checked",
+      "remaining:", selected.length,
+    );
   },
 
   async onSubmit() {
+    if (this.data.submitting) return;
+
     const name = this.data.groupName.trim();
     if (!name) {
       this.setData({ nameError: "请输入厨房名" });

@@ -1,0 +1,15 @@
+// WXS helper for group-create page template expressions.
+// Used instead of Array.indexOf/includes which may not be reliably
+// supported in WXML data-binding expressions across all WeChat versions.
+
+function hasItem(arr, id) {
+  if (!arr) return false;
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i] === id) return true;
+  }
+  return false;
+}
+
+module.exports = {
+  hasItem: hasItem,
+};

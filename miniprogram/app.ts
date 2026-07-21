@@ -58,11 +58,12 @@ App({
       })
       .catch((err: unknown) => {
         console.error("[app] init failed", err);
-        wx.showModal({
-          title: "初始化失败",
-          content: "网络异常，请重启小程序重试",
-          showCancel: false,
-        });
+          wx.showModal({
+            title: "初始化失败",
+            content: "网络异常，请重启小程序重试",
+            showCancel: false,
+            confirmColor: "#c8815e",
+          });
       })
       .finally(() => wx.hideLoading());
   },

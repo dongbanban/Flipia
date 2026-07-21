@@ -14,4 +14,5 @@
 - [x] 不通过时的 toast 文案根据 `reason` 展示："内容包含敏感信息，请修改后重试" 或 "内容包含链接，请移除后重试"
 
 ## Comments
-- <!-- TODO: add commit SHA after commit -->
+- `3e598ba` — feat: add content security text checks to all text inputs
+- 烹饪描述 checkbox blocked: no cooking-description field exists in dish-pool form. Needs UI addition first.

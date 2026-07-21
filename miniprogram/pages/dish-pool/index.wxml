@@ -76,7 +76,7 @@
             data-dish="{{item}}"
             data-idx="{{index}}"
             catchtap="onToggleEnabled"
-          >{{item.enabled ? '已启用' : '已禁用'}}</view>
+          >{{item.enabled ? '今日供应' : '今日停供'}}</view>
           <view
             class="dish-delete-btn"
             data-dish="{{item}}"
@@ -126,7 +126,7 @@
             data-dish="{{item}}"
             data-idx="{{index}}"
             catchtap="onToggleEnabled"
-          >{{item.enabled ? '已启用' : '已禁用'}}</view>
+          >{{item.enabled ? '今日供应' : '今日停供'}}</view>
           <view
             class="dish-delete-btn"
             data-dish="{{item}}"
@@ -222,7 +222,7 @@
 
       <!-- 图片上传 -->
       <view class="form-field">
-        <text class="form-label">图片（最多 3 张）</text>
+        <text class="form-label">图片</text>
         <view class="image-list">
           <view
             wx:for="{{formData.images}}"
@@ -233,7 +233,7 @@
             <view class="remove-badge image-remove" data-idx="{{index}}" bind:tap="onRemoveImage">×</view>
           </view>
           <view
-            wx:if="{{formData.images.length < 3}}"
+            wx:if="{{formData.images.length < 1}}"
             class="image-add {{formUploading ? 'image-add--uploading' : ''}}"
             bind:tap="onChooseImages"
           >
@@ -262,7 +262,7 @@
         <view
           class="form-toggle-btn {{formData.enabled ? 'form-toggle-btn--on' : 'form-toggle-btn--off'}}"
           bind:tap="onFormToggleEnabled"
-        >{{formData.enabled ? '✓ 已启用' : '○ 已禁用'}}</view>
+        >{{formData.enabled ? '✓ 今日供应' : '○ 今日停供'}}</view>
         <view class="form-delete-btn" bind:tap="onFormDeleteDish">下架菜品</view>
       </view>
     </block>

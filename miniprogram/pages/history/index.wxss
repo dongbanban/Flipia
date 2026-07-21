@@ -55,12 +55,38 @@
   padding-left: 4rpx;
 }
 
-.record-card {
+/* ── Swipe-to-delete ──────────────────────────── */
+
+.swipe-wrapper {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16rpx;
+}
+
+.swipe-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 150rpx;
+  background-color: #e74c3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: var(--radius-card);
+}
+
+.swipe-content {
+  position: relative;
   background-color: var(--color-bg);
   border-radius: var(--radius-card);
   padding: 28rpx;
-  margin-bottom: 16rpx;
+  z-index: 1;
 }
+
+/* ── Card internals ───────────────────────────── */
 
 .record-head {
   display: flex;
@@ -131,4 +157,61 @@
 .record-photo-add--uploading {
   font-size: 24rpx;
   color: var(--color-text-secondary);
+}
+
+/* ── Share to chat button ─────────────────────── */
+
+.record-share {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  margin-top: 20rpx;
+  padding: 16rpx 0 0;
+  font-size: 24rpx;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.06);
+  line-height: 1;
+}
+
+.record-share::after {
+  border: none;
+}
+
+.record-share-hover {
+  opacity: 0.6;
+}
+
+.record-share-arrow {
+  font-size: 26rpx;
+}
+
+/* ── Day share image button ───────────────────── */
+
+.day-share-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 24rpx;
+  margin-top: 8rpx;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-card);
+  font-size: 28rpx;
+  color: var(--color-primary);
+}
+
+.day-share-icon {
+  font-size: 30rpx;
+}
+
+/* ── Hidden share image canvas ────────────────── */
+
+.share-canvas {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 750rpx;
 }

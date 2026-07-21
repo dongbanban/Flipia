@@ -82,7 +82,7 @@
   </view>
 
   <view wx:if="{{!todaySummary && (phase === 'idle' || phase === '') && !loadingConfig}}" class="guide-placeholder">
-    <text class="guide-text">随手一抽，决定当餐</text>
+    <text class="guide-text">吃什么呢？交给 Flipia 吧～</text>
   </view>
 
   <view wx:if="{{todaySummary}}" class="summary-bar" bind:tap="onGoHistory">

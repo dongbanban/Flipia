@@ -334,7 +334,7 @@ Page({
           wx.showModal({
             title: "踢出成员",
             content: `确认将「${name}」移出厨房？`,
-            confirmColor: "#cc6666",
+            confirmColor: "#c8815e",
             success: resolve,
           });
         },
@@ -397,7 +397,7 @@ Page({
           wx.showModal({
             title: "退出厨房",
             content: "退出后将从你的厨房列表中移除该厨房，厨房数据不受影响。",
-            confirmColor: "#cc6666",
+            confirmColor: "#c8815e",
             success: resolve,
           });
         },
@@ -448,7 +448,7 @@ Page({
           wx.showModal({
             title: "解散厨房",
             content: "解散后厨房及所有数据将被永久删除，不可恢复。",
-            confirmColor: "#ff4d4f",
+            confirmColor: "#c8815e",
             success: resolve,
           });
         },

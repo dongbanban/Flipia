@@ -565,7 +565,7 @@ Page({
 
   async onChooseImages() {
     const current = (this.data.formData as FormData).images;
-    const remaining = 3 - current.length;
+    const remaining = 1 - current.length;
     if (remaining <= 0) return;
 
     wx.chooseMedia({

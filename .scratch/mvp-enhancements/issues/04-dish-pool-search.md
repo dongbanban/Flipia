@@ -16,4 +16,4 @@
 
 ## Comments
 
-- SHA: (pending commit) — Added search bar with 300ms debounce, cross-category regex search, category badge on results, empty state, FAB hiding, and search state cleanup on page re-entry.
+- e47b4fb — Added search bar with 300ms debounce, cross-category regex search, category badge on results, empty state, FAB hiding, and search state cleanup on page re-entry.

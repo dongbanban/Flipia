@@ -1,3 +1,4 @@
+<wxs module="c" src="./category-filter.wxs" />
 <view class="page">
   <view class="form">
     <view class="form-field">
@@ -39,20 +40,20 @@
         <view wx:if="{{sourceLoading}}" class="loading-row">
           <text class="loading-hint">加载中…</text>
         </view>
-        <view wx:elif="{{sourceCategories.length > 0}}" class="category-grid">
+        <view wx:if="{{!sourceLoading && sourceCategories.length === 0}}" class="loading-row">
+          <text class="loading-hint">该厨房暂无分类</text>
+        </view>
+        <view wx:if="{{!sourceLoading && sourceCategories.length > 0}}" class="category-grid">
           <view
             wx:for="{{sourceCategories}}"
             wx:key="id"
-            class="category-chip {{selectedCategoryIds.indexOf(item.id) !== -1 ? 'category-chip--selected' : ''}}"
-            data-id="{{item.id}}"
-            bind:tap="onToggleCategory"
+            class="category-chip {{c.hasItem(selectedCategoryIds, item.id) ? 'category-chip--selected' : ''}}"
+            data-index="{{index}}"
+            catch:tap="onToggleCategory"
           >
             <text class="category-chip__text">{{item.name}}</text>
-            <text wx:if="{{selectedCategoryIds.indexOf(item.id) !== -1}}" class="category-chip__check">✓</text>
+            <text wx:if="{{c.hasItem(selectedCategoryIds, item.id)}}" class="category-chip__check">✓</text>
           </view>
-        </view>
-        <view wx:else class="loading-row">
-          <text class="loading-hint">该厨房暂无分类</text>
         </view>
       </view>
     </block>

@@ -16,46 +16,92 @@
   </view>
 
   <view wx:else class="list">
-    <view wx:for="{{dayGroups}}" wx:key="date" class="day-group">
+    <view wx:for="{{dayGroups}}" wx:key="date" class="day-group" wx:for-index="dayIndex">
       <view class="day-header">{{item.label}}</view>
-      <view wx:for="{{item.records}}" wx:key="_id" wx:for-item="record" class="record-card">
-        <view class="record-head">
-          <text class="record-time">{{record.time}}</text>
-          <text wx:if="{{memberCount > 1 && record.drawerLabel}}" class="record-drawer">{{record.drawerLabel}}</text>
+
+      <!-- Swipe-to-delete wrapper for each record card -->
+      <view
+        wx:for="{{item.records}}"
+        wx:key="_id"
+        wx:for-item="record"
+        class="swipe-wrapper"
+        data-record-id="{{record._id}}"
+        bindtouchstart="onSwipeStart"
+        bindtouchmove="onSwipeMove"
+        bindtouchend="onSwipeEnd"
+      >
+        <!-- Delete button revealed behind card on swipe -->
+        <view
+          class="swipe-delete"
+          catchtap="onDeleteRecord"
+          data-record-id="{{record._id}}"
+        >
+          <text>删除</text>
         </view>
-        <view wx:for="{{record.results}}" wx:key="categoryId" wx:for-item="group" class="record-group">
-          <text class="record-category">{{group.categoryName}}：</text>
-          <block wx:for="{{group.dishes}}" wx:key="dishId" wx:for-item="dish">
-            <text class="record-dish">{{dish.dishName}}</text>
-          </block>
-        </view>
-        <view class="record-photos">
-          <view
-            wx:for="{{record.images}}"
-            wx:key="*this"
-            wx:for-item="img"
-            class="record-photo-item"
-          >
-            <image
-              class="record-photo-thumb"
-              src="{{img}}"
-              mode="aspectFill"
-              data-images="{{record.images}}"
-              data-current="{{img}}"
-              bind:tap="onPreviewRecordImage"
-            />
+
+        <!-- Card content (translates horizontally on swipe) -->
+        <view
+          class="swipe-content"
+          style="transform: translateX({{_swipeActiveId === record._id ? translateXPx : (swipedRecordId === record._id ? -deleteBtnPx : 0)}}px); transition: {{_swipeActiveId === record._id ? 'none' : 'transform 0.25s ease-out'}};"
+        >
+          <view class="record-head">
+            <text class="record-time">{{record.time}}</text>
+            <text wx:if="{{memberCount > 1 && record.drawerLabel}}" class="record-drawer">{{record.drawerLabel}}</text>
           </view>
-          <view
-            wx:if="{{!record.images || record.images.length < 3}}"
-            class="record-photo-add {{uploadingRecordId === record._id ? 'record-photo-add--uploading' : ''}}"
+          <view wx:for="{{record.results}}" wx:key="categoryId" wx:for-item="group" class="record-group">
+            <text class="record-category">{{group.categoryName}}：</text>
+            <block wx:for="{{group.dishes}}" wx:key="dishId" wx:for-item="dish">
+              <text class="record-dish">{{dish.dishName}}</text>
+            </block>
+          </view>
+          <view class="record-photos">
+            <view
+              wx:for="{{record.images}}"
+              wx:key="*this"
+              wx:for-item="img"
+              class="record-photo-item"
+            >
+              <image
+                class="record-photo-thumb"
+                src="{{img}}"
+                mode="aspectFill"
+                data-images="{{record.images}}"
+                data-current="{{img}}"
+                bind:tap="onPreviewRecordImage"
+              />
+            </view>
+            <view
+              wx:if="{{!record.images || record.images.length < 3}}"
+              class="record-photo-add {{uploadingRecordId === record._id ? 'record-photo-add--uploading' : ''}}"
+              data-record-id="{{record._id}}"
+              bind:tap="onRecordChooseImage"
+            >
+              <text wx:if="{{uploadingRecordId === record._id}}">上传中…</text>
+              <text wx:else>+</text>
+            </view>
+          </view>
+
+          <!-- Share to chat button -->
+          <button
+            class="record-share"
+            open-type="share"
             data-record-id="{{record._id}}"
-            bind:tap="onRecordChooseImage"
+            hover-class="record-share-hover"
           >
-            <text wx:if="{{uploadingRecordId === record._id}}">上传中…</text>
-            <text wx:else>+</text>
-          </view>
+            <text class="record-share-arrow">↗</text>
+            <text>分享给朋友</text>
+          </button>
         </view>
+      </view>
+
+      <!-- Share image button: only on first day group -->
+      <view wx:if="{{dayIndex === 0}}" class="day-share-btn" bindtap="onGenerateShareImage">
+        <text class="day-share-icon">↓</text>
+        <text>保存为图片</text>
       </view>
     </view>
   </view>
 </view>
+
+<!-- Hidden canvas for share image generation (outside .page to avoid clipping) -->
+<canvas type="2d" id="shareCanvas" class="share-canvas"></canvas>
