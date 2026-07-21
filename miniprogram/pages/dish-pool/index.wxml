@@ -6,8 +6,27 @@
   bind:create="onGroupCreate"
 />
 <view class="page">
-  <!-- 分类 tab 横向滚动 -->
-  <view class="tab-bar-wrap">
+  <!-- Search bar -->
+  <view class="search-bar">
+    <view class="search-bar__inner">
+      <text class="search-bar__icon">🔍</text>
+      <input
+        class="search-bar__input"
+        type="text"
+        placeholder="搜索菜品…"
+        value="{{searchKeyword}}"
+        bind:input="onSearchInput"
+      />
+      <view
+        wx:if="{{searchKeyword}}"
+        class="search-bar__clear"
+        bind:tap="onClearSearch"
+      >✕</view>
+    </view>
+  </view>
+
+  <!-- 分类 tab 横向滚动 — hidden during search -->
+  <view wx:if="{{!searchKeyword}}" class="tab-bar-wrap">
     <scroll-view class="tab-bar" scroll-x enable-flex>
       <view
         wx:for="{{categories}}"
@@ -24,10 +43,63 @@
 
   <!-- 加载骨架屏 / 菜品列表 / 空状态 -->
   <view class="dish-area">
-    <view wx:if="{{loading}}" class="skeleton-list">
+    <!-- Search mode: loading skeleton -->
+    <view wx:if="{{searchKeyword && loading}}" class="skeleton-list">
       <view wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="skeleton-card" />
     </view>
 
+    <!-- Search mode: results -->
+    <scroll-view wx:elif="{{searchKeyword && searchResults.length > 0}}" scroll-y class="dish-list">
+      <view
+        wx:for="{{searchResults}}"
+        wx:key="_id"
+        class="dish-card {{item.enabled ? '' : 'dish-card--disabled'}}"
+        data-dish="{{item}}"
+        data-idx="{{index}}"
+        bind:tap="onOpenEdit"
+      >
+        <image
+          wx:if="{{item.images && item.images.length > 0}}"
+          class="dish-thumb"
+          src="{{item.images[0]}}"
+          mode="aspectFill"
+        />
+        <view wx:else class="dish-thumb dish-thumb--placeholder" />
+        <view class="dish-info">
+          <text class="dish-name">{{item.name}}</text>
+          <view class="dish-category-badge">{{item.categoryName}}</view>
+          <text
+            wx:if="{{memberCount > 1 && item.creatorName}}"
+            class="dish-creator"
+          >大厨：{{item.creatorName}}</text>
+        </view>
+        <view class="dish-card-actions">
+          <view
+            class="dish-toggle-text {{item.enabled ? 'dish-toggle-text--on' : 'dish-toggle-text--off'}}"
+            data-dish="{{item}}"
+            data-idx="{{index}}"
+            catchtap="onToggleEnabled"
+          >{{item.enabled ? '已启用' : '已禁用'}}</view>
+          <view
+            class="dish-delete-btn"
+            data-dish="{{item}}"
+            catchtap="onCardDeleteDish"
+          >下架</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- Search mode: empty -->
+    <view wx:elif="{{searchKeyword && !loading && searchResults.length === 0}}" class="empty-state">
+      <text class="empty-hint">没有找到相关菜品</text>
+    </view>
+
+    <!-- Normal mode: loading skeleton -->
+    <view wx:elif="{{loading}}" class="skeleton-list">
+      <view wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="skeleton-card" />
+    </view>
+
+    <!-- Normal mode: dish list -->
     <scroll-view wx:elif="{{dishes.length > 0}}" scroll-y class="dish-list">
       <view
         wx:for="{{dishes}}"
@@ -67,17 +139,19 @@
       </view>
     </scroll-view>
 
+    <!-- Normal mode: empty (with categories) -->
     <view wx:elif="{{categories.length > 0}}" class="empty-state">
       <text class="empty-hint">还没有菜品，快去添加吧~</text>
     </view>
 
+    <!-- Normal mode: empty (no categories) -->
     <view wx:else class="empty-state">
       <text class="empty-hint">暂无分类</text>
     </view>
   </view>
 
-  <!-- 浮动添加按钮 -->
-  <view wx:if="{{categories.length > 0}}" class="fab" bind:tap="onOpenAdd">+</view>
+  <!-- 浮动添加按钮 — hidden during search -->
+  <view wx:if="{{categories.length > 0 && !searchKeyword}}" class="fab" bind:tap="onOpenAdd">+</view>
 
   <!-- 添加/编辑表单弹层 -->
   <view wx:if="{{formVisible}}" class="form-mask" bind:tap="onCloseForm" />

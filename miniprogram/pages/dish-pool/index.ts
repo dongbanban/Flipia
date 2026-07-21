@@ -6,7 +6,7 @@ import {
 } from "../../lib/dish-pool";
 import type { DishRecord } from "../../lib/dish-pool";
 import type { Category } from "../../lib/init-data";
-import { checkTextWithToast } from "../../lib/content-security";
+import { checkImage, checkTextWithToast } from "../../lib/content-security";
 
 interface AppInstance {
   globalData: {
@@ -43,6 +43,8 @@ Page({
     categories: [] as Category[],
     activeTab: 0,
     dishes: [] as DishRecord[],
+    searchKeyword: "",
+    searchResults: [] as (DishRecord & { categoryName: string })[],
     loading: false,
     formVisible: false,
     formMode: "add" as "add" | "edit",
@@ -69,6 +71,7 @@ Page({
   _shown: false,
   _originalImages: [] as string[],
   _uploadedFileIDs: [] as string[],
+  _searchTimer: null as number | null,
 
   onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
     const app = getApp<AppInstance>();
@@ -132,15 +135,26 @@ Page({
     }
     if (this._groupId !== app.globalData.groupId) {
       this._groupId = app.globalData.groupId;
+      if (this._searchTimer) {
+        clearTimeout(this._searchTimer);
+        this._searchTimer = null;
+      }
       this.setData({
         loading: false,
         formVisible: false,
         dishes: [],
+        searchKeyword: "",
+        searchResults: [],
         activeTab: 0,
       });
       this._init();
       return;
     }
+    if (this._searchTimer) {
+      clearTimeout(this._searchTimer);
+      this._searchTimer = null;
+    }
+    this.setData({ searchKeyword: "", searchResults: [] });
     this._refreshCategories();
   },
 
@@ -191,35 +205,126 @@ Page({
         .limit(100)
         .get();
 
-      const dishes = res.data as DishRecord[];
-      const sorted = sortDishes(dishes);
-
-      const creatorIds = [
-        ...new Set(
-          sorted
-            .map((d) => d.creatorId)
-            .filter(
-              (id): id is string =>
-                !!id && !sorted.find((d) => d.creatorId === id)?.creatorName,
-            ),
-        ),
-      ];
-
-      const nameMap: Record<string, string> = {};
-      if (creatorIds.length > 0) {
-        const userRes = await this._db!.collection("users")
-          .where({ _openid: this._db!.command.in(creatorIds) })
-          .get();
-        for (const user of userRes.data as Array<{
-          _openid: string;
-          nickName: string;
-        }>) {
-          nameMap[user._openid] = user.nickName;
-        }
-      }
-
-      const processed = attachCreatorNames(sorted, nameMap);
+      const processed = await this._loadAndProcessDishes(
+        res.data as DishRecord[],
+      );
       this.setData({ dishes: processed });
+    } finally {
+      this.setData({ loading: false });
+    }
+  },
+
+  /** Sort and resolve creator names for a batch of dishes. */
+  async _loadAndProcessDishes(dishes: DishRecord[]): Promise<DishRecord[]> {
+    const sorted = sortDishes(dishes);
+
+    const creatorIds = [
+      ...new Set(
+        sorted
+          .map((d) => d.creatorId)
+          .filter(
+            (id): id is string =>
+              !!id && !sorted.find((d) => d.creatorId === id)?.creatorName,
+          ),
+      ),
+    ];
+
+    const nameMap: Record<string, string> = {};
+    if (creatorIds.length > 0) {
+      const userRes = await this._db!.collection("users")
+        .where({ _openid: this._db!.command.in(creatorIds) })
+        .get();
+      for (const user of userRes.data as Array<{
+        _openid: string;
+        nickName: string;
+      }>) {
+        nameMap[user._openid] = user.nickName;
+      }
+    }
+
+    return attachCreatorNames(sorted, nameMap);
+  },
+
+  // ── Search ─────────────────────────────────────────────────────────────────
+
+  _escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  },
+
+  _buildCategoryMap(): Record<string, string> {
+    const map: Record<string, string> = {};
+    for (const cat of this.data.categories as Category[]) {
+      map[cat.id] = cat.name;
+    }
+    return map;
+  },
+
+  onSearchInput(e: WechatMiniprogram.Input) {
+    const keyword = e.detail.value;
+    this.setData({ searchKeyword: keyword });
+
+    if (this._searchTimer) {
+      clearTimeout(this._searchTimer);
+      this._searchTimer = null;
+    }
+
+    if (!keyword.trim()) {
+      this.setData({ searchResults: [] });
+      const categories = this.data.categories as Category[];
+      if (categories.length > 0) {
+        const activeCat = categories[this.data.activeTab] as Category;
+        this._loadDishes(activeCat.id);
+      }
+      return;
+    }
+
+    this._searchTimer = setTimeout(() => {
+      this._doSearch(keyword.trim());
+    }, 300);
+  },
+
+  onClearSearch() {
+    if (this._searchTimer) {
+      clearTimeout(this._searchTimer);
+      this._searchTimer = null;
+    }
+    this.setData({ searchKeyword: "", searchResults: [] });
+    const categories = this.data.categories as Category[];
+    if (categories.length > 0) {
+      const activeCat = categories[this.data.activeTab] as Category;
+      this._loadDishes(activeCat.id);
+    }
+  },
+
+  async _doSearch(keyword: string) {
+    if (!keyword) {
+      this.setData({ searchResults: [] });
+      return;
+    }
+
+    this.setData({ loading: true });
+    try {
+      const escaped = this._escapeRegex(keyword);
+      const res = await this._db!.collection("dishes")
+        .where({
+          groupId: this._groupId,
+          name: this._db!.RegExp({ regexp: escaped, options: "i" }),
+        })
+        .orderBy("createdAt", "desc")
+        .limit(100)
+        .get();
+
+      const processed = await this._loadAndProcessDishes(
+        res.data as DishRecord[],
+      );
+      const catMap = this._buildCategoryMap();
+      const searchResults = processed.map((d) => ({
+        ...d,
+        categoryName: catMap[d.categoryId] ?? d.categoryId,
+      }));
+      this.setData({ searchResults });
+    } catch (err) {
+      console.error("[dish-pool] search failed", err);
     } finally {
       this.setData({ loading: false });
     }
@@ -341,9 +446,18 @@ Page({
       success: async (res) => {
         this.setData({ formUploading: true });
         try {
-          const fileIDs = await this._uploadImages(
-            res.tempFiles.map((f) => f.tempFilePath),
-          );
+          // Content security: check each image before upload
+          const safePaths: string[] = [];
+          for (const f of res.tempFiles) {
+            const result = await checkImage(f.tempFilePath);
+            if (result.pass) {
+              safePaths.push(f.tempFilePath);
+            } else {
+              wx.showToast({ title: "图片不合规，请更换", icon: "none" });
+            }
+          }
+          if (safePaths.length === 0) return;
+          const fileIDs = await this._uploadImages(safePaths);
           const merged = [...current, ...fileIDs];
           this.setData({ "formData.images": merged, formDirty: true });
         } catch (err) {

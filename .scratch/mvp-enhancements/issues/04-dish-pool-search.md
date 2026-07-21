@@ -4,12 +4,16 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] 搜索栏：分类 tab 栏上方新增搜索输入框（`<input type="text" placeholder="搜索菜品…">`），带清除按钮（输入内容后出现 × 图标）
-- [ ] 输入后 300ms 节流查询 `dishes` 集合：`{groupId, name: db.RegExp({regexp: keyword, options: 'i'})}`，不分 `categoryId`
-- [ ] 搜索结果显示：替换当前 `dishes` 列表展示，搜索模式下不显示分类 tab 栏，每条菜品卡片上显示其所属分类名（如标签 badge）
-- [ ] 没有匹配结果时显示空状态："没有找到相关菜品"
-- [ ] 清空搜索框（点击 × 或手动删除全部文字）→ 恢复分类 tab 视图、加载当前选中分类的菜品列表
-- [ ] 搜索时隐藏浮动添加按钮（FAB），避免与搜索态视觉冲突
-- [ ] 搜索模式下点击菜品卡片的行为与正常列表一致（进入编辑）
+- [x] 搜索栏：分类 tab 栏上方新增搜索输入框（`<input type="text" placeholder="搜索菜品…">`），带清除按钮（输入内容后出现 × 图标）
+- [x] 输入后 300ms 节流查询 `dishes` 集合：`{groupId, name: db.RegExp({regexp: keyword, options: 'i'})}`，不分 `categoryId`
+- [x] 搜索结果显示：替换当前 `dishes` 列表展示，搜索模式下不显示分类 tab 栏，每条菜品卡片上显示其所属分类名（如标签 badge）
+- [x] 没有匹配结果时显示空状态："没有找到相关菜品"
+- [x] 清空搜索框（点击 × 或手动删除全部文字）→ 恢复分类 tab 视图、加载当前选中分类的菜品列表
+- [x] 搜索时隐藏浮动添加按钮（FAB），避免与搜索态视觉冲突
+- [x] 搜索模式下点击菜品卡片的行为与正常列表一致（进入编辑）
+
+## Comments
+
+- SHA: (pending commit) — Added search bar with 300ms debounce, cross-category regex search, category badge on results, empty state, FAB hiding, and search state cleanup on page re-entry.

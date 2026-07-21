@@ -9,6 +9,61 @@
   background-color: var(--color-bg);
 }
 
+/* ── Search bar ── */
+.search-bar {
+  flex-shrink: 0;
+  padding: 16rpx 24rpx;
+  background: var(--color-bg);
+}
+
+.search-bar__inner {
+  display: flex;
+  align-items: center;
+  height: 64rpx;
+  background: #f5f5f5;
+  border-radius: 32rpx;
+  padding: 0 20rpx;
+}
+
+.search-bar__icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+  flex-shrink: 0;
+}
+
+.search-bar__input {
+  flex: 1;
+  height: 100%;
+  font-size: 28rpx;
+  color: var(--color-text);
+}
+
+.search-bar__clear {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: #ccc;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  flex-shrink: 0;
+}
+
+/* ── Category badge (search results) ── */
+.dish-category-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 20rpx;
+  color: var(--color-primary);
+  background: rgba(200, 129, 94, 0.08);
+  border: 1rpx solid rgba(200, 129, 94, 0.2);
+  border-radius: 16rpx;
+  padding: 2rpx 14rpx;
+  margin-top: 4rpx;
+}
+
 /* ── Tab bar ── */
 .tab-bar-wrap {
   height: 76rpx;
