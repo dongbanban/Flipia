@@ -20,7 +20,7 @@ export function validateCategoryName(
 }
 
 export function generateCategoryId(): string {
-  return `cat-custom-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  return `cat-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
 export function addCategory(

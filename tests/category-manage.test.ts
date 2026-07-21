@@ -59,7 +59,7 @@ describe("validateCategoryName", () => {
 describe("generateCategoryId", () => {
   it("returns a string starting with cat-custom-", () => {
     const id = generateCategoryId();
-    expect(id.startsWith("cat-custom-")).toBe(true);
+    expect(id.startsWith("cat-")).toBe(true);
   });
 
   it("returns unique IDs on repeated calls", () => {
@@ -77,7 +77,7 @@ describe("addCategory", () => {
     const result = addCategory(input, "甜点");
     expect(result).toHaveLength(3);
     expect(result[2].name).toBe("甜点");
-    expect(result[2].id).toMatch(/^cat-custom-/);
+    expect(result[2].id).toMatch(/^cat-/);
   });
 
   it("does not mutate the original array", () => {
