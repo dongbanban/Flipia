@@ -12,6 +12,7 @@ interface AppGlobalData {
   avatarUrl: string;
   groupId: string;
   groups: GroupInfo[];
+  needProfileSetup?: boolean;
 }
 
 interface AppInstance {
@@ -36,6 +37,7 @@ App({
     avatarUrl: "",
     groupId: "",
     groups: [],
+    needProfileSetup: false,
   } as AppGlobalData,
 
   _readyResolvers: [] as Array<() => void>,
@@ -54,7 +56,11 @@ App({
         const resolvers = this._readyResolvers;
         this._readyResolvers = [];
         for (const resolve of resolvers) resolve();
-        wx.switchTab({ url: "/pages/index/index" });
+        if (this.globalData.needProfileSetup) {
+          wx.redirectTo({ url: "/pages/profile-setup/index" });
+        } else {
+          wx.switchTab({ url: "/pages/index/index" });
+        }
       })
       .catch((err: unknown) => {
         console.error("[app] init failed", err);
@@ -156,6 +162,10 @@ App({
         const user = res.data[0] as { nickName: string; avatarUrl?: string };
         this.globalData.nickName = user.nickName;
         this.globalData.avatarUrl = user.avatarUrl || "";
+        // Detect default auto-generated nicknames: 用户 + 6 hex chars, with no avatar
+        if (/^用户[a-z0-9]{6}$/.test(user.nickName) && !user.avatarUrl) {
+          this.globalData.needProfileSetup = true;
+        }
         return;
       }
 
@@ -165,6 +175,7 @@ App({
       });
       this.globalData.nickName = nickName;
       this.globalData.avatarUrl = "";
+      this.globalData.needProfileSetup = true;
     } catch (err) {
       console.error("[app] ensure user profile failed", err);
     }

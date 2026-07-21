@@ -1,0 +1,41 @@
+<view class="page">
+  <view class="content">
+    <!-- Intro text -->
+    <text class="intro">设置你的头像和昵称，让家人朋友能认出你</text>
+
+    <!-- Avatar picker -->
+    <button
+      class="avatar-btn"
+      open-type="chooseAvatar"
+      bindchooseavatar="onChooseAvatar"
+    >
+      <image
+        wx:if="{{avatarUrl}}"
+        class="avatar-img"
+        src="{{avatarUrl}}"
+        mode="aspectFill"
+      />
+      <text wx:else class="avatar-placeholder">👤</text>
+      <view class="avatar-ring-inner"></view>
+    </button>
+
+    <!-- Nickname input -->
+    <view class="nickname-field">
+      <input
+        class="nickname-input"
+        type="nickname"
+        value="{{nickName}}"
+        placeholder="请输入昵称"
+        placeholder-class="nickname-placeholder"
+        maxlength="20"
+        bindinput="onNickInput"
+      />
+    </view>
+
+    <!-- Action buttons -->
+    <view class="btn-row">
+      <button class="btn btn--skip" plain bindtap="onSkip">跳过</button>
+      <button class="btn btn--confirm" bindtap="onConfirm">确认</button>
+    </view>
+  </view>
+</view>

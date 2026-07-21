@@ -1,16 +1,28 @@
 <view class="page">
   <view class="profile-card">
-    <image
-      wx:if="{{avatarUrl}}"
-      class="profile-avatar"
-      src="{{avatarUrl}}"
-      mode="aspectFill"
-      binderror="onAvatarError"
+    <button
+      class="profile-avatar-btn"
+      open-type="chooseAvatar"
+      bindchooseavatar="onChooseAvatar"
+    >
+      <image
+        wx:if="{{avatarUrl}}"
+        class="profile-avatar"
+        src="{{avatarUrl}}"
+        mode="aspectFill"
+        binderror="onAvatarError"
+      />
+      <view wx:else class="profile-avatar profile-avatar--placeholder">
+        <text class="profile-avatar__icon">👤</text>
+      </view>
+    </button>
+    <input
+      type="nickname"
+      class="profile-nickname"
+      value="{{nickName}}"
+      bindblur="onNicknameBlur"
+      placeholder="请输入昵称"
     />
-    <view wx:else class="profile-avatar profile-avatar--placeholder">
-      <text class="profile-avatar__icon">👤</text>
-    </view>
-    <text class="profile-nickname">{{nickName}}</text>
   </view>
 
   <view class="menu-list">

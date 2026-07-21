@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/profile-setup/index",
     "pages/index/index",
     "pages/dish-pool/index",
     "pages/history/index",

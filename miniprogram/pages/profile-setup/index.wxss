@@ -1,0 +1,178 @@
+/* ── Page layout ── */
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 56rpx;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: linear-gradient(175deg, var(--color-primary-light) 0%, var(--color-bg) 50%);
+}
+
+.content {
+  width: 100%;
+  max-width: 560rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-40rpx);
+}
+
+/* ── Intro text ── */
+.intro {
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.7;
+  letter-spacing: 1rpx;
+  margin-bottom: 72rpx;
+  padding: 0 16rpx;
+}
+
+/* ── Avatar button ── */
+.avatar-btn {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0;
+  background: var(--color-bg);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  margin-bottom: 56rpx;
+  box-shadow:
+    0 0 0 6rpx var(--color-primary-light),
+    0 8rpx 32rpx rgba(200, 129, 94, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Override WeChat default button border */
+.avatar-btn::after {
+  border: none;
+}
+
+/* Press feedback */
+.avatar-btn:active {
+  transform: scale(0.95);
+  box-shadow:
+    0 0 0 6rpx var(--color-primary-light),
+    0 4rpx 16rpx rgba(200, 129, 94, 0.12);
+}
+
+/* Inner subtle ring — a thin accent line inside the glow ring */
+.avatar-ring-inner {
+  position: absolute;
+  inset: -8rpx;
+  border-radius: 50%;
+  border: 2rpx solid rgba(200, 129, 94, 0.25);
+  pointer-events: none;
+}
+
+/* Avatar image */
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--color-bg-secondary);
+}
+
+/* Avatar placeholder emoji */
+.avatar-placeholder {
+  font-size: 64rpx;
+  line-height: 1;
+  opacity: 0.45;
+}
+
+/* ── Nickname input ── */
+.nickname-field {
+  width: 100%;
+  margin-bottom: 64rpx;
+}
+
+.nickname-input {
+  width: 100%;
+  height: 96rpx;
+  padding: 0 36rpx;
+  font-size: 30rpx;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 2rpx solid #e8ddd6;
+  border-radius: var(--radius-btn);
+  text-align: center;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.nickname-input:focus {
+  border-color: var(--color-primary);
+}
+
+.nickname-placeholder {
+  color: var(--color-text-secondary);
+  font-size: 28rpx;
+}
+
+/* ── Button row ── */
+.btn-row {
+  width: 100%;
+  display: flex;
+  gap: 24rpx;
+}
+
+/* Base button reset */
+.btn {
+  flex: 1;
+  height: 92rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 600;
+  border-radius: var(--radius-btn);
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.btn::after {
+  border: none;
+}
+
+/* Press feedback for all buttons */
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ── Skip button (outline) ── */
+.btn--skip {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2rpx solid var(--color-primary);
+  opacity: 0.85;
+}
+
+.btn--skip:active {
+  opacity: 0.6;
+}
+
+/* ── Confirm button (filled) ── */
+.btn--confirm {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  box-shadow: 0 6rpx 20rpx rgba(200, 129, 94, 0.3);
+}
+
+.btn--confirm:active {
+  opacity: 0.85;
+}

@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 — Content Security Service
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] 新增页面 `pages/profile-setup/index`（非 tab 页，纯导航页）：
   - 展示简介文案（"设置你的头像和昵称，让家人朋友能认出你"）

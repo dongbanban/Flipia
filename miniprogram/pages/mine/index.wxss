@@ -18,6 +18,23 @@
   border-radius: var(--radius-card);
 }
 
+/* Avatar button — invisible chrome, just the image */
+.profile-avatar-btn {
+  width: 100rpx !important;
+  height: 100rpx !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  border: none !important;
+  flex-shrink: 0;
+  line-height: 1 !important;
+}
+
+.profile-avatar-btn::after {
+  border: none !important;
+}
+
 .profile-avatar {
   width: 100rpx;
   height: 100rpx;
@@ -36,11 +53,15 @@
   font-size: 44rpx;
 }
 
+/* Nickname input — looks like text but is editable */
 .profile-nickname {
   margin-left: 28rpx;
   font-size: 34rpx;
   font-weight: 600;
   color: var(--color-text);
+  flex: 1;
+  height: 48rpx;
+  line-height: 48rpx;
 }
 
 .menu-list {
