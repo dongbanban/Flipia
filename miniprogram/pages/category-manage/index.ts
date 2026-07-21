@@ -116,6 +116,8 @@ Page({
       return;
     }
 
+    if (!(await checkTextWithToast(value))) return;
+
     const arr = addCategory(this.data.categories as Category[], value);
 
     wx.showLoading({ title: "保存中…", mask: true });
@@ -169,6 +171,8 @@ Page({
       this.setData({ editError: error });
       return;
     }
+
+    if (!(await checkTextWithToast(value))) return;
 
     const arr = renameCategory(
       this.data.categories as Category[],

@@ -1,3 +1,4 @@
+import { checkTextWithToast } from "../../lib/content-security";
 import {
   type Category,
   generateGroupId,
@@ -135,6 +136,8 @@ Page({
       this.setData({ nameError: "已有同名厨房" });
       return;
     }
+
+    if (!(await checkTextWithToast(name))) return;
 
     if (this.data.importEnabled && this.data.sourceGroupIdx < 0) {
       wx.showToast({ title: "请选择源厨房", icon: "none" });

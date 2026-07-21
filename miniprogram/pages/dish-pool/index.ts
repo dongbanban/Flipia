@@ -405,6 +405,8 @@ Page({
       return;
     }
 
+    if (!(await checkTextWithToast(value))) return;
+
     wx.showLoading({ title: "保存中…", mask: true });
     try {
       const isEdit = this.data.formMode === "edit";

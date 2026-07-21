@@ -1,3 +1,5 @@
+import { checkTextWithToast } from "../../lib/content-security";
+
 interface GroupInfo {
   _id: string;
   _openid: string;
@@ -282,6 +284,8 @@ Page({
       this.setData({ editingName: false });
       return;
     }
+
+    if (!(await checkTextWithToast(name))) return;
 
     wx.showLoading({ title: "保存中…", mask: true });
     try {

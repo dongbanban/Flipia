@@ -4,14 +4,6 @@ export interface ContentSecurityResult {
 }
 
 /**
- * 文本内容安全检测
- *
- * 调用云函数 content-security 的 textCheck action，
- * 依次执行微信 msgSecCheck 敏感词检测和自定义 URL 正则过滤。
- *
- * @param text - 待检测文本，空字符串直接返回 { pass: true }
- */
-/**
  * 文本安全检测 + toast 提示
  *
  * 调用 checkText，不通过时自动弹出 toast 提示原因。
@@ -29,6 +21,14 @@ export async function checkTextWithToast(text: string): Promise<boolean> {
   return true;
 }
 
+/**
+ * 文本内容安全检测
+ *
+ * 调用云函数 content-security 的 textCheck action，
+ * 依次执行微信 msgSecCheck 敏感词检测和自定义 URL 正则过滤。
+ *
+ * @param text - 待检测文本，空字符串直接返回 { pass: true }
+ */
 export async function checkText(text: string): Promise<ContentSecurityResult> {
   if (!text) return { pass: true };
 
@@ -47,7 +47,7 @@ export async function checkText(text: string): Promise<ContentSecurityResult> {
 }
 
 const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "gif"];
-const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
+const MAX_IMAGE_SIZE = 1024 * 1024; // 1MB (微信 API 官方限制)
 
 function extToContentType(ext: string): string | null {
   switch (ext) {
@@ -68,7 +68,7 @@ function extToContentType(ext: string): string | null {
 /**
  * 图片内容安全检测
  *
- * 1) 客户端校验格式（jpg/png/bmp/gif）和大小（≤ 3MB）
+ * 1) 客户端校验格式（jpg/png/bmp/gif）和大小（≤ 1MB）
  * 2) 读取图片文件为 base64
  * 3) 调用云函数 content-security 的 imageCheck action
  * 4) 云函数调用微信 imgSecCheck 同步返回结果

@@ -11,7 +11,7 @@
 - [x] 新增 `lib/content-security.ts` 暴露 `checkImage(tempFilePath)` 方法，通过云函数 `imageCheck` action 调用 `cloud.openapi.security.imgSecCheck`，返回 `{pass, reason}`
 - [x] `checkText` 对空字符串直接返回 `{pass: true}`，不浪费 API 调用
 - [x] 云函数 `textCheck` 中用自定义 URL 正则过滤替代 `urlSecCheck`（该 API 不存在），命中即返回 `{pass: false, reason: '文本包含链接'}`
-- [x] `checkImage` 检测前校验图片格式为 jpg/png/bmp/gif 且大小 ≤ 3MB，不满足时返回 `{pass: false, reason: '图片格式不支持或过大'}`
+- [x] `checkImage` 检测前校验图片格式为 jpg/png/bmp/gif 且大小 ≤ 1MB，不满足时返回 `{pass: false, reason: '图片格式不支持或过大'}`
 
 ## Comments
 

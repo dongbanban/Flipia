@@ -9,6 +9,7 @@ import {
   getAvailableCategories,
 } from "../../lib/draw-config-manage";
 import type { Category, DrawConfigEntry, DrawConfigGroup } from "../../lib/init-data";
+import { checkTextWithToast } from "../../lib/content-security";
 
 interface AppGlobalData {
   groupId: string;
@@ -158,6 +159,8 @@ Page({
       this.setData({ modalNameError: error });
       return;
     }
+
+    if (!(await checkTextWithToast(value))) return;
 
     const entries = [...this.data.modalEntries] as DrawConfigEntry[];
 
