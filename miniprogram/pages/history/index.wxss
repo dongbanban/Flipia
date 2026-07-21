@@ -159,52 +159,38 @@
   color: var(--color-text-secondary);
 }
 
-/* ── Share to chat button ─────────────────────── */
+/* ── Bottom action buttons (share + save image) ─ */
 
-.record-share {
+.record-actions {
+  display: flex;
+  margin-top: 20rpx;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.06);
+}
+
+.record-action-btn {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  margin-top: 20rpx;
-  padding: 16rpx 0 0;
+  padding: 20rpx 0;
   font-size: 24rpx;
   color: var(--color-text-secondary);
   background: none;
   border: none;
-  border-top: 1rpx solid rgba(0, 0, 0, 0.06);
   line-height: 1;
 }
 
-.record-share::after {
+.record-action-btn::after {
   border: none;
 }
 
-.record-share-hover {
-  opacity: 0.6;
+.record-action-btn--hover {
+  opacity: 0.5;
 }
 
-.record-share-arrow {
+.record-action-icon {
   font-size: 26rpx;
-}
-
-/* ── Day share image button ───────────────────── */
-
-.day-share-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8rpx;
-  padding: 24rpx;
-  margin-top: 8rpx;
-  background-color: var(--color-bg);
-  border-radius: var(--radius-card);
-  font-size: 28rpx;
-  color: var(--color-primary);
-}
-
-.day-share-icon {
-  font-size: 30rpx;
 }
 
 /* ── Hidden share image canvas ────────────────── */

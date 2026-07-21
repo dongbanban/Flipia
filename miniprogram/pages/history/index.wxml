@@ -16,7 +16,7 @@
   </view>
 
   <view wx:else class="list">
-    <view wx:for="{{dayGroups}}" wx:key="date" class="day-group" wx:for-index="dayIndex">
+    <view wx:for="{{dayGroups}}" wx:key="date" class="day-group">
       <view class="day-header">{{item.label}}</view>
 
       <!-- Swipe-to-delete wrapper for each record card -->
@@ -81,23 +81,28 @@
             </view>
           </view>
 
-          <!-- Share to chat button -->
-          <button
-            class="record-share"
-            open-type="share"
-            data-record-id="{{record._id}}"
-            hover-class="record-share-hover"
-          >
-            <text class="record-share-arrow">↗</text>
-            <text>分享给朋友</text>
-          </button>
+          <!-- Bottom action buttons: share to chat + save as image -->
+          <view class="record-actions">
+            <button
+              class="record-action-btn"
+              open-type="share"
+              data-record-id="{{record._id}}"
+              hover-class="record-action-btn--hover"
+            >
+              <text class="record-action-icon">↗</text>
+              <text>分享给朋友</text>
+            </button>
+            <view
+              class="record-action-btn"
+              hover-class="record-action-btn--hover"
+              data-record-id="{{record._id}}"
+              bindtap="onGenerateShareImage"
+            >
+              <text class="record-action-icon">↓</text>
+              <text>保存为图片</text>
+            </view>
+          </view>
         </view>
-      </view>
-
-      <!-- Share image button: only on first day group -->
-      <view wx:if="{{dayIndex === 0}}" class="day-share-btn" bindtap="onGenerateShareImage">
-        <text class="day-share-icon">↓</text>
-        <text>保存为图片</text>
       </view>
     </view>
   </view>

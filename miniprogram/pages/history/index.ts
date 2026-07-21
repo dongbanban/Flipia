@@ -422,14 +422,30 @@ Page({
 
   // ── Feature 3: Generate share image ───────────────────────
 
-  async onGenerateShareImage() {
-    const firstDay = this.data.dayGroups[0];
-    if (!firstDay) return;
+  async onGenerateShareImage(e: WechatMiniprogram.TouchEvent) {
+    const recordId = (e.currentTarget.dataset as { recordId: string }).recordId;
+    if (!recordId) return;
+
+    // Find the record and which day group it belongs to (for the date label)
+    let dateLabel = "";
+    let targetRecord: (typeof this.data.dayGroups[number]["records"][number]) | null = null;
+
+    for (const day of this.data.dayGroups) {
+      const found = day.records.find(
+        (r: typeof day.records[number]) => r._id === recordId,
+      );
+      if (found) {
+        dateLabel = day.label;
+        targetRecord = found;
+        break;
+      }
+    }
+    if (!targetRecord) return;
 
     wx.showLoading({ title: "生成中…", mask: true });
 
     try {
-      const tempFilePath = await this._drawShareImage(firstDay);
+      const tempFilePath = await this._drawShareImage(dateLabel, targetRecord);
       wx.hideLoading();
 
       wx.showActionSheet({
@@ -450,7 +466,8 @@ Page({
   },
 
   _drawShareImage(
-    dayGroup: typeof this.data.dayGroups[number],
+    dateLabel: string,
+    record: typeof this.data.dayGroups[number]["records"][number],
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       const query = wx.createSelectorQuery();
@@ -477,32 +494,25 @@ Page({
           const dishSize = 26 * scale;
           const indent = 24 * scale;
           const lineHeightFactor = 1.6;
-          const recordGap = 32 * scale;
           const sectionGap = 16 * scale;
 
-          // Calculate total height
+          // Calculate total height for a single record
           let y = padding;
 
-          // Title
+          // Title (date label)
           y += titleSize * lineHeightFactor;
           y += sectionGap;
 
-          for (const record of dayGroup.records) {
-            // Time
-            y += timeSize * lineHeightFactor;
-            y += 8 * scale;
+          // Time
+          y += timeSize * lineHeightFactor;
+          y += 8 * scale;
 
-            for (const group of record.results) {
-              // Category
-              y += catSize * lineHeightFactor;
-
-              // Dishes
-              for (const _dish of group.dishes) {
-                y += dishSize * lineHeightFactor;
-              }
+          // Result groups
+          for (const group of record.results) {
+            y += catSize * lineHeightFactor;
+            for (const _dish of group.dishes) {
+              y += dishSize * lineHeightFactor;
             }
-
-            y += recordGap;
           }
 
           y += padding; // bottom padding
@@ -525,34 +535,29 @@ Page({
           // Title: date label
           ctx.fillStyle = "#333333";
           ctx.font = `bold ${titleSize}px sans-serif`;
-          ctx.fillText(dayGroup.label, padding, y);
+          ctx.fillText(dateLabel, padding, y);
           y += titleSize * lineHeightFactor + sectionGap;
 
-          // Records
-          for (const record of dayGroup.records) {
-            // Time
-            ctx.fillStyle = "#999999";
-            ctx.font = `${timeSize}px sans-serif`;
-            ctx.fillText(record.time, padding, y);
-            y += timeSize * lineHeightFactor + 8 * scale;
+          // Time
+          ctx.fillStyle = "#999999";
+          ctx.font = `${timeSize}px sans-serif`;
+          ctx.fillText(record.time, padding, y);
+          y += timeSize * lineHeightFactor + 8 * scale;
 
-            // Result groups
-            ctx.fillStyle = "#333333";
-            for (const group of record.results) {
-              // Category name
-              ctx.font = `bold ${catSize}px sans-serif`;
-              ctx.fillText(group.categoryName, padding, y);
-              y += catSize * lineHeightFactor;
+          // Result groups
+          ctx.fillStyle = "#333333";
+          for (const group of record.results) {
+            // Category name
+            ctx.font = `bold ${catSize}px sans-serif`;
+            ctx.fillText(group.categoryName, padding, y);
+            y += catSize * lineHeightFactor;
 
-              // Dish names
-              ctx.font = `${dishSize}px sans-serif`;
-              for (const dish of group.dishes) {
-                ctx.fillText(dish.dishName, padding + indent, y);
-                y += dishSize * lineHeightFactor;
-              }
+            // Dish names
+            ctx.font = `${dishSize}px sans-serif`;
+            for (const dish of group.dishes) {
+              ctx.fillText(dish.dishName, padding + indent, y);
+              y += dishSize * lineHeightFactor;
             }
-
-            y += recordGap;
           }
 
           // Convert to temp file
