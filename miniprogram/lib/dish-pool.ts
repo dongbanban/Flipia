@@ -10,6 +10,7 @@ export interface DishRecord {
   creatorId?: string;
   creatorName?: string;
   createdAt?: number;
+  cookingDescription?: string;
 }
 
 /**
@@ -66,6 +67,7 @@ export function buildImportDishData(
     creatorName: source.creatorName,
     createdAt: Date.now(),
     groupId: targetGroupId,
+    cookingDescription: source.cookingDescription,
   };
 }
 

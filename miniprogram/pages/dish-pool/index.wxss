@@ -376,6 +376,88 @@
   color: var(--color-text);
 }
 
+/* ── Form tabs ── */
+.form-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 32rpx;
+  border-bottom: 2rpx solid #e8e8e8;
+}
+
+.form-tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+  border-bottom: 4rpx solid transparent;
+  margin-bottom: -2rpx;
+}
+
+.form-tab--active {
+  color: var(--color-primary);
+  font-weight: 600;
+  border-bottom-color: var(--color-primary);
+}
+
+/* ── New category inline ── */
+.form-new-cat {
+  padding: 20rpx;
+  background: #f9f9f9;
+  border-radius: var(--radius-card);
+}
+
+.form-new-cat .form-input {
+  margin-bottom: 16rpx;
+}
+
+.form-new-cat-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.form-new-cat-cancel {
+  flex: 1;
+  height: 72rpx;
+  border: 2rpx solid #d9d9d9;
+  border-radius: var(--radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: var(--color-text-secondary);
+}
+
+.form-new-cat-confirm {
+  flex: 1;
+  height: 72rpx;
+  background-color: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.form-new-cat-confirm--loading {
+  opacity: 0.7;
+}
+
+/* ── Cooking description textarea ── */
+.form-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  border: 1rpx solid #e8e8e8;
+  border-radius: var(--radius-card);
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  line-height: 1.6;
+}
+
 /* ── Image upload ── */
 .image-list {
   display: flex;

@@ -6,6 +6,11 @@ import {
 } from "../../lib/dish-pool";
 import type { DishRecord } from "../../lib/dish-pool";
 import type { Category } from "../../lib/init-data";
+import {
+  addCategory,
+  generateCategoryId,
+  validateCategoryName,
+} from "../../lib/category-manage";
 import { checkImage, checkTextWithToast } from "../../lib/content-security";
 
 interface AppInstance {
@@ -24,6 +29,7 @@ interface FormData {
   categoryId: string;
   images: string[];
   enabled: boolean;
+  cookingDescription: string;
 }
 
 const EMPTY_FORM: FormData = {
@@ -32,6 +38,7 @@ const EMPTY_FORM: FormData = {
   categoryId: "",
   images: [],
   enabled: true,
+  cookingDescription: "",
 };
 
 Page({
@@ -48,13 +55,19 @@ Page({
     loading: false,
     formVisible: false,
     formMode: "add" as "add" | "edit",
+    formTab: "manual" as "manual" | "batch",
     formData: { ...EMPTY_FORM } as FormData,
+    formCategoriesForPicker: [] as Array<{ id: string; name: string }>,
     formCategoryIdx: 0,
     formNameError: "",
     formUploading: false,
     formDirty: false,
 
-    importVisible: false,
+    showNewCategory: false,
+    newCategoryName: "",
+    newCategoryError: "",
+    creatingCategory: false,
+
     importStep: "selectGroup" as "selectGroup" | "selectCategories",
     importSourceGroups: [] as Array<{ _id: string; name: string }>,
     importSourceGroupIdx: 0,
@@ -369,13 +382,22 @@ Page({
     const defaultCategoryId = categories[idx]?.id ?? "";
     this._originalImages = [];
     this._uploadedFileIDs = [];
+    const pickerCats: Array<{ id: string; name: string }> = [
+      ...categories,
+      { id: "__new__", name: "+ 新建分类" },
+    ];
     this.setData({
       formVisible: true,
       formMode: "add",
+      formTab: "manual",
       formData: { ...EMPTY_FORM, categoryId: defaultCategoryId },
+      formCategoriesForPicker: pickerCats,
       formCategoryIdx: idx,
       formNameError: "",
       formDirty: false,
+      showNewCategory: false,
+      newCategoryName: "",
+      newCategoryError: "",
     });
   },
 
@@ -397,7 +419,9 @@ Page({
         categoryId: dish.categoryId,
         images,
         enabled: dish.enabled,
+        cookingDescription: dish.cookingDescription ?? "",
       },
+      formCategoriesForPicker: categories as Array<{ id: string; name: string }>,
       formCategoryIdx: catIdx >= 0 ? catIdx : 0,
       formNameError: "",
       formDirty: false,
@@ -408,7 +432,12 @@ Page({
     if (this.data.formMode === "add" && this._uploadedFileIDs.length > 0) {
       void wx.cloud.deleteFile({ fileList: this._uploadedFileIDs });
     }
-    this.setData({ formVisible: false });
+    this.setData({
+      formVisible: false,
+      showNewCategory: false,
+      newCategoryName: "",
+      newCategoryError: "",
+    });
   },
 
   // ── 表单字段更新 ─────────────────────────────────────────────────────────
@@ -425,9 +454,109 @@ Page({
   onFormCategoryChange(e: WechatMiniprogram.PickerChange) {
     const categories = this.data.categories as Category[];
     const idx = Number(e.detail.value);
+    // "+ 新建分类" selected — show inline input instead of selecting it
+    if (idx >= categories.length) {
+      this.setData({ showNewCategory: true });
+      return;
+    }
     this.setData({
       "formData.categoryId": categories[idx].id,
       formCategoryIdx: idx,
+      formDirty: true,
+      showNewCategory: false,
+      newCategoryName: "",
+      newCategoryError: "",
+    });
+  },
+
+  onFormTabChange(e: WechatMiniprogram.TouchEvent) {
+    const tab = (e.currentTarget.dataset as { tab: string }).tab;
+    if (tab === "batch") {
+      this._initImportForm();
+    } else {
+      this.setData({ showNewCategory: false, newCategoryName: "", newCategoryError: "" });
+    }
+    this.setData({ formTab: tab as "manual" | "batch" });
+  },
+
+  // ── 新建分类 ──────────────────────────────────────────────────────────────
+
+  onNewCategoryNameInput(e: WechatMiniprogram.Input) {
+    this.setData({ newCategoryName: e.detail.value, newCategoryError: "" });
+  },
+
+  onCancelNewCategory() {
+    const categories = this.data.categories as Category[];
+    const idx = 0;
+    this.setData({
+      showNewCategory: false,
+      newCategoryName: "",
+      newCategoryError: "",
+      formCategoryIdx: idx < categories.length ? idx : 0,
+      "formData.categoryId": categories.length > 0 ? categories[0].id : "",
+    });
+  },
+
+  async onConfirmNewCategory() {
+    const raw = this.data.newCategoryName;
+    const categories = this.data.categories as Category[];
+    const { value, error } = validateCategoryName(
+      raw,
+      categories.map((c) => c.name),
+    );
+    if (error) {
+      this.setData({ newCategoryError: error });
+      return;
+    }
+    if (!(await checkTextWithToast(value))) return;
+
+    this.setData({ creatingCategory: true });
+    try {
+      const newCatId = generateCategoryId();
+      const newCategories = addCategory(categories, value);
+      const newCategory: Category = { id: newCatId, name: value };
+
+      // Persist to user_config
+      const configRes = await this._db!.collection("user_config")
+        .where({ groupId: this._groupId })
+        .limit(1)
+        .get();
+      if (configRes.data.length > 0) {
+        const configId = (configRes.data[0] as { _id: string })._id;
+        await this._db!.collection("user_config")
+          .doc(configId)
+          .update({ data: { categories: newCategories } });
+      }
+
+      const pickerCats: Array<{ id: string; name: string }> = [
+        ...newCategories,
+        { id: "__new__", name: "+ 新建分类" },
+      ];
+
+      this.setData({
+        categories: newCategories,
+        formCategoriesForPicker: pickerCats,
+        formCategoryIdx: newCategories.length - 1,
+        "formData.categoryId": newCategory.id,
+        showNewCategory: false,
+        newCategoryName: "",
+        newCategoryError: "",
+        formDirty: true,
+      });
+      wx.showToast({ title: "分类已添加", icon: "success" });
+    } catch (err) {
+      console.error("[dish-pool] create category failed", err);
+      wx.showToast({ title: "创建失败，请重试", icon: "none" });
+    } finally {
+      this.setData({ creatingCategory: false });
+    }
+  },
+
+  // ── 烹饪描述（编辑模式）───────────────────────────────────────────────────
+
+  onCookingDescriptionInput(e: WechatMiniprogram.Input) {
+    this.setData({
+      "formData.cookingDescription": e.detail.value,
       formDirty: true,
     });
   },
@@ -521,6 +650,8 @@ Page({
 
     if (!(await checkTextWithToast(value))) return;
 
+    if (form.cookingDescription && !(await checkTextWithToast(form.cookingDescription))) return;
+
     wx.showLoading({ title: "保存中…", mask: true });
     try {
       const isEdit = this.data.formMode === "edit";
@@ -539,6 +670,7 @@ Page({
               categoryId: form.categoryId,
               images: form.images,
               enabled: form.enabled,
+              cookingDescription: form.cookingDescription,
               updatedAt: Date.now(),
             },
           });
@@ -555,6 +687,7 @@ Page({
               [`dishes[${idx}].categoryId`]: form.categoryId,
               [`dishes[${idx}].images`]: form.images,
               [`dishes[${idx}].enabled`]: form.enabled,
+              [`dishes[${idx}].cookingDescription`]: form.cookingDescription,
             });
           }
         } else {
@@ -659,9 +792,9 @@ Page({
     });
   },
 
-  // ── 导入菜品 ──────────────────────────────────────────────────────────────
+  // ── 导入菜品（表单内标签页）────────────────────────────────────────────────
 
-  onOpenImport() {
+  _initImportForm() {
     const app = getApp<AppInstance>();
     const allGroups = app.globalData.groups;
     const sources = allGroups
@@ -670,11 +803,11 @@ Page({
 
     if (sources.length === 0) {
       wx.showToast({ title: "没有可导入的厨房", icon: "none" });
+      this.setData({ formTab: "manual" });
       return;
     }
 
     this.setData({
-      importVisible: true,
       importStep: "selectGroup",
       importSourceGroups: sources,
       importSourceGroupIdx: 0,
@@ -682,10 +815,6 @@ Page({
       importLoadingCategories: false,
       importing: false,
     });
-  },
-
-  onCloseImport() {
-    this.setData({ importVisible: false });
   },
 
   onImportSourceGroupChange(e: WechatMiniprogram.PickerChange) {
@@ -837,7 +966,7 @@ Page({
         }
       }
 
-      this.setData({ importVisible: false, importing: false });
+      this.setData({ formVisible: false, importing: false });
       wx.showToast({ title: "导入完成", icon: "success" });
 
       if (this.data.categories.length > 0) {
