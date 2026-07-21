@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 — Content Security Service
 
-**Status:** ready-for-agent
+**Status:** in-progress
 
 - [ ] 菜品名（`dish-pool` 页 `onSaveDish`）：submit 时调用 `checkText`，不通过则 toast 提示并阻止保存
 - [ ] 分类名（`category-manage` 页 `onConfirmAdd` / `onConfirmRename`）：submit 时调用 `checkText`，不通过则 toast 提示并阻止保存

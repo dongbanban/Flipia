@@ -6,6 +6,7 @@ import {
 } from "../../lib/dish-pool";
 import type { DishRecord } from "../../lib/dish-pool";
 import type { Category } from "../../lib/init-data";
+import { checkTextWithToast } from "../../lib/content-security";
 
 interface AppInstance {
   globalData: {

@@ -9,6 +9,7 @@ import {
   syncDrawConfigNames,
 } from "../../lib/draw-config-manage";
 import type { Category, DrawConfigGroup } from "../../lib/init-data";
+import { checkTextWithToast } from "../../lib/content-security";
 
 interface AppGlobalData {
   groupId: string;
