@@ -326,6 +326,22 @@ pnpm test
 - **draw-config-manage** — 所有逻辑依赖 `this.data`/`this._db`/storage
 - **group-create/category-filter.wxs** — 已是独立文件
 
+### 第二轮：大文件拆分与 DB 逻辑模块提取
+
+第一轮提取后，部分页面文件仍超过 500 行。第二轮将 DB 密集型逻辑从 Page 方法中提取为独立模块（接受 `db`/`groupId` 等上下文参数，返回结果，不做 `setData`/toast），Page 方法退化为薄编排层。
+
+| 页面 | 前 | 后 | 新增模块 |
+|---|---|---|---|
+| `dish-pool/index.ts` | 938 | 835 | `lib/search.ts` (74行) — `searchDishes`; `lib/import.ts` (133行) — `getImportSources`/`loadSourceCategories`/`executeImport`; `lib/save.ts` (87行) — `addDishToDb`/`updateDishInDb`/`diffRemovedImages`; `lib/helpers.ts` 追加 `buildCategoryMap` |
+| `history/index.ts` | 655 | 430 | `lib/canvas.ts` 追加 `drawShareImage` (241行) — Canvas 分享图片绘制 |
+| `index/index.ts` | 582 | 482 | `lib/helpers.ts` 追加 `archiveOldRecords`/`loadEnabledDishes`/`loadTodayRecords` (142行) |
+| `group-manage/index.ts` | 494 | 494 | 未改动（已在阈值内） |
+
+提取原则：
+- DB 操作模块接受 `ctx: { db, groupId, ... }` 参数，返回纯数据
+- 所有 toast、loading、setData 留在 Page 方法中
+- 注释使用简体中文（遵循 CODING_STANDARDS.md）
+
 ### 验证
 
 - `pnpm test` 全部通过

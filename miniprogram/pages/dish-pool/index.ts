@@ -1,6 +1,5 @@
 import {
   attachCreatorNames,
-  buildImportDishData,
   sortDishes,
   validateDishName,
 } from "@/lib/dish-pool";
@@ -17,7 +16,9 @@ import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
 import { getMemberCount } from "@/lib/group-utils";
 import { LIMITS, QUERY } from "@/config";
-import { escapeRegex } from "@/pages/dish-pool/lib/helpers";
+import { searchDishes } from "./lib/search";
+import { getImportSources, loadSourceCategories, executeImport, type ImportSourceCategory } from "./lib/import";
+import { addDishToDb, updateDishInDb, type SaveContext } from "./lib/save";
 
 interface AppInstance {
   globalData: {
@@ -227,14 +228,6 @@ Page({
 
   // ── 搜索 ─────────────────────────────────────────────────────────────────
 
-  _buildCategoryMap(): Record<string, string> {
-    const map: Record<string, string> = {};
-    for (const cat of this.data.categories as Category[]) {
-      map[cat.id] = cat.name;
-    }
-    return map;
-  },
-
   onSearchInput(e: WechatMiniprogram.Input) {
     const keyword = e.detail.value;
     this.setData({ searchKeyword: keyword });
@@ -273,34 +266,14 @@ Page({
   },
 
   async _doSearch(keyword: string) {
-    if (!keyword) {
-      this.setData({ searchResults: [] });
-      return;
-    }
-
+    if (!keyword) { this.setData({ searchResults: [] }); return; }
     this.setData({ loading: true });
     try {
-      const escaped = escapeRegex(keyword);
-      const res = await this._db!.collection("dishes")
-        .where({
-          groupId: this._groupId,
-          name: this._db!.RegExp({ regexp: escaped, options: "i" }),
-        })
-        .orderBy("createdAt", "desc")
-        .limit(QUERY.LIMIT_GENERIC_MAX)
-        .get();
-
-      const processed = await this._loadAndProcessDishes(
-        res.data as DishRecord[],
+      const results = await searchDishes(
+        { db: this._db!, groupId: this._groupId, categories: this.data.categories as Category[] },
+        keyword,
       );
-      const catMap = this._buildCategoryMap();
-      const searchResults = processed.map((d) => ({
-        ...d,
-        categoryName: catMap[d.categoryId] ?? d.categoryId,
-      }));
-      this.setData({ searchResults });
-    } catch (err) {
-      console.error("[dish-pool] search failed", err);
+      this.setData({ searchResults: results });
     } finally {
       this.setData({ loading: false });
     }
@@ -595,29 +568,23 @@ Page({
     wx.showLoading({ title: "保存中…", mask: true });
     try {
       const isEdit = this.data.formMode === "edit";
-      let removedFileIDs: string[] = [];
+      const ctx: SaveContext = { db: this._db!, groupId: this._groupId, openid: this._openid };
 
       if (isEdit) {
-        const currentImages = form.images;
-        removedFileIDs = this._originalImages.filter(
-          (fid) => !currentImages.includes(fid),
+        const { removedFileIDs } = await updateDishInDb(
+          ctx,
+          {
+            _id: form._id,
+            name: sanitized,
+            categoryId: form.categoryId,
+            images: form.images,
+            enabled: form.enabled,
+            cookingDescription: form.cookingDescription,
+          },
+          this._originalImages,
         );
-        await this._db!.collection("dishes")
-          .doc(form._id)
-          .update({
-            data: {
-              name: sanitized,
-              categoryId: form.categoryId,
-              images: form.images,
-              enabled: form.enabled,
-              cookingDescription: form.cookingDescription,
-              updatedAt: Date.now(),
-            },
-          });
 
-        const activeCategoryId = (
-          this.data.categories[this.data.activeTab] as Category
-        ).id;
+        const activeCategoryId = (this.data.categories[this.data.activeTab] as Category).id;
         if (form.categoryId === activeCategoryId) {
           const dishes = this.data.dishes as DishRecord[];
           const idx = dishes.findIndex((d) => d._id === form._id);
@@ -633,40 +600,32 @@ Page({
         } else {
           await this._loadDishes(activeCategoryId);
         }
+
+        if (removedFileIDs.length > 0) {
+          void wx.cloud.deleteFile({ fileList: removedFileIDs });
+        }
       } else {
-        const addRes = await this._db!.collection("dishes").add({
-          data: {
-            groupId: this._groupId,
-            name: sanitized,
-            categoryId: form.categoryId,
-            images: form.images,
-            enabled: true,
-            creatorId: this._openid,
-            createdAt: Date.now(),
-          },
+        const { _id, createdAt } = await addDishToDb(ctx, {
+          name: sanitized,
+          categoryId: form.categoryId,
+          images: form.images,
         });
-        const activeCategoryId = (
-          this.data.categories[this.data.activeTab] as Category
-        ).id;
+
+        const activeCategoryId = (this.data.categories[this.data.activeTab] as Category).id;
         if (form.categoryId === activeCategoryId) {
           const newDish: DishRecord = {
-            _id: addRes._id as unknown as string,
+            _id,
             name: sanitized,
             categoryId: form.categoryId,
             images: form.images,
             enabled: true,
             creatorId: this._openid,
-            createdAt: Date.now(),
+            createdAt,
           };
           const dishes = [newDish, ...(this.data.dishes as DishRecord[])];
           this.setData({ dishes });
         }
-      }
 
-      if (removedFileIDs.length > 0) {
-        void wx.cloud.deleteFile({ fileList: removedFileIDs });
-      }
-      if (!isEdit) {
         this._uploadedFileIDs = [];
       }
 
@@ -734,17 +693,12 @@ Page({
 
   _initImportForm() {
     const app = getApp<AppInstance>();
-    const allGroups = app.globalData.groups;
-    const sources = allGroups
-      .filter((g) => g._id !== this._groupId)
-      .map((g) => ({ _id: g._id, name: g.name }));
-
+    const sources = getImportSources(app.globalData.groups, this._groupId);
     if (sources.length === 0) {
       wx.showToast({ title: "没有可导入的厨房", icon: "none" });
       this.setData({ formTab: "manual" });
       return;
     }
-
     this.setData({
       importStep: "selectGroup",
       importSourceGroups: sources,
@@ -766,39 +720,13 @@ Page({
 
     this.setData({ importLoadingCategories: true });
     try {
-      const configRes = await this._db!.collection("user_config")
-        .where({ groupId: sourceGroupId })
-        .limit(1)
-        .get();
-
-      if (configRes.data.length === 0) {
+      const cats = await loadSourceCategories({ db: this._db!, groupId: this._groupId }, sourceGroupId);
+      if (cats.length === 0) {
         wx.showToast({ title: "源厨房无数据", icon: "none" });
         this.setData({ importLoadingCategories: false });
         return;
       }
-
-      const sourceCategories: Category[] = (
-        configRes.data[0] as { categories: Category[] }
-      ).categories;
-
-      const catsWithCount = await Promise.all(
-        sourceCategories.map(async (cat) => {
-          const countRes = await this._db!.collection("dishes")
-            .where({ groupId: sourceGroupId, categoryId: cat.id })
-            .count();
-          return {
-            ...cat,
-            checked: true,
-            dishCount: countRes.total,
-          };
-        }),
-      );
-
-      this.setData({
-        importStep: "selectCategories",
-        importSourceCategories: catsWithCount,
-        importLoadingCategories: false,
-      });
+      this.setData({ importStep: "selectCategories", importSourceCategories: cats, importLoadingCategories: false });
     } catch (err) {
       console.error("[dish-pool] load source categories failed", err);
       this.setData({ importLoadingCategories: false });
@@ -823,9 +751,7 @@ Page({
   },
 
   async onConfirmImport() {
-    const cats = this.data.importSourceCategories as Array<
-      Category & { checked: boolean; dishCount: number }
-    >;
+    const cats = this.data.importSourceCategories as ImportSourceCategory[];
     const checked = cats.filter((c) => c.checked);
     if (checked.length === 0) {
       wx.showToast({ title: "请至少勾选一个分类", icon: "none" });
@@ -833,7 +759,6 @@ Page({
     }
 
     const totalDishes = checked.reduce((sum, c) => sum + c.dishCount, 0);
-
     const confirmed = await showConfirm({
       title: "确认导入",
       content: `将从源厨房导入 ${checked.length} 个分类共 ${totalDishes} 道菜品`,
@@ -844,42 +769,17 @@ Page({
     try {
       const groups = this.data.importSourceGroups;
       const sourceGroupId = groups[this.data.importSourceGroupIdx]._id;
-
       const targetCategories = this.data.categories as Category[];
-      const existingCatIds = new Set(targetCategories.map((c) => c.id));
-      const newCategories: Category[] = [];
 
-      for (const cat of checked) {
-        if (!existingCatIds.has(cat.id)) {
-          newCategories.push({ id: cat.id, name: cat.name });
-        }
-      }
+      const result = await executeImport(
+        { db: this._db!, groupId: this._groupId },
+        sourceGroupId,
+        checked,
+        targetCategories,
+      );
 
-      for (const cat of checked) {
-        const MAX_LIMIT = QUERY.LIMIT_GENERIC_MAX;
-        let allDishes: DishRecord[] = [];
-        let hasMore = true;
-
-        while (hasMore) {
-          const res = await this._db!.collection("dishes")
-            .where({ groupId: sourceGroupId, categoryId: cat.id })
-            .limit(MAX_LIMIT)
-            .skip(allDishes.length)
-            .get();
-
-          const batch = res.data as DishRecord[];
-          allDishes = allDishes.concat(batch);
-          hasMore = batch.length === MAX_LIMIT;
-        }
-
-        for (const dish of allDishes) {
-          const importData = buildImportDishData(dish, this._groupId);
-          await this._db!.collection("dishes").add({ data: importData });
-        }
-      }
-
-      if (newCategories.length > 0) {
-        const merged = [...targetCategories, ...newCategories];
+      if (result.newCategories.length > 0) {
+        const merged = [...targetCategories, ...result.newCategories];
         const configRes = await this._db!.collection("user_config")
           .where({ groupId: this._groupId })
           .limit(1)
@@ -890,7 +790,6 @@ Page({
             .doc(configId)
             .update({ data: { categories: merged } });
         }
-
         if (this.data.categories.length > 0) {
           this.setData({ categories: merged });
         }
@@ -900,9 +799,7 @@ Page({
       wx.showToast({ title: "导入完成", icon: "success" });
 
       if (this.data.categories.length > 0) {
-        const activeCat = (this.data.categories as Category[])[
-          this.data.activeTab
-        ] as Category;
+        const activeCat = (this.data.categories as Category[])[this.data.activeTab] as Category;
         await this._loadDishes(activeCat.id);
       }
     } catch (err) {

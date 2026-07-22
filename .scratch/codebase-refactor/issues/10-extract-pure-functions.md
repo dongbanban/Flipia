@@ -106,3 +106,14 @@ miniprogram/pages/
 
 - **Commit:** `350605d` — refactor: extract pure functions from pages into lib modules
 - **Summary:** 创建了 1 个共享模块 (`lib/group-utils.ts`) 和 5 个页面级 helper 模块，从 4 个页面中提取了 11 个纯函数。所有 179 个测试通过，TypeScript 编译无错误。消除了 `_getMemberCount` 在 3 个页面中的重复定义。
+
+### 第二轮：大文件拆分（2026-07-22）
+
+第一轮后 dish-pool（938行）、history（655行）、index（582行）仍超过 500 行阈值。第二轮将 DB 密集型逻辑从 Page 方法提取为接受上下文的独立模块：
+
+- **dish-pool** (938→835): 新增 `lib/search.ts` (74行)、`lib/import.ts` (133行)、`lib/save.ts` (87行)、`lib/helpers.ts` 追加 `buildCategoryMap`
+- **history** (655→430): `lib/canvas.ts` 追加 `drawShareImage` (241行)
+- **index** (582→482): `lib/helpers.ts` 追加 `archiveOldRecords`、`loadEnabledDishes`、`loadTodayRecords` (142行)
+- **group-manage** (494): 已在阈值内，未改动
+
+dish-pool 835 行未达标，残留代码为表单处理器、导入编排、乐观更新等 UI 胶水层，需进一步提取 WXML 组件或引入状态管理才能缩减。

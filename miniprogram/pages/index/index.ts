@@ -1,17 +1,11 @@
-import {
-  attachDrawerNames,
-  getTodaySummary,
-  isToday,
-  type DrawHistoryRecord,
-} from "@/lib/history";
+import type { DrawHistoryRecord } from "@/lib/history";
 import { drawDishes, validateDrawConfig } from "@/lib/draw-engine";
 import type { Dish, DrawConfigEntry } from "@/lib/draw-engine";
 import { resolveEffectiveGroupId } from "@/lib/draw-config-manage";
 import type { DrawConfigGroup, Category } from "@/lib/init-data";
 import { showConfirm } from "@/lib/confirm";
-import { QUERY, HISTORY_WINDOW_DAYS } from "@/config";
 import { getMemberCount } from "@/lib/group-utils";
-import { buildDrawCards, cardsToResults, type DrawCard } from "@/pages/index/lib/helpers";
+import { archiveOldRecords, buildDrawCards, cardsToResults, loadEnabledDishes, loadTodayRecords, type DrawCard } from "@/pages/index/lib/helpers";
 
 interface AppInstance {
   globalData: {
@@ -23,7 +17,6 @@ interface AppInstance {
   whenReady(): Promise<void>;
 }
 
-const SEVEN_DAYS_MS = HISTORY_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 const STORAGE_ACTIVE_CONFIG_KEY = "flipia_active_config_id";
 const STORAGE_LAST_DRAWN_KEY = "flipia_last_drawn_config_id";
 
@@ -193,36 +186,7 @@ Page({
       });
       this._activeEntries = syncedEntries;
 
-      const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
-      type RawDish = {
-        _id: string;
-        name: string;
-        categoryId: string;
-        enabled: boolean;
-        images?: string[];
-      };
-      let allRaw: RawDish[] = [];
-      let skip = 0;
-      let hasMore = true;
-      while (hasMore) {
-        const res = await this._db!.collection("dishes")
-          .where({ groupId: this._groupId, enabled: true })
-          .limit(PAGE_SIZE)
-          .skip(skip)
-          .get();
-        const batch = res.data as RawDish[];
-        allRaw = allRaw.concat(batch);
-        skip += batch.length;
-        hasMore = batch.length > 0;
-      }
-
-      const dishes = allRaw.map((d) => ({
-        id: d._id,
-        name: d.name,
-        categoryId: d.categoryId,
-        enabled: d.enabled,
-        images: d.images,
-      }));
+      const dishes = await loadEnabledDishes(this._db!, this._groupId);
       this._dishPool = dishes;
 
       const validation = validateDrawConfig(dishes, syncedEntries);
@@ -500,79 +464,16 @@ Page({
   },
 
   async _archiveOldRecords() {
-    const cutoff = Date.now() - SEVEN_DAYS_MS;
-    try {
-      const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
-      let skip = 0;
-      let hasMore = true;
-      while (hasMore) {
-        const res = await this._db!.collection("draw_history")
-          .where({
-            groupId: this._groupId,
-            status: "active",
-            confirmedAt: this._db!.command.lt(cutoff),
-          })
-          .field({ _id: true })
-          .limit(PAGE_SIZE)
-          .skip(skip)
-          .get();
-
-        const batch = res.data as Array<{ _id: string }>;
-        for (const item of batch) {
-          await this._db!.collection("draw_history")
-            .doc(item._id)
-            .update({ data: { status: "archived" } });
-        }
-        skip += batch.length;
-        hasMore = batch.length > 0;
-      }
-    } catch (err) {
-      console.error("[index] archive old records failed", err);
-    }
+    await archiveOldRecords(this._db!, this._groupId);
   },
 
   async _loadTodaySummary() {
     try {
-      const dayStart = new Date();
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date();
-      dayEnd.setHours(23, 59, 59, 999);
-      const res = await this._db!.collection("draw_history")
-        .where({
-          groupId: this._groupId,
-          status: "active",
-          confirmedAt: this._db!.command.gte(dayStart.getTime()).and(
-            this._db!.command.lte(dayEnd.getTime()),
-          ),
-        })
-        .orderBy("confirmedAt", "desc")
-        .limit(QUERY.LIMIT_USER_CONFIG)
-        .get();
-
-      let records = (res.data as DrawHistoryRecord[]).filter((r) =>
-        isToday(r.confirmedAt),
+      const { summary, records } = await loadTodayRecords(
+        this._db!,
+        this._groupId,
+        this.data.memberCount,
       );
-
-      if (records.length > 0 && this.data.memberCount > 1) {
-        const drawerIds = [
-          ...new Set(records.map((r) => r.drawerId).filter(Boolean)),
-        ] as string[];
-        if (drawerIds.length > 0) {
-          const nameMap: Record<string, string> = {};
-          const userRes = await this._db!.collection("users")
-            .where({ _openid: this._db!.command.in(drawerIds) })
-            .get();
-          for (const user of userRes.data as Array<{
-            _openid: string;
-            nickName: string;
-          }>) {
-            nameMap[user._openid] = user.nickName;
-          }
-          records = attachDrawerNames(records, nameMap);
-        }
-      }
-
-      const summary = getTodaySummary(records, this.data.memberCount);
       this.setData({ todaySummary: summary, todayRecords: records });
     } catch (err) {
       console.error("[index] load today summary failed", err);
