@@ -22,7 +22,7 @@ interface UserProfile {
   nickName: string;
 }
 
-type App = WechatMiniprogram.App.Instance<Record<string, unknown>> & {
+type AppInstance = WechatMiniprogram.App.Instance<Record<string, unknown>> & {
   globalData: {
     openid: string;
     nickName: string;
@@ -99,7 +99,7 @@ Page({
         this._group = group;
 
         const alreadyInGroup = app.globalData.groups.some(
-          (g) => g._id === group._id,
+          (g: GroupInfo) => g._id === group._id,
         );
         if (alreadyInGroup) {
           app.switchGroup(group._id);
@@ -151,7 +151,7 @@ Page({
     app.switchGroup(e.detail.groupId);
 
     const groups = app.globalData.groups;
-    const group = groups.find((g) => g._id === e.detail.groupId);
+    const group = groups.find((g: GroupInfo) => g._id === e.detail.groupId);
     this._group = (group as GroupInfo | undefined) || null;
 
     this.setData({
@@ -346,7 +346,7 @@ Page({
       }
 
       const app = getApp<AppInstance>();
-      const groups = app.globalData.groups.map((g) =>
+      const groups = app.globalData.groups.map((g: GroupInfo) =>
         g._id === this.data.groupId ? { ...g, name: result.name! } : g,
       );
       app.globalData.groups = groups;
@@ -396,9 +396,9 @@ Page({
       this.setData({ members });
 
       const app = getApp<AppInstance>();
-      const groups = app.globalData.groups.map((g) =>
+      const groups = app.globalData.groups.map((g: GroupInfo) =>
         g._id === this.data.groupId
-          ? { ...g, members: g.members.filter((id) => id !== openid) }
+          ? { ...g, members: g.members.filter((id: string) => id !== openid) }
           : g,
       );
       app.globalData.groups = groups;
@@ -503,7 +503,7 @@ Page({
   _removeFromLocal() {
     const app = getApp<AppInstance>();
     const groups = app.globalData.groups.filter(
-      (g) => g._id !== this.data.groupId,
+      (g: GroupInfo) => g._id !== this.data.groupId,
     );
     app.globalData.groups = groups;
 
