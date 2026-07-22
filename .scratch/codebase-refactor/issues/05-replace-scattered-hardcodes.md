@@ -14,3 +14,5 @@
 - [x] 历史分享图品牌名 `"Flipia时刻"` 替换为 `STRINGS.BRAND_NAME`
 - [x] 替换前后的值完全一致，通过 grep 交叉比对验证
 - [x] `pnpm test` 全部通过 (164 tests, 7 files)
+
+**Commit:** `8af3d5d`
