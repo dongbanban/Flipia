@@ -12,6 +12,8 @@ import {
   validateCategoryName,
 } from "../../lib/category-manage";
 import { validateAndCompressImage, checkImageAsync, checkTextWithToast } from "../../lib/content-security";
+import { sanitizeInput } from "../../lib/sanitize";
+import { showConfirm } from "../../lib/confirm";
 import { LIMITS, QUERY } from "../../config";
 
 interface AppInstance {
@@ -470,13 +472,18 @@ Page({
       this.setData({ newCategoryError: error });
       return;
     }
-    if (!(await checkTextWithToast(value))) return;
+    const { valid, value: sanitized } = await sanitizeInput({
+      value,
+      maxLength: LIMITS.CATEGORY_NAME_MAX,
+      fieldName: "分类名",
+    });
+    if (!valid) return;
 
     this.setData({ creatingCategory: true });
     try {
       const newCatId = generateCategoryId();
-      const newCategories = addCategory(categories, value);
-      const newCategory: Category = { id: newCatId, name: value };
+      const newCategories = addCategory(categories, sanitized);
+      const newCategory: Category = { id: newCatId, name: sanitized };
 
       // Persist to user_config
       const configRes = await this._db!.collection("user_config")
@@ -618,7 +625,12 @@ Page({
       return;
     }
 
-    if (!(await checkTextWithToast(value))) return;
+    const { valid, value: sanitized } = await sanitizeInput({
+      value,
+      maxLength: LIMITS.DISH_NAME_MAX,
+      fieldName: "菜品名",
+    });
+    if (!valid) return;
 
     if (form.cookingDescription && !(await checkTextWithToast(form.cookingDescription))) return;
 
@@ -636,7 +648,7 @@ Page({
           .doc(form._id)
           .update({
             data: {
-              name: value,
+              name: sanitized,
               categoryId: form.categoryId,
               images: form.images,
               enabled: form.enabled,
@@ -653,7 +665,7 @@ Page({
           const idx = dishes.findIndex((d) => d._id === form._id);
           if (idx !== -1) {
             this.setData({
-              [`dishes[${idx}].name`]: value,
+              [`dishes[${idx}].name`]: sanitized,
               [`dishes[${idx}].categoryId`]: form.categoryId,
               [`dishes[${idx}].images`]: form.images,
               [`dishes[${idx}].enabled`]: form.enabled,
@@ -667,7 +679,7 @@ Page({
         const addRes = await this._db!.collection("dishes").add({
           data: {
             groupId: this._groupId,
-            name: value,
+            name: sanitized,
             categoryId: form.categoryId,
             images: form.images,
             enabled: true,
@@ -681,7 +693,7 @@ Page({
         if (form.categoryId === activeCategoryId) {
           const newDish: DishRecord = {
             _id: addRes._id as unknown as string,
-            name: value,
+            name: sanitized,
             categoryId: form.categoryId,
             images: form.images,
             enabled: true,
@@ -735,31 +747,29 @@ Page({
     this.setData({ "formData.enabled": !current, formDirty: true });
   },
 
-  _confirmDelete(dish: DishRecord) {
-    wx.showModal({
+  async _confirmDelete(dish: DishRecord) {
+    const confirmed = await showConfirm({
       title: "下架菜品",
       content: `确认下架「${dish.name}」？`,
-      confirmColor: "#c8815e",
-      success: async (res) => {
-        if (!res.confirm) return;
-        wx.showLoading({ title: "下架中…", mask: true });
-        try {
-          if (dish.images && dish.images.length > 0) {
-            await wx.cloud.deleteFile({ fileList: dish.images });
-          }
-          await this._db!.collection("dishes").doc(dish._id).remove();
-          const dishes = (this.data.dishes as DishRecord[]).filter(
-            (d) => d._id !== dish._id,
-          );
-          this.setData({ dishes });
-        } catch (err) {
-          console.error("[dish-pool] delete failed", err);
-          wx.showToast({ title: "删除失败，请重试", icon: "none" });
-        } finally {
-          wx.hideLoading();
-        }
-      },
     });
+    if (!confirmed) return;
+
+    wx.showLoading({ title: "下架中…", mask: true });
+    try {
+      if (dish.images && dish.images.length > 0) {
+        await wx.cloud.deleteFile({ fileList: dish.images });
+      }
+      await this._db!.collection("dishes").doc(dish._id).remove();
+      const dishes = (this.data.dishes as DishRecord[]).filter(
+        (d) => d._id !== dish._id,
+      );
+      this.setData({ dishes });
+    } catch (err) {
+      console.error("[dish-pool] delete failed", err);
+      wx.showToast({ title: "删除失败，请重试", icon: "none" });
+    } finally {
+      wx.hideLoading();
+    }
   },
 
   // ── 导入菜品（表单内标签页）────────────────────────────────────────────────
@@ -866,19 +876,11 @@ Page({
 
     const totalDishes = checked.reduce((sum, c) => sum + c.dishCount, 0);
 
-    const confirmRes =
-      await new Promise<WechatMiniprogram.ShowModalSuccessCallbackResult>(
-        (resolve) => {
-          wx.showModal({
-            title: "确认导入",
-            content: `将从源厨房导入 ${checked.length} 个分类共 ${totalDishes} 道菜品`,
-            confirmColor: "#c8815e",
-            success: resolve,
-          });
-        },
-      );
-
-    if (!confirmRes.confirm) return;
+    const confirmed = await showConfirm({
+      title: "确认导入",
+      content: `将从源厨房导入 ${checked.length} 个分类共 ${totalDishes} 道菜品`,
+    });
+    if (!confirmed) return;
 
     this.setData({ importing: true });
     try {

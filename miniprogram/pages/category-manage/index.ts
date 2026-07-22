@@ -9,8 +9,9 @@ import {
   syncDrawConfigNames,
 } from "../../lib/draw-config-manage";
 import type { Category, DrawConfigGroup } from "../../lib/init-data";
-import { checkTextWithToast } from "../../lib/content-security";
-import { QUERY } from "../../config";
+import { sanitizeInput } from "../../lib/sanitize";
+import { showConfirm } from "../../lib/confirm";
+import { LIMITS, QUERY } from "../../config";
 
 interface AppGlobalData {
   groupId: string;
@@ -117,9 +118,14 @@ Page({
       return;
     }
 
-    if (!(await checkTextWithToast(value))) return;
+    const { valid, value: sanitized } = await sanitizeInput({
+      value,
+      maxLength: LIMITS.CATEGORY_NAME_MAX,
+      fieldName: "分类名",
+    });
+    if (!valid) return;
 
-    const arr = addCategory(this.data.categories as Category[], value);
+    const arr = addCategory(this.data.categories as Category[], sanitized);
 
     wx.showLoading({ title: "保存中…", mask: true });
     try {
@@ -173,12 +179,17 @@ Page({
       return;
     }
 
-    if (!(await checkTextWithToast(value))) return;
+    const { valid, value: sanitized } = await sanitizeInput({
+      value,
+      maxLength: LIMITS.CATEGORY_NAME_MAX,
+      fieldName: "分类名",
+    });
+    if (!valid) return;
 
     const arr = renameCategory(
       this.data.categories as Category[],
       this.data.editingId,
-      value,
+      sanitized,
     );
     const newGroups = (this.data.drawConfigGroups as DrawConfigGroup[]).map(
       (g) => ({
@@ -199,55 +210,52 @@ Page({
     }
   },
 
-  onDelete(e: WechatMiniprogram.TouchEvent) {
+  async onDelete(e: WechatMiniprogram.TouchEvent) {
     const id = (e.currentTarget.dataset as { id: string }).id;
     const cat = (this.data.categories as Category[]).find((c) => c.id === id);
     if (!cat) return;
 
-    wx.showModal({
+    const confirmed = await showConfirm({
       title: "删除分类",
       content: `确认删除「${cat.name}」？该分类下的所有菜品也将被一并删除，且抽取配置中的对应条目将被移除。`,
-      confirmColor: "#c8815e",
-      success: async (res) => {
-        if (!res.confirm) return;
-
-        wx.showLoading({ title: "删除中…", mask: true });
-        try {
-          const result = deleteCategory(
-            this.data.categories as Category[],
-            this.data.drawConfigGroups as DrawConfigGroup[],
-            id,
-          );
-          await this._saveConfig(result.categories, result.drawConfigGroups);
-          if (this.data.editingId === id) {
-            this.setData({ editingId: "", editValue: "", editError: "" });
-          }
-
-          // Cascade-delete all dishes belonging to the removed category
-          const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
-          let skip = 0;
-          let hasMore = true;
-          while (hasMore) {
-            const dishRes = await this._db!.collection("dishes")
-              .where({ groupId: this._groupId, categoryId: id })
-              .field({ _id: true })
-              .limit(PAGE_SIZE)
-              .skip(skip)
-              .get();
-            const batch = dishRes.data as Array<{ _id: string }>;
-            for (const dish of batch) {
-              await this._db!.collection("dishes").doc(dish._id).remove();
-            }
-            skip += batch.length;
-            hasMore = batch.length > 0;
-          }
-        } catch (err) {
-          console.error("[category-manage] delete failed", err);
-          wx.showToast({ title: "删除失败", icon: "none" });
-        } finally {
-          wx.hideLoading();
-        }
-      },
     });
+    if (!confirmed) return;
+
+    wx.showLoading({ title: "删除中…", mask: true });
+    try {
+      const result = deleteCategory(
+        this.data.categories as Category[],
+        this.data.drawConfigGroups as DrawConfigGroup[],
+        id,
+      );
+      await this._saveConfig(result.categories, result.drawConfigGroups);
+      if (this.data.editingId === id) {
+        this.setData({ editingId: "", editValue: "", editError: "" });
+      }
+
+      // Cascade-delete all dishes belonging to the removed category
+      const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
+      let skip = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const dishRes = await this._db!.collection("dishes")
+          .where({ groupId: this._groupId, categoryId: id })
+          .field({ _id: true })
+          .limit(PAGE_SIZE)
+          .skip(skip)
+          .get();
+        const batch = dishRes.data as Array<{ _id: string }>;
+        for (const dish of batch) {
+          await this._db!.collection("dishes").doc(dish._id).remove();
+        }
+        skip += batch.length;
+        hasMore = batch.length > 0;
+      }
+    } catch (err) {
+      console.error("[category-manage] delete failed", err);
+      wx.showToast({ title: "删除失败", icon: "none" });
+    } finally {
+      wx.hideLoading();
+    }
   },
 });

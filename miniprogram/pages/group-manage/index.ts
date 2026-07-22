@@ -1,4 +1,5 @@
-import { checkTextWithToast } from "../../lib/content-security";
+import { sanitizeInput } from "../../lib/sanitize";
+import { showConfirm } from "../../lib/confirm";
 import { LIMITS } from "../../config";
 
 interface GroupInfo {
@@ -306,43 +307,32 @@ Page({
 
   async onConfirmName() {
     const name = this.data.editValue.trim();
-    if (!name) {
-      wx.showToast({ title: "厨房名不能为空", icon: "none" });
-      return;
-    }
-    if (name.length > LIMITS.GROUP_NAME_MAX) {
-      wx.showToast({ title: `厨房名不超过${LIMITS.GROUP_NAME_MAX}字`, icon: "none" });
-      return;
-    }
     if (name === this.data.groupName) {
       this.setData({ editingName: false });
       return;
     }
 
-    const confirmRes =
-      await new Promise<WechatMiniprogram.ShowModalSuccessCallbackResult>(
-        (resolve) => {
-          wx.showModal({
-            title: "修改厨房名",
-            content: `确定将厨房名改为「${name}」？`,
-            confirmColor: "#c8815e",
-            success: resolve,
-          });
-        },
-      );
-
-    if (!confirmRes.confirm) {
+    const confirmed = await showConfirm({
+      title: "修改厨房名",
+      content: `确定将厨房名改为「${name}」？`,
+    });
+    if (!confirmed) {
       // Keep editing state open so user can adjust
       return;
     }
 
-    if (!(await checkTextWithToast(name))) return;
+    const { valid, value: sanitized } = await sanitizeInput({
+      value: name,
+      maxLength: LIMITS.GROUP_NAME_MAX,
+      fieldName: "厨房名",
+    });
+    if (!valid) return;
 
     wx.showLoading({ title: "保存中…", mask: true });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
-        data: { action: "rename", groupId: this.data.groupId, name },
+        data: { action: "rename", groupId: this.data.groupId, name: sanitized },
       });
 
       const result = res.result as {
@@ -379,19 +369,11 @@ Page({
     const openid = (e.currentTarget.dataset as { openid: string }).openid;
     const name = (e.currentTarget.dataset as { name: string }).name;
 
-    const confirmRes =
-      await new Promise<WechatMiniprogram.ShowModalSuccessCallbackResult>(
-        (resolve) => {
-          wx.showModal({
-            title: "踢出成员",
-            content: `确认将「${name}」移出厨房？`,
-            confirmColor: "#c8815e",
-            success: resolve,
-          });
-        },
-      );
-
-    if (!confirmRes.confirm) return;
+    const confirmed = await showConfirm({
+      title: "踢出成员",
+      content: `确认将「${name}」移出厨房？`,
+    });
+    if (!confirmed) return;
 
     wx.showLoading({ title: "移除中…", mask: true });
     try {
@@ -442,19 +424,11 @@ Page({
   },
 
   async onLeave() {
-    const confirmRes =
-      await new Promise<WechatMiniprogram.ShowModalSuccessCallbackResult>(
-        (resolve) => {
-          wx.showModal({
-            title: "退出厨房",
-            content: "退出后将从你的厨房列表中移除该厨房，厨房数据不受影响。",
-            confirmColor: "#c8815e",
-            success: resolve,
-          });
-        },
-      );
-
-    if (!confirmRes.confirm) return;
+    const confirmed = await showConfirm({
+      title: "退出厨房",
+      content: "退出后将从你的厨房列表中移除该厨房，厨房数据不受影响。",
+    });
+    if (!confirmed) return;
 
     wx.showLoading({ title: "退出中…", mask: true });
     try {
@@ -493,19 +467,11 @@ Page({
   },
 
   async _doDissolve() {
-    const confirmRes =
-      await new Promise<WechatMiniprogram.ShowModalSuccessCallbackResult>(
-        (resolve) => {
-          wx.showModal({
-            title: "解散厨房",
-            content: "解散后厨房及所有数据将被永久删除，不可恢复。",
-            confirmColor: "#c8815e",
-            success: resolve,
-          });
-        },
-      );
-
-    if (!confirmRes.confirm) return;
+    const confirmed = await showConfirm({
+      title: "解散厨房",
+      content: "解散后厨房及所有数据将被永久删除，不可恢复。",
+    });
+    if (!confirmed) return;
 
     wx.showLoading({ title: "解散中…", mask: true });
     try {

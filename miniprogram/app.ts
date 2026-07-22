@@ -1,4 +1,5 @@
 import { buildDefaultUserConfig, buildPresetDishes } from "./lib/init-data";
+import { showConfirm } from "./lib/confirm";
 import { CLOUD, STRINGS } from "./config";
 
 interface GroupInfo {
@@ -60,11 +61,11 @@ App({
       })
       .catch((err: unknown) => {
         console.error("[app] init failed", err);
-          wx.showModal({
+          showConfirm({
             title: "初始化失败",
             content: "网络异常，请重启小程序重试",
-            showCancel: false,
-            confirmColor: "#c8815e",
+            confirmText: "确定",
+            cancelText: "取消",
           });
       });
   },

@@ -8,6 +8,7 @@ import { drawDishes, validateDrawConfig } from "../../lib/draw-engine";
 import type { Dish, DrawConfigEntry } from "../../lib/draw-engine";
 import { resolveEffectiveGroupId } from "../../lib/draw-config-manage";
 import type { DrawConfigGroup, Category } from "../../lib/init-data";
+import { showConfirm } from "../../lib/confirm";
 import { QUERY, HISTORY_WINDOW_DAYS } from "../../config";
 
 interface DrawCard {
@@ -267,17 +268,14 @@ Page({
     }
   },
 
-  onBackToIdle() {
-    wx.showModal({
+  async onBackToIdle() {
+    const confirmed = await showConfirm({
       title: "返回首页",
       content: "返回后当前抽取结果将不会保留",
-      confirmColor: "#c8815e",
-      success: (res) => {
-        if (res.confirm) {
-          this.setData({ phase: "idle", drawCards: [], flippedCount: 0, autoFlipping: false });
-        }
-      },
     });
+    if (confirmed) {
+      this.setData({ phase: "idle", drawCards: [], flippedCount: 0, autoFlipping: false });
+    }
   },
 
   async _resolveActiveConfig() {

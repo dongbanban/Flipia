@@ -1,4 +1,4 @@
-import { checkTextWithToast } from "../../lib/content-security";
+import { sanitizeInput } from "../../lib/sanitize";
 import { LIMITS, QUERY, STRINGS } from "../../config";
 import {
   type Category,
@@ -137,14 +137,6 @@ Page({
     if (this.data.submitting) return;
 
     const name = this.data.groupName.trim();
-    if (!name) {
-      this.setData({ nameError: "请输入厨房名" });
-      return;
-    }
-    if (name.length > LIMITS.GROUP_NAME_MAX) {
-      this.setData({ nameError: `厨房名不能超过 ${LIMITS.GROUP_NAME_MAX} 个字` });
-      return;
-    }
 
     const app = getApp<AppInstance>();
     const duplicate = (app.globalData.groups as GroupInfo[]).some(
@@ -155,7 +147,12 @@ Page({
       return;
     }
 
-    if (!(await checkTextWithToast(name))) return;
+    const { valid, value: sanitized } = await sanitizeInput({
+      value: name,
+      maxLength: LIMITS.GROUP_NAME_MAX,
+      fieldName: "厨房名",
+    });
+    if (!valid) return;
 
     if (this.data.importEnabled && this.data.sourceGroupIdx < 0) {
       wx.showToast({ title: "请选择源厨房", icon: "none" });
@@ -175,7 +172,7 @@ Page({
       const openid = this._openid;
 
       const groupRes = await db.collection("groups").add({
-        data: { name, members: [openid] },
+        data: { name: sanitized, members: [openid] },
       });
       const newGroupId = groupRes._id as string;
 
@@ -192,7 +189,7 @@ Page({
 
       app.globalData.groups = [
         ...(app.globalData.groups as GroupInfo[]),
-        { _id: newGroupId, name, members: [openid] },
+        { _id: newGroupId, name: sanitized, members: [openid] },
       ];
       app.switchGroup(newGroupId);
 

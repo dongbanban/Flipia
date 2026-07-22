@@ -6,6 +6,7 @@ import {
   type DrawHistoryRecord,
 } from "../../lib/history";
 import { uploadImages } from "../../lib/upload-image";
+import { showConfirm } from "../../lib/confirm";
 import { LIMITS, QUERY, STRINGS } from "../../config";
 
 interface AppInstance {
@@ -272,15 +273,11 @@ Page({
   async onDeleteRecord(e: WechatMiniprogram.TouchEvent) {
     const recordId = (e.currentTarget.dataset as { recordId: string }).recordId;
 
-    const { confirm } = await new Promise<{ confirm: boolean }>((resolve) => {
-      wx.showModal({
-        title: "确认删除",
-        content: "确认删除该条记录？删除后不可恢复",
-        confirmColor: "#c8815e",
-        success: resolve,
-      });
+    const confirmed = await showConfirm({
+      title: "确认删除",
+      content: "确认删除该条记录？删除后不可恢复",
     });
-    if (!confirm) return;
+    if (!confirmed) return;
 
     const record = this._findRecord(recordId);
     if (!record) return;

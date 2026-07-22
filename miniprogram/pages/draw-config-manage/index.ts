@@ -9,7 +9,8 @@ import {
   getAvailableCategories,
 } from "../../lib/draw-config-manage";
 import type { Category, DrawConfigEntry, DrawConfigGroup } from "../../lib/init-data";
-import { checkTextWithToast } from "../../lib/content-security";
+import { sanitizeInput } from "../../lib/sanitize";
+import { showConfirm } from "../../lib/confirm";
 import { LIMITS } from "../../config";
 
 interface AppGlobalData {
@@ -161,7 +162,12 @@ Page({
       return;
     }
 
-    if (!(await checkTextWithToast(value))) return;
+    const { valid, value: sanitized } = await sanitizeInput({
+      value,
+      maxLength: LIMITS.DRAW_CONFIG_NAME_MAX,
+      fieldName: "方案名",
+    });
+    if (!valid) return;
 
     const entries = [...this.data.modalEntries] as DrawConfigEntry[];
 
@@ -171,12 +177,12 @@ Page({
       if (this._isNewGroup && this._pendingNewGroup) {
         groups = [
           ...(this.data.drawConfigGroups as DrawConfigGroup[]),
-          { ...this._pendingNewGroup, name: value, entries },
+          { ...this._pendingNewGroup, name: sanitized, entries },
         ];
       } else {
         groups = (this.data.drawConfigGroups as DrawConfigGroup[]).map((g) => {
           if (g.id !== this.data.modalGroupId) return g;
-          return { ...g, name: value, entries };
+          return { ...g, name: sanitized, entries };
         });
       }
 
@@ -313,7 +319,7 @@ Page({
     });
   },
 
-  onDelete(e: WechatMiniprogram.TouchEvent) {
+  async onDelete(e: WechatMiniprogram.TouchEvent) {
     const id = (e.currentTarget.dataset as { id: string }).id;
     const g = (this.data.drawConfigGroups as DrawConfigGroup[]).find(
       (grp) => grp.id === id,
@@ -321,34 +327,31 @@ Page({
     if (!g) return;
     if (this.data.drawConfigGroups.length <= 1) return;
 
-    wx.showModal({
+    const confirmed = await showConfirm({
       title: "删除方案",
       content: `确认删除「${g.name}」？`,
-      confirmColor: "#c8815e",
-      success: async (res) => {
-        if (!res.confirm) return;
-
-        try {
-          const groups = deleteDrawConfigGroup(
-            this.data.drawConfigGroups as DrawConfigGroup[],
-            id,
-          );
-          if (groups === this.data.drawConfigGroups) return;
-
-          if (this.data.activeDrawConfigGroupId === id) {
-            this._setActiveId(groups[0].id);
-          }
-
-          await this._saveGroups(groups);
-
-          if (this.data.activeDrawConfigGroupId === id) {
-            this.setData({ activeDrawConfigGroupId: groups[0].id });
-          }
-        } catch (err) {
-          console.error("[draw-config-manage] delete failed", err);
-          wx.showToast({ title: "删除失败", icon: "none" });
-        }
-      },
     });
+    if (!confirmed) return;
+
+    try {
+      const groups = deleteDrawConfigGroup(
+        this.data.drawConfigGroups as DrawConfigGroup[],
+        id,
+      );
+      if (groups === this.data.drawConfigGroups) return;
+
+      if (this.data.activeDrawConfigGroupId === id) {
+        this._setActiveId(groups[0].id);
+      }
+
+      await this._saveGroups(groups);
+
+      if (this.data.activeDrawConfigGroupId === id) {
+        this.setData({ activeDrawConfigGroupId: groups[0].id });
+      }
+    } catch (err) {
+      console.error("[draw-config-manage] delete failed", err);
+      wx.showToast({ title: "删除失败", icon: "none" });
+    }
   },
 });
