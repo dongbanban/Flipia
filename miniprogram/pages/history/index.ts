@@ -5,7 +5,7 @@ import {
   type DayGroup,
   type DrawHistoryRecord,
 } from "../../lib/history";
-import { validateAndCompressImage, checkImageAsync } from "../../lib/content-security";
+import { uploadImages } from "../../lib/upload-image";
 import { LIMITS, QUERY, STRINGS } from "../../config";
 
 interface AppInstance {
@@ -81,56 +81,37 @@ Page({
     return group ? group.members.length : 0;
   },
 
-  onRecordUploadImage(e: WechatMiniprogram.TouchEvent) {
+  async onRecordUploadImage(e: WechatMiniprogram.TouchEvent) {
     const recordId = (e.currentTarget.dataset as { recordId: string }).recordId;
 
-    wx.chooseImage({
-      count: 1,
-      sizeType: ["compressed"],
-      sourceType: ["album", "camera"],
-      success: async (res) => {
-        this.setData({ uploadingRecordId: recordId });
-        wx.showLoading({ title: "上传中…", mask: true });
-        try {
-          // 1. Validate + compress
-          let uploadPath = res.tempFilePaths[0];
-          try {
-            uploadPath = await validateAndCompressImage(uploadPath);
-          } catch (reason) {
-            wx.hideLoading();
-            wx.showToast({ title: reason as string || "图片不合规，请更换", icon: "none" });
-            return;
-          }
+    try {
+      this.setData({ uploadingRecordId: recordId });
+      const fileIDs = await uploadImages({ count: 1 });
 
-          // 2. Upload to cloud storage
-          const fileIDs = await this._uploadHistoryImages([uploadPath]);
+      if (fileIDs.length === 0) {
+        // Image was skipped (e.g., validation failed) — toast already shown by uploadImages
+        return;
+      }
 
-          // 3. Submit for async content security check (fire-and-forget)
-          for (const fileID of fileIDs) {
-            checkImageAsync(fileID);
-          }
-
-          const record = this._findRecord(recordId);
-          const currentImages = record?.images || [];
-          const merged = [fileIDs[0], ...currentImages].slice(0, LIMITS.HISTORY_IMAGE_MAX);
-          await this._db!.collection("draw_history")
-            .doc(recordId)
-            .update({ data: { images: merged } });
-          this._updateRecordImages(recordId, merged);
-          wx.hideLoading();
-          wx.showToast({ title: "上传成功", icon: "success" });
-        } catch (err) {
-          console.error("[history] upload image failed", err);
-          wx.hideLoading();
-          wx.showToast({ title: "上传失败，请重试", icon: "none" });
-        } finally {
-          this.setData({ uploadingRecordId: "" });
-        }
-      },
-      fail: () => {
-        // user cancelled, do nothing
-      },
-    });
+      const record = this._findRecord(recordId);
+      const currentImages = record?.images || [];
+      const merged = [fileIDs[0], ...currentImages].slice(0, LIMITS.HISTORY_IMAGE_MAX);
+      await this._db!.collection("draw_history")
+        .doc(recordId)
+        .update({ data: { images: merged } });
+      this._updateRecordImages(recordId, merged);
+      wx.showToast({ title: "上传成功", icon: "success" });
+    } catch (err) {
+      // uploadImages already shows toast for errors; for cancel, err contains
+      // "chooseImage:fail cancel" — silently ignore
+      if (
+        !(err as { errMsg?: string }).errMsg?.includes("chooseImage:fail cancel")
+      ) {
+        console.error("[history] upload image failed", err);
+      }
+    } finally {
+      this.setData({ uploadingRecordId: "" });
+    }
   },
 
   onPreviewRecordImage(e: WechatMiniprogram.TouchEvent) {
@@ -165,21 +146,6 @@ Page({
       }),
     ) as typeof this.data.dayGroups;
     this.setData({ dayGroups });
-  },
-
-  async _uploadHistoryImages(tempPaths: string[]): Promise<string[]> {
-    const results = await Promise.all(
-      tempPaths.map((path) => {
-        const ext = path.split(".").pop() ?? "jpg";
-        return wx.cloud.uploadFile({
-          cloudPath: `history/${this._groupId}/${Date.now()}_${Math.random()
-            .toString(36)
-            .slice(2)}.${ext}`,
-          filePath: path,
-        });
-      }),
-    );
-    return results.map((r) => r.fileID);
   },
 
   async _loadHistory() {
