@@ -2,22 +2,22 @@ import { validateAndCompressImage, checkImageAsync } from "./content-security";
 import { LIMITS } from "../config";
 
 export interface UploadImageOptions {
-  /** Max number of images to pick (passed to wx.chooseImage count) */
+  /** 最多可选择的图片数量（传给 wx.chooseImage count） */
   count: number;
-  /** Image source types: album, camera */
+  /** 图片来源：相册、相机 */
   sourceType?: Array<"album" | "camera">;
-  /** Show loading toast during upload */
+  /** 上传过程中显示 loading toast */
   showToast?: boolean;
 }
 
 /**
- * Full image upload pipeline:
- * 1. wx.chooseImage → user picks images
- * 2. validateAndCompressImage → format check + compress if needed
- * 3. wx.cloud.uploadFile → upload to cloud storage
- * 4. checkImageAsync → fire-and-forget content-security review
+ * 完整图片上传流程：
+ * 1. wx.chooseImage → 用户选择图片
+ * 2. validateAndCompressImage → 格式校验 + 必要时压缩
+ * 3. wx.cloud.uploadFile → 上传至云存储
+ * 4. checkImageAsync → fire-and-forget 内容安全检测
  *
- * Returns array of cloud file IDs.
+ * 返回云存储文件 ID 数组。
  */
 export async function uploadImages(options: UploadImageOptions): Promise<string[]> {
   const { count, sourceType = ["album", "camera"], showToast = true } = options;
@@ -33,7 +33,7 @@ export async function uploadImages(options: UploadImageOptions): Promise<string[
           const fileIDs: string[] = [];
 
           for (const tempPath of res.tempFilePaths) {
-            // Validate and compress
+            // 校验并压缩
             let uploadPath = tempPath;
             try {
               uploadPath = await validateAndCompressImage(tempPath);
@@ -42,16 +42,16 @@ export async function uploadImages(options: UploadImageOptions): Promise<string[
                 wx.hideLoading();
                 wx.showToast({ title: reason as string || "图片不合规，请更换", icon: "none" });
               }
-              continue; // skip this image, continue with others
+              continue; // 跳过当前图片，继续处理其他
             }
 
-            // Upload to cloud storage
+            // 上传至云存储
             const cloudRes = await wx.cloud.uploadFile({
               cloudPath: `images/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`,
               filePath: uploadPath,
             });
 
-            // Fire-and-forget content security check
+            // Fire-and-forget 内容安全检测
             checkImageAsync(cloudRes.fileID).catch(() => {});
 
             fileIDs.push(cloudRes.fileID);

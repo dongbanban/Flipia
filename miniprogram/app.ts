@@ -57,7 +57,7 @@ App({
         const resolvers = this._readyResolvers;
         this._readyResolvers = [];
         for (const resolve of resolvers) resolve();
-        // Each page handles its own routing after app is ready
+        // 应用就绪后各页面自行处理路由跳转
       })
       .catch((err: unknown) => {
         console.error("[app] init failed", err);
@@ -162,7 +162,7 @@ App({
       }
 
       const nickName = `用户${openid.slice(-6)}`;
-      // Defer user doc creation — the profile-setup page will create it on confirm
+      // 延迟创建用户文档——profile-setup 页面将在确认时创建
       this.globalData.nickName = nickName;
       this.globalData.avatarUrl = "";
       this.globalData.needProfileSetup = true;

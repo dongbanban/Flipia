@@ -13,13 +13,13 @@ export interface SanitizeOptions {
 }
 
 /**
- * Sanitize and validate user text input:
- * 1. Trim whitespace
- * 2. Check non-empty
- * 3. Check maxLength
- * 4. Content-security review via checkTextWithToast
+ * 校验并过滤用户文本输入：
+ * 1. 去除首尾空白
+ * 2. 检查非空
+ * 3. 检查最大长度
+ * 4. 通过 checkTextWithToast 进行内容安全检测
  *
- * Returns { valid, value }. If invalid, shows a toast internally (unless showToast=false).
+ * 返回 { valid, value }。若无效，内部会显示 toast（除非 showToast=false）。
  */
 export async function sanitizeInput(options: SanitizeOptions): Promise<SanitizeResult> {
   const { value, maxLength, fieldName, showToast = true } = options;

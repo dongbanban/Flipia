@@ -8,9 +8,9 @@ export interface ConfirmOptions {
 const CONFIRM_COLOR = "#c8815e";
 
 /**
- * Show a confirmation modal with consistent styling.
- * Wraps wx.showModal with preset confirmColor.
- * Returns true if user confirmed.
+ * 显示确认弹窗，使用统一样式。
+ * 封装 wx.showModal，预设 confirmColor。
+ * 用户确认时返回 true。
  */
 export function showConfirm(options: ConfirmOptions): Promise<boolean> {
   return new Promise((resolve) => {

@@ -302,7 +302,7 @@ Page({
         return;
       }
     } catch {
-      // network error — fall through to local resolve, worst case stale
+      // 网络错误 — 降级使用本地解析，最坏情况是陈旧数据
     }
 
     const storedActiveId = wx.getStorageSync(STORAGE_ACTIVE_CONFIG_KEY) as string;

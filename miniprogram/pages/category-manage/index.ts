@@ -233,7 +233,7 @@ Page({
         this.setData({ editingId: "", editValue: "", editError: "" });
       }
 
-      // Cascade-delete all dishes belonging to the removed category
+      // 级联删除该分类下的所有菜品
       const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
       let skip = 0;
       let hasMore = true;

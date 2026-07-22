@@ -1,4 +1,4 @@
-// Draw engine — pure functions for random dish selection.
+// 抽取引擎 — 随机菜品选择的纯函数。
 
 export interface Dish {
   id: string;

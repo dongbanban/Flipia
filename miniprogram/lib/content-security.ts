@@ -49,7 +49,7 @@ export async function checkText(text: string): Promise<ContentSecurityResult> {
 }
 
 // ---------------------------------------------------------------------------
-// Image helpers — validation, compression, async content check (v2)
+// 图片辅助 — 校验、压缩、异步内容检测 (v2)
 // ---------------------------------------------------------------------------
 
 const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "bmp", "gif"];
@@ -71,21 +71,21 @@ function extToContentType(ext: string): string | null {
 }
 
 /**
- * Validate format and compress oversized images.
- * Returns the temp file path to use for upload (compressed if needed).
+ * 校验图片格式并压缩超大图片。
+ * 返回用于上传的临时文件路径（必要时返回压缩后的路径）。
  *
- * @throws {string} user-facing error message on validation/compression failure
+ * @throws {string} 校验或压缩失败时抛出面向用户的错误消息
  */
 export async function validateAndCompressImage(
   tempFilePath: string,
 ): Promise<string> {
-  // Validate format
+  // 校验格式
   const ext = tempFilePath.split(".").pop()?.toLowerCase() || "";
   if (!extToContentType(ext)) {
     throw "图片格式不支持";
   }
 
-  // Check size
+  // 检查文件大小
   let size: number;
   try {
     const fs = wx.getFileSystemManager();
@@ -95,7 +95,7 @@ export async function validateAndCompressImage(
     throw "无法读取图片信息";
   }
 
-  // Compress if needed
+  // 必要时压缩
   if (size <= LIMITS.IMAGE_MAX_SIZE) return tempFilePath;
 
   const qualities = [80, 60, 40, 20];
@@ -115,7 +115,7 @@ export async function validateAndCompressImage(
         return compressedPath;
       }
     } catch {
-      // try next quality
+      // 尝试下一个压缩质量
     }
   }
 
@@ -123,7 +123,7 @@ export async function validateAndCompressImage(
 }
 
 /**
- * Submit an already-uploaded image for async content security check (v2).
+ * 对已上传的图片发起异步内容安全检测 (v2)。
  *
  * This is the mediaCheckAsync path. The image must already be uploaded to
  * cloud storage. Results arrive asynchronously via WeChat message push to
@@ -148,33 +148,33 @@ export async function checkImageAsync(
     });
   } catch (err) {
     console.warn("[content-security] imageCheckAsync submit failed", err);
-    // Non-blocking — the callback handles cleanup if needed
+    // 非阻塞——回调负责处理后续清理
   }
 }
 
 /**
- * [DEPRECATED] Synchronous image content check via imgSecCheck (v1).
+ * [已弃用] 通过 imgSecCheck 进行同步图片内容检测 (v1)。
  *
- * This function still works for avatar/profile pages that need sync blocking
- * behavior, but the underlying cloud API (security.imgSecCheck) is deprecated
- * and may return degraded results. New image upload flows should use:
- *   1. validateAndCompressImage(tempFilePath) — client-side check
- *   2. upload to cloud storage
- *   3. checkImageAsync(cloudFileID) — async mediaCheckAsync
+ * 此方法在头像/个人资料等需要同步阻塞的场景下仍可用，
+ * 但底层云 API (security.imgSecCheck) 已被弃用，可能返回降级结果。
+ * 新的图片上传流程应使用：
+ *   1. validateAndCompressImage(tempFilePath) — 客户端校验
+ *   2. 上传至云存储
+ *   3. checkImageAsync(cloudFileID) — 异步 mediaCheckAsync
  *
  * @param tempFilePath - 微信临时文件路径
  */
 export async function checkImage(
   tempFilePath: string,
 ): Promise<ContentSecurityResult> {
-  // Validate format
+  // 校验格式
   const ext = tempFilePath.split(".").pop()?.toLowerCase() || "";
   const contentType = extToContentType(ext);
   if (!contentType) {
     return { pass: false, reason: "图片格式不支持" };
   }
 
-  // Validate file size & compress if needed
+  // 校验文件大小并在必要时压缩
   let workingPath = tempFilePath;
   let workingContentType = contentType;
   try {
@@ -193,7 +193,7 @@ export async function checkImage(
     return { pass: false, reason: "无法读取图片信息" };
   }
 
-  // Read file as base64 for cloud function transport
+  // 读取文件为 base64 以传递给云函数
   let base64: string;
   try {
     const fs = wx.getFileSystemManager();
@@ -202,7 +202,7 @@ export async function checkImage(
     return { pass: false, reason: "图片读取失败" };
   }
 
-  // Call cloud function (deprecated v1 API — may return degraded:true)
+  // 调用云函数（已弃用的 v1 API——可能返回 degraded:true）
   try {
     const res = await wx.cloud.callFunction({
       name: "content-security",
@@ -223,7 +223,7 @@ export async function checkImage(
   }
 }
 
-// Keep the old compressIfNeeded for backward compat with checkImage
+// 保留旧的 compressIfNeeded 以兼容 checkImage
 async function compressIfNeeded(
   tempFilePath: string,
   originalSize: number,
@@ -247,7 +247,7 @@ async function compressIfNeeded(
         return compressedPath;
       }
     } catch {
-      // try next quality
+      // 尝试下一个压缩质量
     }
   }
   throw new Error("压缩后仍超过大小限制");

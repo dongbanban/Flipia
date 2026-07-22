@@ -192,7 +192,7 @@ Page({
     }
   },
 
-  /** Sort and resolve creator names for a batch of dishes. */
+  /** 对一批菜品进行排序并解析创建者昵称。 */
   async _loadAndProcessDishes(dishes: DishRecord[]): Promise<DishRecord[]> {
     const sorted = sortDishes(dishes);
 
@@ -223,7 +223,7 @@ Page({
     return attachCreatorNames(sorted, nameMap);
   },
 
-  // ── Search ─────────────────────────────────────────────────────────────────
+  // ── 搜索 ─────────────────────────────────────────────────────────────────
 
   _escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -419,7 +419,7 @@ Page({
   onFormCategoryChange(e: WechatMiniprogram.PickerChange) {
     const categories = this.data.categories as Category[];
     const idx = Number(e.detail.value);
-    // "+ 新建分类" selected — show inline input instead of selecting it
+    // "+ 新建分类" 被选中 — 显示内联输入框而非直接选中它
     if (idx >= categories.length) {
       this.setData({ showNewCategory: true });
       return;
@@ -486,7 +486,7 @@ Page({
       const newCategories = addCategory(categories, sanitized);
       const newCategory: Category = { id: newCatId, name: sanitized };
 
-      // Persist to user_config
+      // 持久化到 user_config
       const configRes = await this._db!.collection("user_config")
         .where({ groupId: this._groupId })
         .limit(1)
@@ -549,7 +549,7 @@ Page({
       const merged = [...current, ...fileIDs];
       this.setData({ "formData.images": merged, formDirty: true });
     } catch (err) {
-      // User cancelled or upload failed — uploadImages handles toast
+      // 用户取消或上传失败 — uploadImages 会处理 toast
     } finally {
       this.setData({ formUploading: false });
     }

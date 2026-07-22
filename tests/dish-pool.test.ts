@@ -8,7 +8,7 @@ import {
 } from "../miniprogram/lib/dish-pool";
 import type { DishRecord } from "../miniprogram/lib/dish-pool";
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── 辅助函数 ──────────────────────────────────────────────────────────────────
 
 function makeDish(id: string, createdAt?: number): DishRecord {
   return {

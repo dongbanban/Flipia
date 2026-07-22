@@ -58,3 +58,36 @@ All `.page` containers MUST use absolute positioning instead of `100vh`. See [AD
 | Without `group-switcher` | `position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto;` |
 
 Never use `100vh`, `min-height: 100vh`, or `height: 100vh` in any `.wxss` file.
+
+## Comments
+
+所有注释统一使用简体中文。这是硬性规则，不允许混用中英文注释。
+
+### 规则
+
+| 规则 | 说明 |
+|------|------|
+| 注释语言 | 简体中文 |
+| JSDoc 标签 | `@param`、`@returns`、`@typedef` 等标签保留英文，描述文字用中文 |
+| 代码符号 | 注释中引用的函数名、变量名、文件路径保留原文 |
+| 分隔线 | `// ── 分区名 ──` 保留视觉结构，分区名翻译为中文 |
+| 编译器指令 | `@ts-ignore`、`@ts-expect-error`、`eslint-disable` 等工具指令不翻译 |
+| TODO 标记 | `TODO:` 可保留英文或中文，不做强制要求 |
+
+### 示例
+
+```ts
+/** 对菜品列表按拼音排序并附加创建者昵称。 */
+function sortDishes(dishes: Dish[]): Dish[] { ... }
+
+/**
+ * 上传图片到云存储。
+ * @param options - 上传配置选项
+ * @param options.maxCount - 最大选图数，默认 1
+ * @returns 上传成功后的 cloud fileID 数组
+ */
+function uploadImage(options: UploadOptions): Promise<string[]> { ... }
+
+// ── 搜索 ──────────────────────────────────────────────────
+const keyword = e.detail.value
+```

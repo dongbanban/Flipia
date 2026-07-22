@@ -30,21 +30,21 @@ Page({
     loading: true,
     empty: false,
     uploadingRecordId: "",
-    /** Swipe-to-delete state */
+    /** 滑动删除状态 */
     swipedRecordId: "",
     _swipeActiveId: "",
     translateXPx: 0,
     deleteBtnPx: 0,
-    /** Share image canvas height (dynamic) */
+    /** 分享图片 canvas 高度（动态） */
     canvasHeight: 0,
-    /** Share image placeholder brand text */
+    /** 分享图片占位品牌文案 */
     brandText: STRINGS.BRAND_NAME + "时刻",
   },
 
   _db: null as ReturnType<typeof wx.cloud.database> | null,
   _groupId: "",
   _loaded: false,
-  /** Swipe gesture tracking */
+  /** 滑动手势追踪 */
   _trackingSwipe: false,
   _swipeStartTranslatePx: 0,
 
@@ -92,7 +92,7 @@ Page({
       const fileIDs = await uploadImages({ count: 1 });
 
       if (fileIDs.length === 0) {
-        // Image was skipped (e.g., validation failed) — toast already shown by uploadImages
+        // 图片被跳过（如校验失败）— toast 已由 uploadImages 显示
         return;
       }
 
@@ -105,8 +105,8 @@ Page({
       this._updateRecordImages(recordId, merged);
       wx.showToast({ title: "上传成功", icon: "success" });
     } catch (err) {
-      // uploadImages already shows toast for errors; for cancel, err contains
-      // "chooseImage:fail cancel" — silently ignore
+      // uploadImages 已显示错误 toast；取消操作时 err 包含
+      // "chooseImage:fail cancel" — 静默忽略
       if (
         !(err as { errMsg?: string }).errMsg?.includes("chooseImage:fail cancel")
       ) {
@@ -207,15 +207,15 @@ Page({
     }
   },
 
-  // ── Feature 1: Left-swipe delete ──────────────────────────
+  // ── 功能 1：左滑删除 ──────────────────────────
 
   onSwipeStart(e: WechatMiniprogram.TouchEvent) {
     const recordId = (e.currentTarget.dataset as { recordId: string }).recordId;
 
-    // Determine if this card is already open BEFORE any setData call
+    // 在调用 setData 前判断当前卡片是否已展开
     const isThisCardOpen = this.data.swipedRecordId === recordId;
 
-    // If a different card is open, close it first
+    // 如果有其他卡片已打开，先将其关闭
     if (this.data.swipedRecordId && !isThisCardOpen) {
       this.setData({ swipedRecordId: "" });
     }
@@ -234,7 +234,7 @@ Page({
     const deltaY = e.touches[0].clientY - this.data.touchStartY;
 
     if (!this._trackingSwipe) {
-      // Only commit to horizontal swipe if movement is clearly horizontal
+      // 仅在水平移动明显时确认为横滑
       if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) {
         this._trackingSwipe = true;
         const recordId = (e.currentTarget.dataset as { recordId: string })
@@ -287,14 +287,14 @@ Page({
     try {
       await this._db!.collection("draw_history").doc(recordId).remove();
 
-      // Fire-and-forget cloud file deletion
+      // Fire-and-forget 删除云文件
       if (record.images && record.images.length > 0) {
         wx.cloud.deleteFile({ fileList: record.images }).catch((err) => {
           console.error("[history] cloud file delete failed", err);
         });
       }
 
-      // Remove record from local state, and remove empty day groups
+      // 从本地状态移除记录，并移除空日期分组
       const dayGroups = (this.data.dayGroups as typeof this.data.dayGroups)
         .map((day: typeof this.data.dayGroups[number]) => ({
           ...day,
@@ -327,7 +327,7 @@ Page({
     }
   },
 
-  // ── Feature 2: Share to chat ───────────────────────────────
+  // ── 功能 2：分享至聊天 ───────────────────────────────
 
   onShareAppMessage(
     e: WechatMiniprogram.Page.IShareAppMessageOption,
@@ -348,13 +348,13 @@ Page({
     };
   },
 
-  // ── Feature 3: Generate share image ───────────────────────
+  // ── 功能 3：生成分享图片 ───────────────────────
 
   async onGenerateShareImage(e: WechatMiniprogram.TouchEvent) {
     const recordId = (e.currentTarget.dataset as { recordId: string }).recordId;
     if (!recordId) return;
 
-    // Find the record and which day group it belongs to (for the date label)
+    // 查找记录及其所属日期分组（用于获取日期标签）
     let dateLabel = "";
     let targetRecord: (typeof this.data.dayGroups[number]["records"][number]) | null = null;
 
@@ -404,8 +404,8 @@ Page({
         .fields({ node: true, size: true })
         .exec(async () => {
           try {
-            // Re-query to get the canvas node (exec callback is sync-only,
-            // so we use a second query inside the async wrapper)
+            // 重新查询以获取 canvas 节点（exec 回调只能同步，
+            // 因此在 async 包装中使用第二次查询）
             const query2 = wx.createSelectorQuery();
             const nodeRes = await new Promise<any>((res) => {
               query2
@@ -425,7 +425,7 @@ Page({
             const sysInfo = wx.getSystemInfoSync();
             const scale = sysInfo.windowWidth / 750;
 
-            // ── Colors ──
+            // ── 颜色 ──
             const C_BG = "#ffffff";
             const C_TEXT = "#1a1a1a";
             const C_SECONDARY = "#888888";
@@ -434,7 +434,7 @@ Page({
             const C_PLACEHOLDER = "#d9d9d9";
             const CARD_R = 16 * scale;
 
-            // ── Layout (px) ──
+            // ── 布局 (px) ──
             const MARGIN = 32 * scale;
             const CARD_PAD = 20 * scale;
             const BODY_GAP = 16 * scale;
@@ -443,7 +443,7 @@ Page({
             const GROUP_MT = 4 * scale;
 
 
-            // ── Fonts (px) ──
+            // ── 字体 (px) ──
             const FS_TIME = 24 * scale;
             const FS_DRAWER = 20 * scale;
             const FS_CAT = 28 * scale;
@@ -460,7 +460,7 @@ Page({
             const bodyWidth = cardWidth - 2 * CARD_PAD;
             const infoWidth = bodyWidth - IMG_SIZE - BODY_GAP;
 
-            // ── Helpers ──
+            // ── 辅助函数 ──
             const roundRect = (
               x: number, y: number, w: number, h: number, r: number,
             ) => {
@@ -483,7 +483,7 @@ Page({
               return ctx.measureText(text).width;
             };
 
-            // ── Load image ──
+            // ── 加载图片 ──
             let loadedImg: any = null;
             if (record.images && record.images.length > 0) {
               try {
@@ -505,7 +505,7 @@ Page({
             }
             const hasImage = loadedImg !== null;
 
-            // ── Height calculation ──
+            // ── 高度计算 ──
             let infoH = lineH(FS_TIME);
             infoH += HEAD_MB;
             for (const group of record.results) {
@@ -521,11 +521,11 @@ Page({
             ctx.scale(dpr, dpr);
             ctx.textBaseline = "top";
 
-            // ── Draw background ──
+            // ── 绘制背景 ──
             ctx.fillStyle = C_BG;
             ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            // ── Card background with shadow ──
+            // ── 带阴影的卡片背景 ──
             let y = MARGIN;
             const cardX = MARGIN;
             const cardTop = y;
@@ -539,12 +539,12 @@ Page({
             ctx.fill();
             ctx.restore();
 
-            // ── Card content ──
+            // ── 卡片内容 ──
             y += CARD_PAD;
             const bodyX = cardX + CARD_PAD;
             const bodyTop = y;
 
-            // Left: image or placeholder
+            // 左：图片或占位符
             if (hasImage) {
               ctx.save();
               roundRect(bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
@@ -578,7 +578,7 @@ Page({
               ctx.textAlign = "left";
             }
 
-            // Right: info
+            // 右：信息区
             const infoX = bodyX + IMG_SIZE + BODY_GAP;
             let iY = bodyTop;
 
@@ -625,7 +625,7 @@ Page({
               iY += lineH(FS_CAT);
             }
 
-            // ── Export ──
+            // ── 导出 ──
             wx.canvasToTempFilePath({
               canvas,
               x: 0,

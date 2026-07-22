@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { drawDishes, validateDrawConfig } from "../miniprogram/lib/draw-engine";
 import type { Dish, DrawConfigEntry } from "../miniprogram/lib/draw-engine";
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── 辅助函数 ──────────────────────────────────────────────────────────────────
 
 function makeDish(
   id: string,
@@ -84,7 +84,7 @@ describe("drawDishes", () => {
   });
 
   it("no duplicates within the same category group", () => {
-    // run 20 times to surface any accidental duplicate
+    // 运行 20 次以检测任何意外重复
     for (let i = 0; i < 20; i++) {
       const result = drawDishes(POOL, CONFIG);
       for (const group of result) {
@@ -109,7 +109,7 @@ describe("drawDishes", () => {
       { categoryId: VEG, categoryName: "蔬菜", count: 99 },
     ];
     const result = drawDishes(POOL, config);
-    expect(result[0].dishes).toHaveLength(2); // only 2 veg dishes exist
+    expect(result[0].dishes).toHaveLength(2); // 仅有 2 道素菜
   });
 
   it("empty pool → all groups have 0 dishes", () => {
@@ -124,7 +124,7 @@ describe("drawDishes", () => {
   });
 
   it("randomness: multiple calls return different orderings over many runs", () => {
-    // Draw 3 from 3 meat dishes — order should vary across 30 calls
+    // 从 3 道荤菜中抽 3 道 — 多次调用顺序应不同
     const allMeat: Dish[] = [
       makeDish("m1", MEAT),
       makeDish("m2", MEAT),
@@ -140,7 +140,7 @@ describe("drawDishes", () => {
         .join(",");
       orders.add(order);
     }
-    // With 3! = 6 possible orders and 30 trials, getting only 1 is astronomically unlikely
+    // 有 3! = 6 种可能顺序，运行 30 次仅出现 1 种的概率极低
     expect(orders.size).toBeGreaterThan(1);
   });
 });
@@ -156,7 +156,7 @@ describe("validateDrawConfig", () => {
 
   it("returns invalid when a category has insufficient dishes", () => {
     const config: DrawConfigEntry[] = [
-      { categoryId: VEG, categoryName: "蔬菜", count: 5 }, // only 2 veg
+      { categoryId: VEG, categoryName: "蔬菜", count: 5 }, // 仅有 2 道素菜
     ];
     const result = validateDrawConfig(POOL, config);
     expect(result.valid).toBe(false);
@@ -174,7 +174,7 @@ describe("validateDrawConfig", () => {
 
   it("returns invalid for the first failing category", () => {
     const config: DrawConfigEntry[] = [
-      { categoryId: MEAT, categoryName: "肉菜", count: 10 }, // fails first
+      { categoryId: MEAT, categoryName: "肉菜", count: 10 }, // 该分类最先不满足
       { categoryId: VEG, categoryName: "蔬菜", count: 1 },
     ];
     const { valid, reason } = validateDrawConfig(POOL, config);

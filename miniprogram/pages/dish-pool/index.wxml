@@ -1,5 +1,5 @@
 <view class="page">
-  <!-- Search bar -->
+  <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-bar__inner">
       <text class="search-bar__icon">🔍</text>
@@ -18,7 +18,7 @@
     </view>
   </view>
 
-  <!-- 分类 tab 横向滚动 — hidden during search -->
+  <!-- 分类标签横向滚动 — 搜索时隐藏 -->
   <view wx:if="{{!searchKeyword}}" class="tab-bar-wrap">
     <scroll-view class="tab-bar" scroll-x enable-flex>
       <view
@@ -33,12 +33,12 @@
 
   <!-- 加载骨架屏 / 菜品列表 / 空状态 -->
   <view class="dish-area">
-    <!-- Search mode: loading skeleton -->
+    <!-- 搜索模式：加载骨架屏 -->
     <view wx:if="{{searchKeyword && loading}}" class="skeleton-list">
       <view wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="skeleton-card" />
     </view>
 
-    <!-- Search mode: results -->
+    <!-- 搜索模式：结果 -->
     <scroll-view wx:elif="{{searchKeyword && searchResults.length > 0}}" scroll-y class="dish-list">
       <view
         wx:for="{{searchResults}}"
@@ -79,15 +79,15 @@
       </view>
     </scroll-view>
 
-    <!-- Search mode: empty -->
+    <!-- 搜索模式：空状态 -->
     <empty-state wx:elif="{{searchKeyword && !loading && searchResults.length === 0}}" text="没有找到相关菜品" />
 
-    <!-- Normal mode: loading skeleton -->
+    <!-- 普通模式：加载骨架屏 -->
     <view wx:elif="{{loading}}" class="skeleton-list">
       <view wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="skeleton-card" />
     </view>
 
-    <!-- Normal mode: dish list -->
+    <!-- 普通模式：菜品列表 -->
     <scroll-view wx:elif="{{dishes.length > 0}}" scroll-y class="dish-list">
       <view
         wx:for="{{dishes}}"
@@ -127,7 +127,7 @@
       </view>
     </scroll-view>
 
-    <!-- Normal mode: empty (with categories) -->
+    <!-- 普通模式：空状态（有分类） -->
     <empty-state
       wx:elif="{{categories.length > 0}}"
       text="还没有菜品，快去添加吧~"
@@ -135,11 +135,11 @@
       bind:action="onOpenAdd"
     />
 
-    <!-- Normal mode: empty (no categories) -->
+    <!-- 普通模式：空状态（无分类） -->
     <empty-state wx:else text="暂无分类" />
   </view>
 
-  <!-- 浮动添加按钮 — hidden during search -->
+  <!-- 浮动添加按钮 — 搜索时隐藏 -->
   <view wx:if="{{categories.length > 0 && !searchKeyword}}" class="fab" bind:tap="onOpenAdd">+</view>
 
   <!-- 添加/编辑表单弹层 -->
@@ -149,7 +149,7 @@
     bind:close="onCloseForm"
   >
     <view class="form-content">
-      <!-- Tabs (add mode only) -->
+      <!-- 标签页（仅添加模式） -->
       <view wx:if="{{formMode === 'add'}}" class="form-tabs">
         <view
           class="form-tab {{formTab === 'manual' ? 'form-tab--active' : ''}}"
@@ -163,7 +163,7 @@
         >批量导入</view>
       </view>
 
-      <!-- Manual tab / Edit mode -->
+      <!-- 手动添加标签页 / 编辑模式 -->
       <block wx:if="{{formMode === 'edit' || formTab === 'manual'}}">
         <!-- 菜品名 -->
         <view class="form-field">
@@ -192,7 +192,7 @@
           </picker>
         </view>
 
-        <!-- 新建分类 (add mode only) -->
+        <!-- 新建分类（仅添加模式） -->
         <view wx:if="{{showNewCategory}}" class="form-field form-new-cat">
           <input
             class="form-input {{newCategoryError ? 'form-input--error' : ''}}"
@@ -234,7 +234,7 @@
           </view>
         </view>
 
-        <!-- 烹饪描述 (edit mode only) -->
+        <!-- 烹饪描述（仅编辑模式） -->
         <view wx:if="{{formMode === 'edit'}}" class="form-field">
           <text class="form-label">烹饪描述</text>
           <textarea
@@ -258,7 +258,7 @@
         </view>
       </block>
 
-      <!-- Batch import tab (add mode only) -->
+      <!-- 批量导入标签页（仅添加模式） -->
       <block wx:elif="{{formTab === 'batch'}}">
         <!-- 第一步：选择源厨房 -->
         <block wx:if="{{importStep === 'selectGroup'}}">

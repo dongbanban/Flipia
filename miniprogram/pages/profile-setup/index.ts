@@ -14,30 +14,30 @@ interface AppInstance {
 
 Page({
   data: {
-    avatarUrl: "",        // temp local path after chooseAvatar
+    avatarUrl: "",        // 选择头像后的本地临时路径
     nickName: "",
-    hasNewAvatar: false,   // true if user selected a new avatar in this session
-    nicknameFocus: false,  // auto-focus input after avatar selected
-    canConfirm: false,     // computed — true when nickname is non-empty
+    hasNewAvatar: false,   // 用户在本会话中选择了新头像时为 true
+    nicknameFocus: false,  // 选择头像后自动聚焦输入框
+    canConfirm: false,     // 计算得出 — 昵称非空时为 true
   },
 
   async onLoad() {
     wx.hideHomeButton();
-    // Splash page already awaited app.whenReady() and routed here —
-    // globalData is guaranteed ready.
+    // Splash 页面已经 await app.whenReady() 并路由至此 —
+    // globalData 保证已就绪。
     await getApp<AppInstance>().whenReady();
   },
 
   onChooseAvatar(e: WechatMiniprogram.CustomEvent) {
     const { avatarUrl } = e.detail;
     this.setData({ avatarUrl, hasNewAvatar: true });
-    // Auto-focus nickname input after avatar selection for sequential flow
+    // 选择头像后自动聚焦昵称输入框，实现顺序流程
     wx.nextTick(() => {
       this.setData({ nicknameFocus: true });
     });
   },
 
-  /** Tap avatar circle → custom image picker (camera / gallery, no WeChat avatars) */
+  /** 点击头像圆 → 自定义图片选择器（相机 / 相册，不使用微信头像） */
   onTapAvatarDisplay() {
     wx.chooseMedia({
       count: 1,
@@ -58,7 +58,7 @@ Page({
     });
   },
 
-  /** Reset focus flag when nickname input loses focus */
+  /** 昵称输入框失焦时重置聚焦标志 */
   onNicknameBlur() {
     this.setData({ nicknameFocus: false });
   },
@@ -73,7 +73,7 @@ Page({
     const { avatarUrl, nickName, hasNewAvatar } = this.data;
     const trimmedNick = nickName.trim();
 
-    // Validate: nickname is required, avatar is optional
+    // 校验：昵称必填，头像可选
     if (!trimmedNick) {
       wx.showToast({ title: "请输入昵称", icon: "none" });
       return;
@@ -84,9 +84,9 @@ Page({
     try {
       let finalAvatarUrl = "";
 
-      // If a new avatar was selected, validate and upload
+      // 如果选择了新头像，先校验再上传
       if (hasNewAvatar && avatarUrl) {
-        // Security check
+        // 安全检测
         const checkResult = await checkImage(avatarUrl);
         if (!checkResult.pass) {
           wx.hideLoading();
@@ -97,7 +97,7 @@ Page({
           return;
         }
 
-        // Upload to cloud storage
+        // 上传至云存储
         const openid = app.globalData.openid;
         const ext = avatarUrl.split(".").pop() || "jpg";
         const cloudPath = `avatars/${openid}/${Date.now()}_avatar.${ext}`;
@@ -111,13 +111,13 @@ Page({
         finalAvatarUrl = app.globalData.avatarUrl;
       }
 
-      // Update local globalData immediately
+      // 立即更新本地 globalData
       app.globalData.nickName = trimmedNick || app.globalData.nickName;
       app.globalData.avatarUrl = finalAvatarUrl;
-      // Clear needProfileSetup flag
+      // 清除 needProfileSetup 标志
       app.globalData.needProfileSetup = false;
 
-      // Update users collection in DB
+      // 更新数据库中的 users 集合
       const db = wx.cloud.database();
       const userRes = await db
         .collection("users")
@@ -137,7 +137,7 @@ Page({
             data: updateData,
           });
       } else {
-        // User doc doesn't exist, create it
+        // 用户文档不存在，创建之
         await db.collection("users").add({
           data: {
             nickName: trimmedNick || `用户${app.globalData.openid.slice(-6)}`,
@@ -163,7 +163,7 @@ Page({
     const app = getApp<AppInstance>();
     const openid = app.globalData.openid;
 
-    // Check if user doc exists in DB
+    // 检查数据库中是否存在用户文档
     const db = wx.cloud.database();
     const userRes = await db
       .collection("users")
@@ -172,7 +172,7 @@ Page({
       .get();
 
     if (userRes.data.length === 0) {
-      // New user: create default profile
+      // 新用户：创建默认资料
       const nickName = `用户${openid.slice(-6)}`;
       await db.collection("users").add({
         data: { nickName, avatarUrl: "", createdAt: Date.now() },
@@ -180,7 +180,7 @@ Page({
       app.globalData.nickName = nickName;
       app.globalData.avatarUrl = "";
     }
-    // If existing user, keep current profile (globalData already has it)
+    // 如果是已有用户，保持当前资料不变（globalData 已有）
 
     app.globalData.needProfileSetup = false;
 

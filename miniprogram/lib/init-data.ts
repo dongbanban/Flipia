@@ -1,6 +1,6 @@
 import { STRINGS } from "../config";
 
-// init-data — pure factory functions for first-launch cloud initialization.
+// init-data — 首次启动云端初始化的纯工厂函数。
 
 export interface Category {
   id: string;

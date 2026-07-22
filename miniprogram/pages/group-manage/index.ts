@@ -317,7 +317,7 @@ Page({
       content: `确定将厨房名改为「${name}」？`,
     });
     if (!confirmed) {
-      // Keep editing state open so user can adjust
+      // 保持编辑状态打开，以便用户修改
       return;
     }
 

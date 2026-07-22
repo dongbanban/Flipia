@@ -18,7 +18,7 @@
     <view wx:for="{{dayGroups}}" wx:key="date" class="day-group">
       <view class="day-header">{{item.label}}</view>
 
-      <!-- Swipe-to-delete wrapper for each record card -->
+      <!-- 每条记录卡片的滑动删除包装器 -->
       <view
         wx:for="{{item.records}}"
         wx:key="_id"
@@ -29,7 +29,7 @@
         bindtouchmove="onSwipeMove"
         bindtouchend="onSwipeEnd"
       >
-        <!-- Delete button revealed behind card on swipe -->
+        <!-- 滑动时在卡片后方露出的删除按钮 -->
         <view
           class="swipe-delete"
           style="visibility: {{swipedRecordId === record._id ? 'visible' : 'hidden'}};"
@@ -39,14 +39,14 @@
           <text>删除</text>
         </view>
 
-        <!-- Card content (translates horizontally on swipe) -->
+        <!-- 卡片内容（滑动时水平平移） -->
         <view
           class="swipe-content"
           style="transform: translateX({{_swipeActiveId === record._id ? translateXPx : (swipedRecordId === record._id ? -deleteBtnPx : 0)}}px); transition: {{_swipeActiveId === record._id ? 'none' : 'transform 0.25s ease-out'}};"
         >
-          <!-- Horizontal body: image/placeholder left, info right -->
+          <!-- 水平布局：左图/占位符，右信息 -->
           <view class="card-body">
-            <!-- Mode 1: has image -->
+            <!-- 模式 1：有图片 -->
             <view
               wx:if="{{record.images && record.images.length > 0}}"
               class="card-image-wrap"
@@ -60,7 +60,7 @@
                 bind:tap="onPreviewRecordImage"
               />
             </view>
-            <!-- Mode 2: no image, upload placeholder -->
+            <!-- 模式 2：无图片，显示上传占位符 -->
             <view
               wx:else
               class="card-placeholder"
@@ -76,7 +76,7 @@
               </block>
             </view>
 
-            <!-- Right info area -->
+            <!-- 右侧信息区 -->
             <view class="card-info">
               <view class="record-head">
                 <text class="record-time">{{record.time}}</text>
@@ -91,7 +91,7 @@
             </view>
           </view>
 
-          <!-- Bottom action buttons: share to chat + save as image -->
+          <!-- 底部操作按钮：分享给朋友 + 保存为图片 -->
           <view class="record-actions">
             <button
               class="record-action-btn"
@@ -118,5 +118,5 @@
   </view>
 </view>
 
-<!-- Hidden canvas for share image generation (outside .page to avoid clipping) -->
+<!-- 隐藏 canvas 用于生成分享图片（放在 .page 外避免裁剪） -->
 <canvas type="2d" id="shareCanvas" class="share-canvas"></canvas>

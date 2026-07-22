@@ -215,6 +215,35 @@ pnpm test
 
 ---
 
+## 代码注释中文化
+
+在完成上述重构后，统一将项目所有源代码中的英文注释（包括单行注释、块注释、JSDoc、HTML 注释）翻译为简体中文。这是一个纯文档性质的工作，不涉及任何逻辑或行为变更。
+
+### 翻译范围
+
+| 目录 | 文件数 | 说明 |
+|------|--------|------|
+| `cloudfunctions/` | 6 | 云函数 index.js + config.js |
+| `miniprogram/lib/` | 7 | 工具函数库 |
+| `miniprogram/pages/` | 16 | 8 个页面的 ts + wxml |
+| `miniprogram/components/` | 6 | 3 个组件的 ts + wxml |
+| `miniprogram/config.ts` | 1 | 统一配置文件 |
+| `miniprogram/app.ts` | 1 | 应用入口 |
+| `tests/` | 7 | Vitest 测试文件 |
+
+### 翻译原则
+
+- JSDoc 标签（`@param`、`@returns` 等）保留英文，仅翻译描述文字
+- 代码符号引用（函数名、变量名、路径）保留原文
+- 分隔线中的分段名翻译为中文，保留视觉结构
+- 已是中文的注释不重复翻译
+- 编译器/工具指令（`@ts-ignore`、`eslint-disable` 等）不翻译
+
+### 验证
+
+- `pnpm test` 全部通过 —— 纯注释修改，行为不发生任何变化
+- 全局 grep 确认无英文注释遗漏
+
 ## Out of Scope
 
 - 深层架构变更：纯函数模块（draw-engine、dish-pool、history、category-manage 等）的接口和实现不变

@@ -7,26 +7,26 @@ const db = cloud.database();
 const config = require("./config");
 
 // ---------------------------------------------------------------------------
-// Configuration — set these as CloudBase environment variables after
-// configuring message push in MP Admin Panel (开发 → 开发设置 → 消息推送)
+// 配置 — 在 MP 管理后台（开发 → 开发设置 → 消息推送）配置消息推送后，
+// 将这些设置为 CloudBase 环境变量
 // ---------------------------------------------------------------------------
 const TOKEN = process.env.WX_MSG_TOKEN || "";
-const ENCODING_AES_KEY = process.env.WX_MSG_ENCODING_AES_KEY || ""; // 43 chars
+const ENCODING_AES_KEY = process.env.WX_MSG_ENCODING_AES_KEY || ""; // 43 个字符
 
 // ---------------------------------------------------------------------------
-// WeChat message decryption (JSON format, AES-256-CBC)
+// 微信消息解密（JSON 格式，AES-256-CBC）
 // ---------------------------------------------------------------------------
 
 /**
- * Decode the 43-char base64 EncodingAESKey into a 32-byte Buffer.
- * WeChat uses an alternate base64 encoding without trailing '=' padding.
+ * 将 43 字符的 base64 EncodingAESKey 解码为 32 字节的 Buffer。
+ * 微信使用不带尾部 '=' 填充的替代 base64 编码。
  */
 function decodeAESKey(b64Key) {
-  return Buffer.from(b64Key + "=", "base64"); // → 32 bytes
+  return Buffer.from(b64Key + "=", "base64"); // → 32 字节
 }
 
 /**
- * PKCS7 unpadding.
+ * PKCS7 去填充。
  */
 function pkcs7Unpad(buf) {
   const pad = buf[buf.length - 1];
@@ -35,10 +35,10 @@ function pkcs7Unpad(buf) {
 }
 
 /**
- * Decrypt a WeChat-encrypted payload, returning the raw plaintext (string).
- * Caller decides whether to JSON.parse.
- * @param {string} encrypted - Base64-encoded ciphertext
- * @returns {string} Decrypted plaintext
+ * 解密微信加密的负载，返回原始明文（字符串）。
+ * 由调用方决定是否 JSON.parse。
+ * @param {string} encrypted - Base64 编码的密文
+ * @returns {string} 解密后的明文
  */
 function decryptRaw(encrypted) {
   const aesKey = decodeAESKey(ENCODING_AES_KEY);
@@ -50,21 +50,21 @@ function decryptRaw(encrypted) {
   let decrypted = Buffer.concat([decipher.update(cipherBuf), decipher.final()]);
   decrypted = pkcs7Unpad(decrypted);
 
-  // decrypted layout: random(16) + msgLen(4 BE) + msg + appId
+  // 解密后布局：random(16) + msgLen(4 大端序) + msg + appId
   const msgLen = decrypted.readUInt32BE(16);
   const msgBuf = decrypted.slice(20, 20 + msgLen);
   return msgBuf.toString("utf8");
 }
 
 /**
- * Decrypt and JSON.parse a WeChat-encrypted JSON message.
+ * 解密并 JSON.parse 微信加密的 JSON 消息。
  */
 function decryptJSON(encrypted) {
   return JSON.parse(decryptRaw(encrypted));
 }
 
 /**
- * Verify WeChat signature: SHA1(sort([token, timestamp, nonce, ...args]).join(''))
+ * 验证微信签名：SHA1(sort([token, timestamp, nonce, ...args]).join(''))
  */
 function verifySignature(signature, timestamp, nonce, ...args) {
   const sorted = [TOKEN, timestamp, nonce, ...args].sort().join("");
@@ -79,18 +79,18 @@ function verifySignature(signature, timestamp, nonce, ...args) {
 }
 
 // ---------------------------------------------------------------------------
-// Business logic: process a wxa_media_check result
+// 业务逻辑：处理 wxa_media_check 结果
 // ---------------------------------------------------------------------------
 
 /**
- * When a media check result comes back as "risky":
- * 1. Delete the offending cloud file
- * 2. Remove its fileID from any dish or draw_history record that references it
+ * 当媒体检测结果返回 "risky" 时：
+ * 1. 删除违规云文件
+ * 2. 从引用该文件的所有 dish 或 draw_history 记录中移除其 fileID
  */
 async function handleRiskyImage(cloudFileID) {
   console.warn("[callback] risky image detected, cleaning up:", cloudFileID);
 
-  // 1. Delete cloud file
+  // 1. 删除云文件
   try {
     await cloud.deleteFile({ fileList: [cloudFileID] });
     console.log("[callback] deleted cloud file:", cloudFileID);
@@ -98,7 +98,7 @@ async function handleRiskyImage(cloudFileID) {
     console.error("[callback] failed to delete file:", cloudFileID, err);
   }
 
-  // 2. Remove reference from dishes collection
+  // 2. 从 dishes 集合中移除引用
   try {
     const dishRes = await db.collection(config.COLLECTION_DISHES)
       .where({ [config.FIELD_IMAGE_URL]: cloudFileID })
@@ -113,13 +113,13 @@ async function handleRiskyImage(cloudFileID) {
     console.error("[callback] failed to clean dish records:", err);
   }
 
-  // 3. Remove reference from draw_history records (images array)
+  // 3. 从 draw_history 记录中移除引用（images 数组）
   try {
-    // WeChat cloud DB doesn't support array-contains on cloud.Database.RegExp
-    // efficiently, so we fetch recent records and filter in code.
+    // 微信云数据库不支持对 cloud.Database.RegExp 进行 array-contains 高效查询，
+    // 所以获取最近记录并在代码中过滤。
     const historyRes = await db.collection(config.COLLECTION_DRAW_HISTORY)
       .where({
-        [config.FIELD_IMAGES]: db.command.all([cloudFileID]), // won't work perfectly, but as a rough filter
+        [config.FIELD_IMAGES]: db.command.all([cloudFileID]), // 不完全精确，但作为粗略过滤
       })
       .limit(config.QUERY_LIMIT_HISTORY)
       .get();
@@ -138,14 +138,14 @@ async function handleRiskyImage(cloudFileID) {
 }
 
 /**
- * Process the decrypted wxa_media_check event payload.
+ * 处理解密后的 wxa_media_check 事件负载。
  */
 async function processMediaCheckEvent(payload) {
   const { trace_id, result, detail, errcode } = payload;
 
   console.log("[callback] media check result:", JSON.stringify({ trace_id, result, errcode }));
 
-  // Find the check record
+  // 查找检测记录
   let checkRecord;
   try {
     const checkRes = await db.collection(config.COLLECTION_CONTENT_CHECKS)
@@ -165,7 +165,7 @@ async function processMediaCheckEvent(payload) {
 
   const { cloudFileID, _id: recordId } = checkRecord;
 
-  // Update check record status
+  // 更新检测记录状态
   const status = result?.suggest === config.STATUS_RISKY ? config.STATUS_RISKY : config.STATUS_PASS;
   try {
     await db.collection(config.COLLECTION_CONTENT_CHECKS).doc(recordId).update({
@@ -181,22 +181,22 @@ async function processMediaCheckEvent(payload) {
     console.error("[callback] failed to update check record:", err);
   }
 
-  // If risky, clean up the image
+  // 若违规，清理图片
   if (result?.suggest === config.STATUS_RISKY) {
     await handleRiskyImage(cloudFileID);
   }
 }
 
 // ---------------------------------------------------------------------------
-// HTTP entry point (CloudBase HTTP cloud function)
+// HTTP 入口（CloudBase HTTP 云函数）
 // ---------------------------------------------------------------------------
 
 exports.main = async (event, context) => {
-  // CloudBase HTTP access service can deliver query params in several formats.
-  // Normalize to a flat object.
+  // CloudBase HTTP 访问服务可能以多种格式传递查询参数。
+  // 统一规范化为扁平对象。
   let query = event.queryStringParameters || event.queryString || event.query || {};
   if (typeof query === "string") {
-    // manual query string parse (compatible with older Node.js)
+    // 手动查询字符串解析（兼容旧版 Node.js）
     query = Object.fromEntries(
       query.split("&").map((p) => {
         const eq = p.indexOf("=");
@@ -208,7 +208,7 @@ exports.main = async (event, context) => {
   const httpMethod = (event.httpMethod || event.method || "GET").toUpperCase();
   const body = event.body;
 
-  // Dump full event for diagnosis (keys only, values truncated)
+  // 输出完整事件用于诊断（仅键名，值被截断）
   const eventDump = {
     httpMethod,
     hasBody: !!body,
@@ -219,7 +219,7 @@ exports.main = async (event, context) => {
   };
   console.log("[callback] request dump:", JSON.stringify(eventDump));
 
-  // ---- GET: diagnostic / health check (no echostr = browser test) ----
+  // ---- GET：诊断/健康检查（无 echostr = 浏览器测试）----
   if (httpMethod === "GET" && !query.echostr) {
     return {
       statusCode: 200,
@@ -228,7 +228,7 @@ exports.main = async (event, context) => {
     };
   }
 
-  // ---- GET: URL verification ----
+  // ---- GET：URL 验证 ----
   if (httpMethod === "GET") {
     const sig = query.msg_signature || query.signature;
     const { timestamp, nonce, echostr } = query;
@@ -241,11 +241,11 @@ exports.main = async (event, context) => {
       return { statusCode: 403, body: "signature failed" };
     }
     try {
-      // Try to decrypt — echostr may be encrypted (base64) or plaintext (numeric string).
-      // If it looks like plaintext, return it as-is.
+      // 尝试解密 — echostr 可能是加密的（base64）或是明文（数字字符串）。
+      // 如果看起来是明文，直接返回。
       let echostrPlain;
       if (/^[0-9]+$/.test(echostr)) {
-        // Plaintext echostr (no encryption) — return directly
+        // 明文 echostr（未加密）— 直接返回
         echostrPlain = echostr;
       } else {
         echostrPlain = decryptRaw(echostr);
@@ -258,7 +258,7 @@ exports.main = async (event, context) => {
     }
   }
 
-  // ---- POST: message push ----
+  // ---- POST：消息推送 ----
   if (httpMethod === "POST") {
     if (!body) {
       return { statusCode: 400, body: "missing body" };
@@ -271,7 +271,7 @@ exports.main = async (event, context) => {
       return { statusCode: 400, body: "invalid json" };
     }
 
-    // Verify msg_signature if available
+    // 若可用则验证 msg_signature
     const { msg_signature, signature, timestamp, nonce } = query;
     const sig = msg_signature || signature;
     if (sig && TOKEN) {
@@ -281,10 +281,10 @@ exports.main = async (event, context) => {
       }
     }
 
-    // Decrypt
+    // 解密
     if (!parsed.Encrypt) {
       console.warn("[callback] no Encrypt field in body, treating as plain JSON");
-      // Some configurations may send plain JSON — handle wxa_media_check directly
+      // 某些配置可能发送明文 JSON — 直接处理 wxa_media_check
       if (parsed.Event === config.EVENT_WXA_MEDIA_CHECK || parsed.MsgType === config.EVENT_TYPE_EVENT) {
         await processMediaCheckEvent(parsed);
       }
@@ -301,12 +301,12 @@ exports.main = async (event, context) => {
 
     console.log("[callback] decrypted event:", JSON.stringify(decrypted).slice(0, config.LOG_TRUNCATE));
 
-    // Route by event type
+    // 按事件类型路由
     if (decrypted.Event === config.EVENT_WXA_MEDIA_CHECK || decrypted.MsgType === config.EVENT_TYPE_EVENT) {
       await processMediaCheckEvent(decrypted);
     }
 
-    // Always respond "success" within 5s to prevent WeChat from retrying
+    // 始终在 5 秒内返回 "success"，防止微信重试
     return { statusCode: 200, headers: { "Content-Type": "text/plain" }, body: "success" };
   }
 

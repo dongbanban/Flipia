@@ -3,7 +3,7 @@ const cloud = require("wx-server-sdk");
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const config = require("./config");
 
-// URL regex — matches http/https/ftp links in text
+// URL 正则 — 匹配文本中的 http/https/ftp 链接
 const URL_REGEX = config.URL_REGEX;
 
 function extractUrls(text) {
@@ -19,7 +19,7 @@ function extractUrls(text) {
 async function handleTextCheck(event, openid) {
   const { content } = event;
 
-  // Step 1: msgSecCheck v2
+  // 步骤 1：msgSecCheck v2
   try {
     const result = await cloud.openapi.security.msgSecCheck({
       openid,
@@ -32,16 +32,16 @@ async function handleTextCheck(event, openid) {
       return { pass: false, reason: "文本包含违规内容" };
     }
   } catch (err) {
-    // errCode 87014 = risky content (inherited from v1 behavior, v2 may also throw)
+    // errCode 87014 = 违规内容（继承自 v1 行为，v2 也可能抛出）
     if (err.errCode === config.ERR_CODE_RISKY) {
       return { pass: false, reason: "文本包含违规内容" };
     }
-    // Other errors (network, auth, rate-limit) — fail closed
+    // 其他错误（网络、鉴权、频率限制）— 失败即拦截
     console.error("[content-security] msgSecCheck error", err);
     return { pass: false, reason: "文本安全检测失败" };
   }
 
-  // Step 2: URL filter
+  // 步骤 2：URL 过滤器
   const urls = extractUrls(content);
   if (urls.length > 0) {
     return { pass: false, reason: "文本包含链接" };
@@ -74,7 +74,7 @@ async function handleImageCheck(event) {
     return { pass: false, reason: "图片数据缺失" };
   }
 
-  // Reconstruct Buffer from base64-encoded string passed by the client
+  // 从客户端传入的 base64 编码字符串重建 Buffer
   let buffer;
   try {
     buffer = Buffer.from(media.value, "base64");
@@ -92,13 +92,13 @@ async function handleImageCheck(event) {
     });
     return { pass: true };
   } catch (err) {
-    // errCode 87014 = risky content — still block
+    // errCode 87014 = 违规内容 — 仍然拦截
     if (err.errCode === config.ERR_CODE_RISKY) {
       return { pass: false, reason: "图片包含违规内容" };
     }
-    // Other errors: deprecated API is broken / permission revoked / etc.
-    // FALLTHROUGH: return pass=true so uploads aren't blocked by API outage.
-    // TODO: once mediaCheckAsync is in place, remove this fallback.
+    // 其他错误：已废弃 API 不可用 / 权限被回收 / 等
+    // FALLTHROUGH: 返回 pass=true，避免 API 故障阻塞上传
+    // TODO: 一旦 mediaCheckAsync 就位，移除此兜底逻辑
     console.warn(
       "[content-security] imgSecCheck unavailable (deprecated API), allowing upload. err:",
       JSON.stringify({ errCode: err.errCode, errMsg: err.errMsg }),
@@ -125,7 +125,7 @@ async function handleImageCheckAsync(event) {
     return { pass: false, reason: "缺少 cloudFileID" };
   }
 
-  // Get temp download URL for the cloud file
+  // 获取云文件的临时下载 URL
   let tempUrl;
   try {
     const urlRes = await cloud.getTempFileURL({ fileList: [cloudFileID] });
@@ -138,14 +138,14 @@ async function handleImageCheckAsync(event) {
     return { pass: false, reason: "获取图片URL失败" };
   }
 
-  // Call mediaCheckAsync
+  // 调用 mediaCheckAsync
   let traceId;
   try {
     const result = await cloud.openapi.security.mediaCheckAsync({
       media_url: tempUrl,
-      media_type: config.MEDIA_TYPE_IMAGE,  // 2 = image
-      version: config.VERSION_MEDIA_CHECK,     // v2 API
-      scene: config.SCENE_MEDIA_CHECK,       // 1 = profile/content
+      media_type: config.MEDIA_TYPE_IMAGE,  // 2 = 图片
+      version: config.VERSION_MEDIA_CHECK,     // v2 接口
+      scene: config.SCENE_MEDIA_CHECK,       // 1 = 资料/内容
       openid: OPENID,
     });
     traceId = result.trace_id;
@@ -157,7 +157,7 @@ async function handleImageCheckAsync(event) {
     return { pass: false, reason: "审核提交失败" };
   }
 
-  // Store check record for callback matching
+  // 存储检测记录，用于回调匹配
   try {
     await db.collection(config.COLLECTION_CONTENT_CHECKS).add({
       data: {
@@ -169,7 +169,7 @@ async function handleImageCheckAsync(event) {
     });
   } catch (err) {
     console.error("[content-security] failed to store check record", err);
-    // Non-blocking — callback will just have an orphan trace_id
+    // 非阻塞 — 回调只会收到一个孤立的 trace_id
   }
 
   return { pass: true, trace_id: traceId };

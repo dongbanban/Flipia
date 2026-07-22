@@ -1,6 +1,6 @@
 import { LIMITS } from "../config";
 
-// dish-pool — pure functions for dish pool display logic.
+// dish-pool — 菜品池展示逻辑的纯函数。
 
 export interface DishRecord {
   _id: string;
@@ -48,10 +48,6 @@ export function toggleEnabled(dish: DishRecord): Pick<DishRecord, "enabled"> {
   return { enabled: !dish.enabled };
 }
 
-/**
- * 从 users 集合的昵称映射解析菜品的 creatorName。
- * dishes 中已存在 creatorName 的优先保留，否则按 creatorId 从映射查找。
- */
 /**
  * 构建导入菜品的数据库写入数据。
  * 从源菜品复制字段，替换 groupId，将 createdAt 置为当前时间。

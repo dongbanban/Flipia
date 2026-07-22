@@ -41,7 +41,7 @@ Page({
     const { avatarUrl } = e.detail;
     const app = getApp<AppInstance>();
 
-    // Security check
+    // 安全检测
     const checkResult = await checkImage(avatarUrl);
     if (!checkResult.pass) {
       wx.hideLoading();
@@ -65,11 +65,11 @@ Page({
         fileID = uploadRes.fileID;
       }
 
-      // Update globalData
+      // 更新 globalData
       app.globalData.avatarUrl = fileID;
       app.globalData.needProfileSetup = false;
 
-      // Persist to DB
+      // 持久化到数据库
       const db = wx.cloud.database();
       const userRes = await db.collection("users")
         .where({ _openid: openid })
@@ -100,11 +100,11 @@ Page({
     const openid = app.globalData.openid;
 
     try {
-      // Update globalData
+      // 更新 globalData
       app.globalData.nickName = newNickName;
       app.globalData.needProfileSetup = false;
 
-      // Persist to DB
+      // 持久化到数据库
       const db = wx.cloud.database();
       const userRes = await db.collection("users")
         .where({ _openid: openid })

@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 
 /**
- * Regression tests for group-create import flow:
- * - Categories auto-selected when source kitchen is chosen
- * - Individual category toggle (select/deselect) works correctly
+ * 厨房创建导入流程的回归测试：
+ * - 选择源厨房时自动选中全部分类
+ * - 单个分类勾选/取消勾选功能正常
  */
 
 interface Category {
@@ -25,7 +25,7 @@ const SAMPLE_CATEGORIES: Category[] = [
   { id: "cat-soup", name: "汤" },
 ];
 
-/** Simulates onSelectSourceGroup auto-select */
+/** 模拟 onSelectSourceGroup 自动全选 */
 function simulateSelectSourceGroup(
   state: PageData,
   categories: Category[],
@@ -37,7 +37,7 @@ function simulateSelectSourceGroup(
   };
 }
 
-/** Simulates onToggleCategory using index-based lookup (current implementation) */
+/** 模拟 onToggleCategory，使用基于索引的查找（当前实现方式） */
 function simulateToggleCategory(state: PageData, index: number): PageData {
   const cat = state.sourceCategories[index];
   if (!cat) return state;
@@ -66,7 +66,7 @@ describe("group-create: category toggle (select/deselect)", () => {
   });
 
   it("deselects a category by index (toggle off)", () => {
-    // Start with all selected
+    // 初始状态：全部分类已选中
     let state: PageData = {
       sourceGroupIdx: 0,
       sourceGroupName: "test",
@@ -74,7 +74,7 @@ describe("group-create: category toggle (select/deselect)", () => {
       selectedCategoryIds: SAMPLE_CATEGORIES.map((c) => c.id),
     };
 
-    // Toggle index 0 (cat-meat) — should deselect it
+    // 切换索引 0 (cat-meat) — 应取消选中
     state = simulateToggleCategory(state, 0);
     expect(state.selectedCategoryIds).not.toContain("cat-meat");
     expect(state.selectedCategoryIds).toHaveLength(3);
@@ -89,7 +89,7 @@ describe("group-create: category toggle (select/deselect)", () => {
       selectedCategoryIds: ["cat-veg", "cat-staple", "cat-soup"],
     };
 
-    // Toggle index 0 (cat-meat) — should re-select it
+    // 切换索引 0 (cat-meat) — 应重新选中
     state = simulateToggleCategory(state, 0);
     expect(state.selectedCategoryIds).toContain("cat-meat");
     expect(state.selectedCategoryIds).toHaveLength(4);

@@ -9,7 +9,7 @@ Page({
   },
 
   onReady() {
-    // Start card-flip animation immediately
+    // 立即开始翻牌动画
     this.setData({ flipping: true });
   },
 
