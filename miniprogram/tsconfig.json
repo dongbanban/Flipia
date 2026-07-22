@@ -8,7 +8,11 @@
     "allowSyntheticDefaultImports": true,
     "ignoreDeprecations": "5.0",
     "typeRoots": ["./node_modules/@types", "./node_modules"],
-    "types": ["miniprogram-api-typings"]
+    "types": ["miniprogram-api-typings"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]

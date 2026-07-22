@@ -1,11 +1,11 @@
-import { sanitizeInput } from "../../lib/sanitize";
-import { LIMITS, QUERY, STRINGS } from "../../config";
+import { sanitizeInput } from "@/lib/sanitize";
+import { LIMITS, QUERY, STRINGS } from "@/config";
 import {
   type Category,
   generateGroupId,
   buildDefaultUserConfig,
   buildPresetDishes,
-} from "../../lib/init-data";
+} from "@/lib/init-data";
 
 interface GroupInfo {
   _id: string;

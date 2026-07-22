@@ -1,5 +1,5 @@
-import type { Category, DrawConfigGroup } from "./init-data";
-import { LIMITS } from "../config";
+import type { Category, DrawConfigGroup } from "@/lib/init-data";
+import { LIMITS } from "@/config";
 
 export interface ValidateCategoryNameResult {
   value: string;

@@ -3,15 +3,15 @@ import {
   addCategory,
   renameCategory,
   deleteCategory,
-} from "../../lib/category-manage";
+} from "@/lib/category-manage";
 import {
   syncAllGroupNames,
   syncDrawConfigNames,
-} from "../../lib/draw-config-manage";
-import type { Category, DrawConfigGroup } from "../../lib/init-data";
-import { sanitizeInput } from "../../lib/sanitize";
-import { showConfirm } from "../../lib/confirm";
-import { LIMITS, QUERY } from "../../config";
+} from "@/lib/draw-config-manage";
+import type { Category, DrawConfigGroup } from "@/lib/init-data";
+import { sanitizeInput } from "@/lib/sanitize";
+import { showConfirm } from "@/lib/confirm";
+import { LIMITS, QUERY } from "@/config";
 
 interface AppGlobalData {
   groupId: string;

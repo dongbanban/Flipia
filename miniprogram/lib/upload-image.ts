@@ -1,5 +1,5 @@
-import { validateAndCompressImage, checkImageAsync } from "./content-security";
-import { LIMITS } from "../config";
+import { validateAndCompressImage, checkImageAsync } from "@/lib/content-security";
+import { LIMITS } from "@/config";
 
 export interface UploadImageOptions {
   /** 最多可选择的图片数量（传给 wx.chooseImage count） */

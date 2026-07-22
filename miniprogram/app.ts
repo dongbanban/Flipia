@@ -1,6 +1,6 @@
-import { buildDefaultUserConfig, buildPresetDishes } from "./lib/init-data";
-import { showConfirm } from "./lib/confirm";
-import { CLOUD, STRINGS } from "./config";
+import { buildDefaultUserConfig, buildPresetDishes } from "@/lib/init-data";
+import { showConfirm } from "@/lib/confirm";
+import { CLOUD, STRINGS } from "@/config";
 
 interface GroupInfo {
   _id: string;

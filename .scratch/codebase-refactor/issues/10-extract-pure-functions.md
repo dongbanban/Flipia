@@ -98,5 +98,11 @@ miniprogram/pages/
 
 ## 验证
 - `pnpm test` 全部通过
-- TypeScript 编译无错误
-- 微信开发者工具中逐页回归关键路径：首页抽取、菜品池搜索/编辑、厨房成员管理、历史记录分享图生成
+- [x] `pnpm test` 全部通过
+- [x] TypeScript 编译无错误
+- [ ] 微信开发者工具中逐页回归关键路径：首页抽取、菜品池搜索/编辑、厨房成员管理、历史记录分享图生成
+
+## Comments
+
+- **Commit:** `350605d` — refactor: extract pure functions from pages into lib modules
+- **Summary:** 创建了 1 个共享模块 (`lib/group-utils.ts`) 和 5 个页面级 helper 模块，从 4 个页面中提取了 11 个纯函数。所有 179 个测试通过，TypeScript 编译无错误。消除了 `_getMemberCount` 在 3 个页面中的重复定义。

@@ -3,15 +3,15 @@ import {
   getTodaySummary,
   isToday,
   type DrawHistoryRecord,
-} from "../../lib/history";
-import { drawDishes, validateDrawConfig } from "../../lib/draw-engine";
-import type { Dish, DrawConfigEntry } from "../../lib/draw-engine";
-import { resolveEffectiveGroupId } from "../../lib/draw-config-manage";
-import type { DrawConfigGroup, Category } from "../../lib/init-data";
-import { showConfirm } from "../../lib/confirm";
-import { QUERY, HISTORY_WINDOW_DAYS } from "../../config";
-import { getMemberCount } from "../../lib/group-utils";
-import { buildDrawCards, cardsToResults, type DrawCard } from "./lib/helpers";
+} from "@/lib/history";
+import { drawDishes, validateDrawConfig } from "@/lib/draw-engine";
+import type { Dish, DrawConfigEntry } from "@/lib/draw-engine";
+import { resolveEffectiveGroupId } from "@/lib/draw-config-manage";
+import type { DrawConfigGroup, Category } from "@/lib/init-data";
+import { showConfirm } from "@/lib/confirm";
+import { QUERY, HISTORY_WINDOW_DAYS } from "@/config";
+import { getMemberCount } from "@/lib/group-utils";
+import { buildDrawCards, cardsToResults, type DrawCard } from "@/pages/index/lib/helpers";
 
 interface AppInstance {
   globalData: {

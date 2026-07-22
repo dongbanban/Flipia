@@ -1,4 +1,4 @@
-import { LIMITS } from "../config";
+import { LIMITS } from "@/config";
 
 // dish-pool — 菜品池展示逻辑的纯函数。
 

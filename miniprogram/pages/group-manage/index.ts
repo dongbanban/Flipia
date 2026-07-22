@@ -1,7 +1,7 @@
-import { buildProfileMap, buildMemberInfoList } from "./lib/helpers";
-import { sanitizeInput } from "../../lib/sanitize";
-import { showConfirm } from "../../lib/confirm";
-import { LIMITS } from "../../config";
+import { buildProfileMap, buildMemberInfoList } from "@/pages/group-manage/lib/helpers";
+import { sanitizeInput } from "@/lib/sanitize";
+import { showConfirm } from "@/lib/confirm";
+import { LIMITS } from "@/config";
 
 interface GroupInfo {
   _id: string;

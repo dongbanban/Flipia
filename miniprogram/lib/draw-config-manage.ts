@@ -1,6 +1,6 @@
-import type { Category, DrawConfigEntry, DrawConfigGroup } from "./init-data";
-import { generateGroupId } from "./init-data";
-import { LIMITS } from "../config";
+import type { Category, DrawConfigEntry, DrawConfigGroup } from "@/lib/init-data";
+import { generateGroupId } from "@/lib/init-data";
+import { LIMITS } from "@/config";
 
 export function clampDrawCount(count: number): number {
   if (count < LIMITS.DRAW_COUNT_MIN) return LIMITS.DRAW_COUNT_MIN;

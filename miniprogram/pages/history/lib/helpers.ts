@@ -1,4 +1,4 @@
-import { formatTime, type DrawHistoryRecord } from "../../../lib/history";
+import { formatTime, type DrawHistoryRecord } from "@/lib/history";
 
 /** 带显示字段的历史记录条目类型。 */
 export interface EnrichedRecord extends DrawHistoryRecord {

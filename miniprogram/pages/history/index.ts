@@ -3,13 +3,13 @@ import {
   groupByDay,
   type DayGroup,
   type DrawHistoryRecord,
-} from "../../lib/history";
-import { getMemberCount } from "../../lib/group-utils";
-import { uploadImages } from "../../lib/upload-image";
-import { showConfirm } from "../../lib/confirm";
-import { LIMITS, QUERY, STRINGS } from "../../config";
-import { buildRecordDisplayFields, type EnrichedRecord } from "./lib/helpers";
-import { roundRect, lineH, measure } from "./lib/canvas";
+} from "@/lib/history";
+import { getMemberCount } from "@/lib/group-utils";
+import { uploadImages } from "@/lib/upload-image";
+import { showConfirm } from "@/lib/confirm";
+import { LIMITS, QUERY, STRINGS } from "@/config";
+import { buildRecordDisplayFields, type EnrichedRecord } from "@/pages/history/lib/helpers";
+import { roundRect, lineH, measure } from "@/pages/history/lib/canvas";
 
 interface AppInstance {
   globalData: {

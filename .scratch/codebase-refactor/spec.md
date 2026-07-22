@@ -266,6 +266,73 @@ pnpm test
 
 改动范围：仅 `pages/splash/index.ts` 一处文件，`onShow()` 第 17 行后插入 `await new Promise(r => setTimeout(r, 500))`。
 
+## Pages 纯函数提取（10-extract-pure-functions）
+
+将 `miniprogram/pages/` 下各模块中嵌入在 Page 对象内的纯函数提取到模块级 `lib/` 目录，解耦业务逻辑与数据转换/工具函数。
+
+### 识别依据
+
+纯函数定义：无副作用（不读写 DB、不调 `setData`、不调 `wx.*` API），不依赖 `this.data`/`this._*` 实例字段，相同输入始终返回相同输出。
+
+### 提取清单
+
+#### 共享工具（→ `miniprogram/lib/group-utils.ts`）
+
+| 函数 | 当前位置 | 说明 |
+|------|---------|------|
+| `getMemberCount(groups, groupId)` | `index/index.ts:154`, `dish-pool/index.ts:922`, `history/index.ts:82` | 三处完全相同的实现，提取到共享 lib |
+
+#### index/（→ `pages/index/lib/helpers.ts`）
+
+| 函数 | 说明 |
+|------|------|
+| `buildDrawCards(results, dishPool?)` | 将 `drawDishes()` 返回的抽取结果转为 UI 卡片数组 |
+| `cardsToResults(cards)` | 将翻牌后的卡片数组反序列化为 `draw_history.results` 格式 |
+
+#### dish-pool/（→ `pages/dish-pool/lib/helpers.ts`）
+
+| 函数 | 说明 |
+|------|------|
+| `escapeRegex(str)` | 正则特殊字符转义，用于数据库模糊搜索 |
+
+#### group-manage/（→ `pages/group-manage/lib/helpers.ts`）
+
+| 函数 | 说明 |
+|------|------|
+| `buildProfileMap(profiles)` | `UserProfile[] → Record<string, string>` |
+| `buildMemberInfoList(memberOpenids, profileMap, ownerOpenid)` | 构建成员信息列表（含 fallback 昵称） |
+| `buildFallbackNickname(openid)` | 生成 `用户${openid.slice(-6)}` |
+
+#### history/（→ `pages/history/lib/helpers.ts`）
+
+| 函数 | 说明 |
+|------|------|
+| `buildRecordDisplayFields(dayGroups)` | 为 `groupByDay()` 结果中的每条 record 注入 `time` 和 `drawerLabel` 显示字段 |
+
+#### history/（可选 → `pages/history/lib/canvas.ts`）
+
+| 函数 | 说明 |
+|------|------|
+| `roundRect(ctx, x, y, w, h, r)` | Canvas 圆角矩形绘制（有 ctx 副作用但属于工具层） |
+| `lineH(fs)` | 行高计算 |
+| `measure(ctx, text, fs, bold?)` | 文本宽度测量 |
+
+### 不作为提取的模块
+
+- **splash** — 仅 25 行纯路由逻辑
+- **mine** — 无纯函数可提取
+- **profile-setup** — 无纯函数可提取
+- **category-manage** — 所有逻辑依赖 `this.data`/`this._db`
+- **draw-config-manage** — 所有逻辑依赖 `this.data`/`this._db`/storage
+- **group-create/category-filter.wxs** — 已是独立文件
+
+### 验证
+
+- `pnpm test` 全部通过
+- 微信开发者工具中逐页回归关键用户路径
+
+---
+
 ## Out of Scope
 
 - 深层架构变更：纯函数模块（draw-engine、dish-pool、history、category-manage 等）的接口和实现不变

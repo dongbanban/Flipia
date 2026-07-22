@@ -1,4 +1,4 @@
-import type { DrawResultGroup } from "../../../lib/draw-engine";
+import type { DrawResultGroup } from "@/lib/draw-engine";
 
 export interface DrawCard {
   id: string;

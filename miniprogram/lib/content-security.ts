@@ -1,4 +1,4 @@
-import { LIMITS } from "../config";
+import { LIMITS } from "@/config";
 
 export interface ContentSecurityResult {
   pass: boolean;

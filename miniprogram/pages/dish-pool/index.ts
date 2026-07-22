@@ -3,21 +3,21 @@ import {
   buildImportDishData,
   sortDishes,
   validateDishName,
-} from "../../lib/dish-pool";
-import type { DishRecord } from "../../lib/dish-pool";
-import type { Category } from "../../lib/init-data";
+} from "@/lib/dish-pool";
+import type { DishRecord } from "@/lib/dish-pool";
+import type { Category } from "@/lib/init-data";
 import {
   addCategory,
   generateCategoryId,
   validateCategoryName,
-} from "../../lib/category-manage";
-import { checkTextWithToast } from "../../lib/content-security";
-import { uploadImages } from "../../lib/upload-image";
-import { sanitizeInput } from "../../lib/sanitize";
-import { showConfirm } from "../../lib/confirm";
-import { getMemberCount } from "../../lib/group-utils";
-import { LIMITS, QUERY } from "../../config";
-import { escapeRegex } from "./lib/helpers";
+} from "@/lib/category-manage";
+import { checkTextWithToast } from "@/lib/content-security";
+import { uploadImages } from "@/lib/upload-image";
+import { sanitizeInput } from "@/lib/sanitize";
+import { showConfirm } from "@/lib/confirm";
+import { getMemberCount } from "@/lib/group-utils";
+import { LIMITS, QUERY } from "@/config";
+import { escapeRegex } from "@/pages/dish-pool/lib/helpers";
 
 interface AppInstance {
   globalData: {

@@ -1,4 +1,4 @@
-import { checkImage } from "../../lib/content-security";
+import { checkImage } from "@/lib/content-security";
 
 interface AppInstance {
   globalData: {

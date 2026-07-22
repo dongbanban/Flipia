@@ -7,11 +7,11 @@ import {
   addDrawConfigEntry,
   removeDrawConfigEntry,
   getAvailableCategories,
-} from "../../lib/draw-config-manage";
-import type { Category, DrawConfigEntry, DrawConfigGroup } from "../../lib/init-data";
-import { sanitizeInput } from "../../lib/sanitize";
-import { showConfirm } from "../../lib/confirm";
-import { LIMITS } from "../../config";
+} from "@/lib/draw-config-manage";
+import type { Category, DrawConfigEntry, DrawConfigGroup } from "@/lib/init-data";
+import { sanitizeInput } from "@/lib/sanitize";
+import { showConfirm } from "@/lib/confirm";
+import { LIMITS } from "@/config";
 
 interface AppGlobalData {
   groupId: string;

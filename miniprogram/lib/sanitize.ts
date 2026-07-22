@@ -1,4 +1,4 @@
-import { checkTextWithToast } from "./content-security";
+import { checkTextWithToast } from "@/lib/content-security";
 
 export interface SanitizeResult {
   valid: boolean;

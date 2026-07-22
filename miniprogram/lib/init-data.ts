@@ -1,4 +1,4 @@
-import { STRINGS } from "../config";
+import { STRINGS } from "@/config";
 
 // init-data — 首次启动云端初始化的纯工厂函数。
 
