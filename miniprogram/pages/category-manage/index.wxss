@@ -41,7 +41,7 @@
   display: inline-flex;
   align-items: center;
   padding: 14rpx 16rpx 14rpx 28rpx;
-  background-color: #fff;
+  background-color: var(--color-primary-light);
   border-radius: 48rpx;
   font-size: 28rpx;
   color: var(--color-primary);
