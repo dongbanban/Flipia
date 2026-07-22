@@ -11,7 +11,8 @@ Implement the work described by the user in the spec or tickets.
 If implementing from a ticket file (under `.scratch/<feature>/issues/`):
 
 1. **Start** — change `Status:` in the ticket file from `ready-for-agent` to `in-progress`. Read the ticket body and acceptance criteria before writing any code.
-2. **Done** — mark every acceptance criterion checkbox as `- [x]`, change `Status:` to `done`, then append the commit SHA and a one-line summary under `## Comments`.
+2. **Standards** — read `CODING_STANDARDS.md` and `docs/config-and-utils.md`. Adhere to all rules and use existing config constants / utility functions / shared components instead of introducing duplicates or hardcoded values.
+3. **Done** — mark every acceptance criterion checkbox as `- [x]`, change `Status:` to `done`, then append the commit SHA and a one-line summary under `## Comments`.
 
 ## Build
 
