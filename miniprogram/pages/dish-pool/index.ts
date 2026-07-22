@@ -11,7 +11,8 @@ import {
   generateCategoryId,
   validateCategoryName,
 } from "../../lib/category-manage";
-import { validateAndCompressImage, checkImageAsync, checkTextWithToast } from "../../lib/content-security";
+import { checkTextWithToast } from "../../lib/content-security";
+import { uploadImages } from "../../lib/upload-image";
 import { sanitizeInput } from "../../lib/sanitize";
 import { showConfirm } from "../../lib/confirm";
 import { LIMITS, QUERY } from "../../config";
@@ -537,62 +538,21 @@ Page({
     const remaining = LIMITS.DISH_IMAGE_MAX - current.length;
     if (remaining <= 0) return;
 
-    wx.chooseMedia({
-      count: remaining,
-      mediaType: ["image"],
-      sourceType: ["album", "camera"],
-      success: async (res) => {
-        this.setData({ formUploading: true });
-        try {
-          // 1. Validate + compress each selected image
-          const safePaths: string[] = [];
-          for (const f of res.tempFiles) {
-            try {
-              const compressedPath = await validateAndCompressImage(f.tempFilePath);
-              safePaths.push(compressedPath);
-            } catch (reason) {
-              wx.showToast({ title: reason as string || "图片不合规，请更换", icon: "none" });
-            }
-          }
-          if (safePaths.length === 0) return;
+    this.setData({ formUploading: true });
+    try {
+      const fileIDs = await uploadImages({ count: remaining, showToast: false });
 
-          // 2. Upload to cloud storage
-          const fileIDs = await this._uploadImages(safePaths);
+      if (this.data.formMode === "add") {
+        this._uploadedFileIDs.push(...fileIDs);
+      }
 
-          // 3. Submit for async content security check (fire-and-forget)
-          for (const fileID of fileIDs) {
-            checkImageAsync(fileID); // no await — non-blocking
-          }
-
-          const merged = [...current, ...fileIDs];
-          this.setData({ "formData.images": merged, formDirty: true });
-        } catch (err) {
-          console.error("[dish-pool] upload failed", err);
-          wx.showToast({ title: "上传失败，请重试", icon: "none" });
-        } finally {
-          this.setData({ formUploading: false });
-        }
-      },
-    });
-  },
-
-  async _uploadImages(tempPaths: string[]): Promise<string[]> {
-    const results = await Promise.all(
-      tempPaths.map((path) => {
-        const ext = path.split(".").pop() ?? "jpg";
-        return wx.cloud.uploadFile({
-          cloudPath: `dishes/${this._groupId}/${Date.now()}_${Math.random()
-            .toString(36)
-            .slice(2)}.${ext}`,
-          filePath: path,
-        });
-      }),
-    );
-    const fileIDs = results.map((r) => r.fileID);
-    if (this.data.formMode === "add") {
-      this._uploadedFileIDs.push(...fileIDs);
+      const merged = [...current, ...fileIDs];
+      this.setData({ "formData.images": merged, formDirty: true });
+    } catch (err) {
+      // User cancelled or upload failed — uploadImages handles toast
+    } finally {
+      this.setData({ formUploading: false });
     }
-    return fileIDs;
   },
 
   onRemoveImage(e: WechatMiniprogram.TouchEvent) {
