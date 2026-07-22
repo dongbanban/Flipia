@@ -2,13 +2,12 @@ const cloud = require("wx-server-sdk");
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
-
-const MAX_MEMBERS = 5;
+const config = require("./config");
 
 function genJoinCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const chars = config.INVITE_CODE_CHARS;
   let code = "";
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < config.INVITE_CODE_LENGTH; i++) {
     code += chars[Math.floor(Math.random() * chars.length)];
   }
   return code;
@@ -18,7 +17,7 @@ async function handleRename(event, openid) {
   const { groupId, name } = event;
   if (!groupId || !name) return { ok: false, error: "缺少参数" };
   const trimmed = name.trim();
-  if (!trimmed || trimmed.length > 12)
+  if (!trimmed || trimmed.length > config.GROUP_NAME_MAX_LENGTH)
     return { ok: false, error: "名称不合法" };
 
   const groupRes = await db.collection("groups").doc(groupId).get();
@@ -76,8 +75,8 @@ async function handleJoin(event, openid) {
     return { ok: false, error: "你已在该厨房中" };
   }
 
-  if (group.members && group.members.length >= MAX_MEMBERS) {
-    return { ok: false, error: "厨房已满（最多5人）" };
+  if (group.members && group.members.length >= config.MAX_MEMBERS) {
+    return { ok: false, error: `厨房已满（最多${config.MAX_MEMBERS}人）` };
   }
 
   await db
@@ -166,7 +165,7 @@ async function deleteGroupData(groupId) {
   await db.collection("groups").doc(groupId).remove();
 
   const delMany = async (collection) => {
-    const MAX_LIMIT = 100;
+    const MAX_LIMIT = config.MAX_LIMIT;
     const countRes = await db.collection(collection).where({ groupId }).count();
     const total = countRes.total;
     for (let i = 0; i < total; i += MAX_LIMIT) {

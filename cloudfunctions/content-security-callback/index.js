@@ -4,6 +4,7 @@ const crypto = require("crypto");
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const db = cloud.database();
+const config = require("./config");
 
 // ---------------------------------------------------------------------------
 // Configuration — set these as CloudBase environment variables after
@@ -99,12 +100,12 @@ async function handleRiskyImage(cloudFileID) {
 
   // 2. Remove reference from dishes collection
   try {
-    const dishRes = await db.collection("dishes")
-      .where({ imageUrl: cloudFileID })
+    const dishRes = await db.collection(config.COLLECTION_DISHES)
+      .where({ [config.FIELD_IMAGE_URL]: cloudFileID })
       .get();
     for (const dish of dishRes.data) {
-      await db.collection("dishes").doc(dish._id).update({
-        data: { imageUrl: "", updatedAt: db.serverDate() },
+      await db.collection(config.COLLECTION_DISHES).doc(dish._id).update({
+        data: { [config.FIELD_IMAGE_URL]: "", [config.FIELD_UPDATED_AT]: db.serverDate() },
       });
       console.log("[callback] cleared image from dish:", dish._id);
     }
@@ -116,17 +117,17 @@ async function handleRiskyImage(cloudFileID) {
   try {
     // WeChat cloud DB doesn't support array-contains on cloud.Database.RegExp
     // efficiently, so we fetch recent records and filter in code.
-    const historyRes = await db.collection("draw_history")
+    const historyRes = await db.collection(config.COLLECTION_DRAW_HISTORY)
       .where({
-        images: db.command.all([cloudFileID]), // won't work perfectly, but as a rough filter
+        [config.FIELD_IMAGES]: db.command.all([cloudFileID]), // won't work perfectly, but as a rough filter
       })
-      .limit(100)
+      .limit(config.QUERY_LIMIT_HISTORY)
       .get();
     for (const record of historyRes.data) {
-      const filtered = (record.images || []).filter((id) => id !== cloudFileID);
-      if (filtered.length !== (record.images || []).length) {
-        await db.collection("draw_history").doc(record._id).update({
-          data: { images: filtered },
+      const filtered = (record[config.FIELD_IMAGES] || []).filter((id) => id !== cloudFileID);
+      if (filtered.length !== (record[config.FIELD_IMAGES] || []).length) {
+        await db.collection(config.COLLECTION_DRAW_HISTORY).doc(record._id).update({
+          data: { [config.FIELD_IMAGES]: filtered },
         });
         console.log("[callback] removed image from history:", record._id);
       }
@@ -147,9 +148,9 @@ async function processMediaCheckEvent(payload) {
   // Find the check record
   let checkRecord;
   try {
-    const checkRes = await db.collection("content_checks")
-      .where({ trace_id })
-      .limit(1)
+    const checkRes = await db.collection(config.COLLECTION_CONTENT_CHECKS)
+      .where({ [config.FIELD_TRACE_ID]: trace_id })
+      .limit(config.QUERY_LIMIT_SINGLE)
       .get();
     checkRecord = checkRes.data[0];
   } catch (err) {
@@ -157,7 +158,7 @@ async function processMediaCheckEvent(payload) {
     return;
   }
 
-  if (!checkRecord || !checkRecord.cloudFileID) {
+  if (!checkRecord || !checkRecord[config.FIELD_CLOUD_FILE_ID]) {
     console.warn("[callback] unknown trace_id, skipping:", trace_id);
     return;
   }
@@ -165,15 +166,15 @@ async function processMediaCheckEvent(payload) {
   const { cloudFileID, _id: recordId } = checkRecord;
 
   // Update check record status
-  const status = result?.suggest === "risky" ? "risky" : "pass";
+  const status = result?.suggest === config.STATUS_RISKY ? config.STATUS_RISKY : config.STATUS_PASS;
   try {
-    await db.collection("content_checks").doc(recordId).update({
+    await db.collection(config.COLLECTION_CONTENT_CHECKS).doc(recordId).update({
       data: {
-        status,
-        suggest: result?.suggest,
-        label: result?.label,
-        resultDetail: detail,
-        resolvedAt: db.serverDate(),
+        [config.FIELD_STATUS]: status,
+        [config.FIELD_SUGGEST]: result?.suggest,
+        [config.FIELD_LABEL]: result?.label,
+        [config.FIELD_RESULT_DETAIL]: detail,
+        [config.FIELD_RESOLVED_AT]: db.serverDate(),
       },
     });
   } catch (err) {
@@ -181,7 +182,7 @@ async function processMediaCheckEvent(payload) {
   }
 
   // If risky, clean up the image
-  if (result?.suggest === "risky") {
+  if (result?.suggest === config.STATUS_RISKY) {
     await handleRiskyImage(cloudFileID);
   }
 }
@@ -212,7 +213,7 @@ exports.main = async (event, context) => {
     httpMethod,
     hasBody: !!body,
     queryKeys: Object.keys(query),
-    querySnippet: JSON.stringify(query).slice(0, 300),
+    querySnippet: JSON.stringify(query).slice(0, config.LOG_TRUNCATE),
     hasToken: !!TOKEN,
     hasAESKey: !!ENCODING_AES_KEY,
   };
@@ -284,7 +285,7 @@ exports.main = async (event, context) => {
     if (!parsed.Encrypt) {
       console.warn("[callback] no Encrypt field in body, treating as plain JSON");
       // Some configurations may send plain JSON — handle wxa_media_check directly
-      if (parsed.Event === "wxa_media_check" || parsed.MsgType === "event") {
+      if (parsed.Event === config.EVENT_WXA_MEDIA_CHECK || parsed.MsgType === config.EVENT_TYPE_EVENT) {
         await processMediaCheckEvent(parsed);
       }
       return { statusCode: 200, headers: { "Content-Type": "text/plain" }, body: "success" };
@@ -298,10 +299,10 @@ exports.main = async (event, context) => {
       return { statusCode: 500, body: "decrypt failed" };
     }
 
-    console.log("[callback] decrypted event:", JSON.stringify(decrypted).slice(0, 300));
+    console.log("[callback] decrypted event:", JSON.stringify(decrypted).slice(0, config.LOG_TRUNCATE));
 
     // Route by event type
-    if (decrypted.Event === "wxa_media_check" || decrypted.MsgType === "event") {
+    if (decrypted.Event === config.EVENT_WXA_MEDIA_CHECK || decrypted.MsgType === config.EVENT_TYPE_EVENT) {
       await processMediaCheckEvent(decrypted);
     }
 

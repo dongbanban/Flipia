@@ -1,9 +1,10 @@
 const cloud = require("wx-server-sdk");
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
+const config = require("./config");
 
 // URL regex — matches http/https/ftp links in text
-const URL_REGEX = /https?:\/\/[^\s]+|ftp:\/\/[^\s]+/gi;
+const URL_REGEX = config.URL_REGEX;
 
 function extractUrls(text) {
   const matches = text.match(URL_REGEX);
@@ -22,17 +23,17 @@ async function handleTextCheck(event, openid) {
   try {
     const result = await cloud.openapi.security.msgSecCheck({
       openid,
-      scene: 2,
-      version: 2,
+      scene: config.SCENE_MSG_SEC_CHECK,
+      version: config.VERSION_MSG_SEC_CHECK,
       content,
     });
 
-    if (result.result && result.result.suggest === "risky") {
+    if (result.result && result.result.suggest === config.SUGGEST_RISKY) {
       return { pass: false, reason: "文本包含违规内容" };
     }
   } catch (err) {
     // errCode 87014 = risky content (inherited from v1 behavior, v2 may also throw)
-    if (err.errCode === 87014) {
+    if (err.errCode === config.ERR_CODE_RISKY) {
       return { pass: false, reason: "文本包含违规内容" };
     }
     // Other errors (network, auth, rate-limit) — fail closed
@@ -92,7 +93,7 @@ async function handleImageCheck(event) {
     return { pass: true };
   } catch (err) {
     // errCode 87014 = risky content — still block
-    if (err.errCode === 87014) {
+    if (err.errCode === config.ERR_CODE_RISKY) {
       return { pass: false, reason: "图片包含违规内容" };
     }
     // Other errors: deprecated API is broken / permission revoked / etc.
@@ -142,9 +143,9 @@ async function handleImageCheckAsync(event) {
   try {
     const result = await cloud.openapi.security.mediaCheckAsync({
       media_url: tempUrl,
-      media_type: 2,  // 2 = image
-      version: 2,     // v2 API
-      scene: 1,       // 1 = profile/content
+      media_type: config.MEDIA_TYPE_IMAGE,  // 2 = image
+      version: config.VERSION_MEDIA_CHECK,     // v2 API
+      scene: config.SCENE_MEDIA_CHECK,       // 1 = profile/content
       openid: OPENID,
     });
     traceId = result.trace_id;
@@ -158,11 +159,11 @@ async function handleImageCheckAsync(event) {
 
   // Store check record for callback matching
   try {
-    await db.collection("content_checks").add({
+    await db.collection(config.COLLECTION_CONTENT_CHECKS).add({
       data: {
         trace_id: traceId,
         cloudFileID,
-        status: "pending",
+        status: config.STATUS_PENDING,
         createdAt: db.serverDate(),
       },
     });
