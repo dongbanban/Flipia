@@ -1,3 +1,5 @@
+import { LIMITS } from "../config";
+
 // dish-pool — pure functions for dish pool display logic.
 
 export interface DishRecord {
@@ -35,7 +37,7 @@ export function validateDishName(raw: string): {
 } {
   const trimmed = raw.trim();
   if (!trimmed) return { value: "", error: "菜品名不能为空" };
-  const value = trimmed.slice(0, 20);
+  const value = trimmed.slice(0, LIMITS.DISH_NAME_MAX);
   return { value, error: null };
 }
 

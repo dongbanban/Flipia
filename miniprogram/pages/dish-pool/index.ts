@@ -12,6 +12,7 @@ import {
   validateCategoryName,
 } from "../../lib/category-manage";
 import { validateAndCompressImage, checkImageAsync, checkTextWithToast } from "../../lib/content-security";
+import { LIMITS, QUERY } from "../../config";
 
 interface AppInstance {
   globalData: {
@@ -176,7 +177,7 @@ Page({
       const res = await this._db!.collection("dishes")
         .where({ groupId: this._groupId, categoryId })
         .orderBy("createdAt", "desc")
-        .limit(100)
+        .limit(QUERY.LIMIT_GENERIC_MAX)
         .get();
 
       const processed = await this._loadAndProcessDishes(
@@ -285,7 +286,7 @@ Page({
           name: this._db!.RegExp({ regexp: escaped, options: "i" }),
         })
         .orderBy("createdAt", "desc")
-        .limit(100)
+        .limit(QUERY.LIMIT_GENERIC_MAX)
         .get();
 
       const processed = await this._loadAndProcessDishes(
@@ -526,7 +527,7 @@ Page({
 
   async onChooseImages() {
     const current = (this.data.formData as FormData).images;
-    const remaining = 1 - current.length;
+    const remaining = LIMITS.DISH_IMAGE_MAX - current.length;
     if (remaining <= 0) return;
 
     wx.chooseMedia({
@@ -895,7 +896,7 @@ Page({
       }
 
       for (const cat of checked) {
-        const MAX_LIMIT = 100;
+        const MAX_LIMIT = QUERY.LIMIT_GENERIC_MAX;
         let allDishes: DishRecord[] = [];
         let hasMore = true;
 

@@ -1,4 +1,5 @@
 import type { Category, DrawConfigGroup } from "./init-data";
+import { LIMITS } from "../config";
 
 export interface ValidateCategoryNameResult {
   value: string;
@@ -12,7 +13,7 @@ export function validateCategoryName(
 ): ValidateCategoryNameResult {
   const trimmed = raw.trim();
   if (!trimmed) return { value: "", error: "分类名不能为空" };
-  const value = trimmed.slice(0, 10);
+  const value = trimmed.slice(0, LIMITS.CATEGORY_NAME_MAX);
   if (existingNames.some((n) => n !== excludeName && n === value)) {
     return { value, error: "分类名已存在" };
   }

@@ -1,4 +1,5 @@
 import { checkTextWithToast } from "../../lib/content-security";
+import { LIMITS } from "../../config";
 
 interface GroupInfo {
   _id: string;
@@ -309,8 +310,8 @@ Page({
       wx.showToast({ title: "厨房名不能为空", icon: "none" });
       return;
     }
-    if (name.length > 12) {
-      wx.showToast({ title: "厨房名不超过12字", icon: "none" });
+    if (name.length > LIMITS.GROUP_NAME_MAX) {
+      wx.showToast({ title: `厨房名不超过${LIMITS.GROUP_NAME_MAX}字`, icon: "none" });
       return;
     }
     if (name === this.data.groupName) {

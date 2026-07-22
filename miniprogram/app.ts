@@ -1,4 +1,5 @@
 import { buildDefaultUserConfig, buildPresetDishes } from "./lib/init-data";
+import { CLOUD, STRINGS } from "./config";
 
 interface GroupInfo {
   _id: string;
@@ -45,7 +46,7 @@ App({
 
   onLaunch(this: AppInstance) {
     wx.cloud.init({
-      env: "cloud1-d5gwv3g0da9888b0e",
+      env: CLOUD.envId,
       traceUser: true,
     });
 
@@ -120,14 +121,14 @@ App({
 
     const groupRes = await db.collection("groups").add({
       data: {
-        name: "我的厨房",
+        name: STRINGS.DEFAULT_GROUP_NAME,
         members: [openid],
       },
     });
     const groupId = groupRes._id as string;
     this.globalData.groupId = groupId;
     this.globalData.groups = [
-      { _id: groupId, name: "我的厨房", members: [openid] },
+      { _id: groupId, name: STRINGS.DEFAULT_GROUP_NAME, members: [openid] },
     ];
     wx.setStorageSync(ACTIVE_GROUP_KEY, groupId);
 

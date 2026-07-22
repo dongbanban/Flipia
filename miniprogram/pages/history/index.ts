@@ -6,6 +6,7 @@ import {
   type DrawHistoryRecord,
 } from "../../lib/history";
 import { validateAndCompressImage, checkImageAsync } from "../../lib/content-security";
+import { LIMITS, QUERY, STRINGS } from "../../config";
 
 interface AppInstance {
   globalData: {
@@ -111,7 +112,7 @@ Page({
 
           const record = this._findRecord(recordId);
           const currentImages = record?.images || [];
-          const merged = [fileIDs[0], ...currentImages].slice(0, 3);
+          const merged = [fileIDs[0], ...currentImages].slice(0, LIMITS.HISTORY_IMAGE_MAX);
           await this._db!.collection("draw_history")
             .doc(recordId)
             .update({ data: { images: merged } });
@@ -187,7 +188,7 @@ Page({
       const res = await this._db!.collection("draw_history")
         .where({ groupId: this._groupId, status: "active" })
         .orderBy("confirmedAt", "desc")
-        .limit(50)
+        .limit(QUERY.LIMIT_HISTORY)
         .get();
 
       let records = res.data as DrawHistoryRecord[];
@@ -368,7 +369,7 @@ Page({
   ): WechatMiniprogram.Page.ICustomShareContent {
     const recordId = (e.target?.dataset as { recordId?: string })?.recordId;
     if (!recordId) {
-      return { title: "Flipia", path: "/pages/index/index" };
+      return { title: STRINGS.BRAND_NAME, path: "/pages/index/index" };
     }
 
     const record = this._findRecord(recordId);
@@ -376,7 +377,7 @@ Page({
       record?.results?.[0]?.dishes?.[0]?.imageUrl || "";
 
     return {
-      title: "【Flipia】今天吃了这些",
+      title: `【${STRINGS.BRAND_NAME}】今天吃了这些`,
       imageUrl,
       path: "/pages/index/index",
     };

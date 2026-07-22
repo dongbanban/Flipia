@@ -1,3 +1,5 @@
+import { LIMITS } from "../config";
+
 export interface ContentSecurityResult {
   pass: boolean;
   reason?: string;
@@ -94,8 +96,7 @@ export async function validateAndCompressImage(
   }
 
   // Compress if needed
-  const MAX_SIZE = 1024 * 1024; // 1MB target
-  if (size <= MAX_SIZE) return tempFilePath;
+  if (size <= LIMITS.IMAGE_MAX_SIZE) return tempFilePath;
 
   const qualities = [80, 60, 40, 20];
   for (const quality of qualities) {
@@ -110,7 +111,7 @@ export async function validateAndCompressImage(
       });
       const fs = wx.getFileSystemManager();
       const stat = fs.statSync(compressedPath) as WechatMiniprogram.Stats;
-      if (stat.size <= MAX_SIZE) {
+      if (stat.size <= LIMITS.IMAGE_MAX_SIZE) {
         return compressedPath;
       }
     } catch {
@@ -179,7 +180,7 @@ export async function checkImage(
   try {
     const fs = wx.getFileSystemManager();
     const stat = fs.statSync(tempFilePath) as WechatMiniprogram.Stats;
-    if (stat.size > 1024 * 1024) {
+    if (stat.size > LIMITS.IMAGE_MAX_SIZE) {
       try {
         workingPath = await compressIfNeeded(tempFilePath, stat.size);
         const compressedExt = workingPath.split(".").pop()?.toLowerCase() || "jpg";
@@ -223,12 +224,11 @@ export async function checkImage(
 }
 
 // Keep the old compressIfNeeded for backward compat with checkImage
-const MAX_IMAGE_SIZE = 1024 * 1024;
 async function compressIfNeeded(
   tempFilePath: string,
   originalSize: number,
 ): Promise<string> {
-  if (originalSize <= MAX_IMAGE_SIZE) return tempFilePath;
+  if (originalSize <= LIMITS.IMAGE_MAX_SIZE) return tempFilePath;
 
   const qualities = [80, 60, 40, 20];
   for (const quality of qualities) {
@@ -243,7 +243,7 @@ async function compressIfNeeded(
       });
       const fs = wx.getFileSystemManager();
       const compressedStat = fs.statSync(compressedPath) as WechatMiniprogram.Stats;
-      if (compressedStat.size <= MAX_IMAGE_SIZE) {
+      if (compressedStat.size <= LIMITS.IMAGE_MAX_SIZE) {
         return compressedPath;
       }
     } catch {

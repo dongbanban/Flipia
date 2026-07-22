@@ -1,3 +1,5 @@
+import { STRINGS } from "../config";
+
 // init-data — pure factory functions for first-launch cloud initialization.
 
 export interface Category {
@@ -55,7 +57,7 @@ export function buildDefaultUserConfig(
   }));
   const defaultGroup: DrawConfigGroup = {
     id: generateGroupId(),
-    name: "雨露均沾",
+    name: STRINGS.DEFAULT_DRAW_CONFIG_NAME,
     entries,
   };
   return {

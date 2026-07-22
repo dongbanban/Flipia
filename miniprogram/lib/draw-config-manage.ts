@@ -1,9 +1,10 @@
 import type { Category, DrawConfigEntry, DrawConfigGroup } from "./init-data";
 import { generateGroupId } from "./init-data";
+import { LIMITS } from "../config";
 
 export function clampDrawCount(count: number): number {
-  if (count < 1) return 1;
-  if (count > 5) return 5;
+  if (count < LIMITS.DRAW_COUNT_MIN) return LIMITS.DRAW_COUNT_MIN;
+  if (count > LIMITS.DRAW_COUNT_MAX) return LIMITS.DRAW_COUNT_MAX;
   return Math.round(count);
 }
 
@@ -55,7 +56,7 @@ export function validateGroupName(
 ): { value: string; error: string | null } {
   const trimmed = raw.trim();
   if (!trimmed) return { value: "", error: "方案名不能为空" };
-  const value = trimmed.slice(0, 100);
+  const value = trimmed.slice(0, LIMITS.DRAW_CONFIG_NAME_MAX);
   if (existingNames.some((n) => n !== excludeName && n === value)) {
     return { value, error: "方案名已存在" };
   }
@@ -66,7 +67,7 @@ export function createDrawConfigGroup(
   groups: DrawConfigGroup[],
   categories: Category[],
 ): DrawConfigGroup[] {
-  if (groups.length >= 10) return groups;
+  if (groups.length >= LIMITS.DRAW_CONFIG_GROUP_MAX) return groups;
   if (categories.length === 0) return groups;
   const entries: DrawConfigEntry[] = categories.map((c) => ({
     categoryId: c.id,

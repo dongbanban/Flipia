@@ -10,6 +10,7 @@ import {
 } from "../../lib/draw-config-manage";
 import type { Category, DrawConfigEntry, DrawConfigGroup } from "../../lib/init-data";
 import { checkTextWithToast } from "../../lib/content-security";
+import { LIMITS } from "../../config";
 
 interface AppGlobalData {
   groupId: string;
@@ -204,8 +205,6 @@ Page({
     }
   },
 
-  noop() {},
-
   onModalNameInput(e: WechatMiniprogram.Input) {
     const names = (this.data.drawConfigGroups as DrawConfigGroup[]).map((g) => g.name);
     const current = (this.data.drawConfigGroups as DrawConfigGroup[]).find(
@@ -218,7 +217,7 @@ Page({
   onModalDecrement(e: WechatMiniprogram.TouchEvent) {
     const id = (e.currentTarget.dataset as { id: string }).id;
     const entry = (this.data.modalEntries as DrawConfigEntry[]).find((d) => d.categoryId === id);
-    if (!entry || entry.count <= 1) return;
+    if (!entry || entry.count <= LIMITS.DRAW_COUNT_MIN) return;
     const updated = updateDrawCount(this.data.modalEntries as DrawConfigEntry[], id, entry.count - 1);
     this.setData({ modalEntries: updated });
     this._refreshModalAvailable(updated);
@@ -227,7 +226,7 @@ Page({
   onModalIncrement(e: WechatMiniprogram.TouchEvent) {
     const id = (e.currentTarget.dataset as { id: string }).id;
     const entry = (this.data.modalEntries as DrawConfigEntry[]).find((d) => d.categoryId === id);
-    if (!entry || entry.count >= 5) return;
+    if (!entry || entry.count >= LIMITS.DRAW_COUNT_MAX) return;
     const updated = updateDrawCount(this.data.modalEntries as DrawConfigEntry[], id, entry.count + 1);
     this.setData({ modalEntries: updated });
     this._refreshModalAvailable(updated);
@@ -289,7 +288,7 @@ Page({
   },
 
   onStartAdd() {
-    if ((this.data.drawConfigGroups as DrawConfigGroup[]).length >= 10) return;
+    if ((this.data.drawConfigGroups as DrawConfigGroup[]).length >= LIMITS.DRAW_CONFIG_GROUP_MAX) return;
     const categories = this.data.categories as Category[];
     if (categories.length === 0) return;
 

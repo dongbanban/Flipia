@@ -10,6 +10,7 @@ import {
 } from "../../lib/draw-config-manage";
 import type { Category, DrawConfigGroup } from "../../lib/init-data";
 import { checkTextWithToast } from "../../lib/content-security";
+import { QUERY } from "../../config";
 
 interface AppGlobalData {
   groupId: string;
@@ -223,7 +224,7 @@ Page({
           }
 
           // Cascade-delete all dishes belonging to the removed category
-          const PAGE_SIZE = 100;
+          const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
           let skip = 0;
           let hasMore = true;
           while (hasMore) {

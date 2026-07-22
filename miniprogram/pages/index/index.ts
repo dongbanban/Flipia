@@ -8,6 +8,7 @@ import { drawDishes, validateDrawConfig } from "../../lib/draw-engine";
 import type { Dish, DrawConfigEntry } from "../../lib/draw-engine";
 import { resolveEffectiveGroupId } from "../../lib/draw-config-manage";
 import type { DrawConfigGroup, Category } from "../../lib/init-data";
+import { QUERY, HISTORY_WINDOW_DAYS } from "../../config";
 
 interface DrawCard {
   id: string;
@@ -30,7 +31,7 @@ interface AppInstance {
   whenReady(): Promise<void>;
 }
 
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const SEVEN_DAYS_MS = HISTORY_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 const STORAGE_ACTIVE_CONFIG_KEY = "flipia_active_config_id";
 const STORAGE_LAST_DRAWN_KEY = "flipia_last_drawn_config_id";
 
@@ -208,7 +209,7 @@ Page({
       });
       this._activeEntries = syncedEntries;
 
-      const PAGE_SIZE = 100;
+      const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
       type RawDish = {
         _id: string;
         name: string;
@@ -561,7 +562,7 @@ Page({
   async _archiveOldRecords() {
     const cutoff = Date.now() - SEVEN_DAYS_MS;
     try {
-      const PAGE_SIZE = 100;
+      const PAGE_SIZE = QUERY.LIMIT_GENERIC_MAX;
       let skip = 0;
       let hasMore = true;
       while (hasMore) {
@@ -605,7 +606,7 @@ Page({
           ),
         })
         .orderBy("confirmedAt", "desc")
-        .limit(20)
+        .limit(QUERY.LIMIT_USER_CONFIG)
         .get();
 
       let records = (res.data as DrawHistoryRecord[]).filter((r) =>

@@ -1,4 +1,5 @@
 import { checkTextWithToast } from "../../lib/content-security";
+import { LIMITS, QUERY, STRINGS } from "../../config";
 import {
   type Category,
   generateGroupId,
@@ -140,8 +141,8 @@ Page({
       this.setData({ nameError: "请输入厨房名" });
       return;
     }
-    if (name.length > 12) {
-      this.setData({ nameError: "厨房名不能超过 12 个字" });
+    if (name.length > LIMITS.GROUP_NAME_MAX) {
+      this.setData({ nameError: `厨房名不能超过 ${LIMITS.GROUP_NAME_MAX} 个字` });
       return;
     }
 
@@ -236,7 +237,7 @@ Page({
         drawConfigGroups: [
           {
             id: drawGroupId,
-            name: "雨露均沾",
+            name: STRINGS.DEFAULT_DRAW_CONFIG_NAME,
             entries: drawEntries,
           },
         ],
@@ -245,7 +246,7 @@ Page({
 
     if (importedCategories.length === 0) return;
 
-    const MAX_DISHES = 500;
+    const MAX_DISHES = LIMITS.DISH_IMPORT_MAX;
     const dishRes = await db
       .collection("dishes")
       .where({
