@@ -196,20 +196,6 @@
   }
 }
 
-/* ── Empty state ── */
-.empty-state {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80rpx 0;
-}
-
-.empty-hint {
-  color: var(--color-text-secondary);
-  font-size: 28rpx;
-}
-
 /* ── Dish toggle text ── */
 .dish-toggle-text {
   font-size: 26rpx;
@@ -295,42 +281,9 @@
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.2);
 }
 
-/* ── Form sheet ── */
-.form-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 100;
-}
-
-.form-sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #fff;
-  border-radius: 24rpx 24rpx 0 0;
-  padding: 32rpx 32rpx 60rpx;
-  z-index: 101;
-}
-
-.form-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 32rpx;
-}
-
-.form-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.form-close {
-  font-size: 36rpx;
-  color: var(--color-text-secondary);
-  padding: 8rpx;
+/* ── Form content ── */
+.form-content {
+  padding-bottom: 32rpx;
 }
 
 .form-field {

@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "modal": "/components/modal/index"
+  },
   "navigationBarTitleText": "方案配置"
 }

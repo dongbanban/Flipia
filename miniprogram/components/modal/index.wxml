@@ -1,0 +1,27 @@
+<view wx:if="{{show}}" class="modal-mask" bind:tap="onClose">
+  <view class="modal-panel" catch:tap="noop">
+    <view class="modal-header">
+      <text class="modal-title">{{title}}</text>
+      <view class="modal-header-right">
+        <text
+          wx:if="{{cancelText}}"
+          class="modal-header-btn modal-header-btn--cancel"
+          bind:tap="onCancel"
+        >{{cancelText}}</text>
+        <text
+          wx:if="{{confirmText}}"
+          class="modal-header-btn modal-header-btn--confirm"
+          bind:tap="onConfirm"
+        >{{confirmText}}</text>
+        <text
+          wx:if="{{!cancelText && !confirmText}}"
+          class="modal-header-btn modal-header-btn--close"
+          bind:tap="onClose"
+        >✕</text>
+      </view>
+    </view>
+    <view class="modal-body">
+      <slot />
+    </view>
+  </view>
+</view>

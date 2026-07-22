@@ -10,10 +10,9 @@
     <text class="loading-hint">加载中…</text>
   </view>
 
-  <view wx:elif="{{empty}}" class="empty-state">
-    <text class="empty-hint">暂无记录</text>
+  <empty-state wx:elif="{{empty}}" text="暂无记录">
     <text class="empty-sub">抽取确认后记录将出现在这里</text>
-  </view>
+  </empty-state>
 
   <view wx:else class="list">
     <view wx:for="{{dayGroups}}" wx:key="date" class="day-group">

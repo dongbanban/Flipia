@@ -40,9 +40,7 @@
         <view wx:if="{{sourceLoading}}" class="loading-row">
           <text class="loading-hint">加载中…</text>
         </view>
-        <view wx:if="{{!sourceLoading && sourceCategories.length === 0}}" class="loading-row">
-          <text class="loading-hint">该厨房暂无分类</text>
-        </view>
+        <empty-state wx:if="{{!sourceLoading && sourceCategories.length === 0}}" text="该厨房暂无分类" />
         <view wx:if="{{!sourceLoading && sourceCategories.length > 0}}" class="category-grid">
           <view
             wx:for="{{sourceCategories}}"

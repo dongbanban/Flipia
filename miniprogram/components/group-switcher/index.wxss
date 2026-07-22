@@ -100,16 +100,6 @@
   font-weight: 600;
 }
 
-.popup-empty {
-  padding: 48rpx 32rpx;
-  text-align: center;
-}
-
-.popup-empty__text {
-  font-size: 28rpx;
-  color: var(--color-text-secondary);
-}
-
 .popup-create {
   display: flex;
   align-items: center;

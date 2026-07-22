@@ -229,52 +229,7 @@
   width: 100%;
 }
 
-/* ── Modal ──────────────────────────────────────────────── */
-
-.modal-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.45);
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.modal-panel {
-  width: 100%;
-  max-height: 80vh;
-  background-color: #fff;
-  border-radius: 32rpx 32rpx 0 0;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 32rpx 32rpx 16rpx 32rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-}
-
-.modal-title {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.modal-close {
-  font-size: 28rpx;
-  color: var(--color-primary);
-  font-weight: 500;
-}
-
-.modal-body {
-  padding: 24rpx 32rpx;
-}
+/* ── Modal content ──────────────────────────────────────── */
 
 .modal-field {
   display: flex;

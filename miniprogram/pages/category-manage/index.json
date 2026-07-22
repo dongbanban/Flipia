@@ -1,4 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "modal": "/components/modal/index",
+    "empty-state": "/components/empty-state/index"
+  },
   "navigationBarTitleText": "分类配置"
 }

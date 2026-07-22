@@ -1,4 +1,7 @@
 {
   "disableScroll": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "modal": "/components/modal/index",
+    "empty-state": "/components/empty-state/index"
+  }
 }

@@ -20,20 +20,6 @@
   font-size: 28rpx;
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100%;
-  gap: 16rpx;
-}
-
-.empty-hint {
-  color: var(--color-text-secondary);
-  font-size: 28rpx;
-}
-
 .empty-sub {
   color: var(--color-text-secondary);
   font-size: 24rpx;

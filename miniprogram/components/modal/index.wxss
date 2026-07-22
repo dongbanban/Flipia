@@ -1,0 +1,73 @@
+/* ── Modal 通用弹窗 ─────────────────────────────────────── */
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-panel {
+  width: 100%;
+  max-height: 80vh;
+  background-color: #fff;
+  border-radius: 32rpx 32rpx 0 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 16rpx 32rpx;
+  border-bottom: 1rpx solid var(--color-bg-secondary);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.modal-header-right {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.modal-header-btn {
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.modal-header-btn--cancel {
+  color: var(--color-text-secondary);
+}
+
+.modal-header-btn--confirm {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.modal-header-btn--close {
+  font-size: 36rpx;
+  color: var(--color-text-secondary);
+  padding: 8rpx;
+}
+
+/* Body */
+.modal-body {
+  padding: 24rpx 32rpx;
+  flex: 1;
+  overflow-y: auto;
+}

@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "empty-state": "/components/empty-state/index"
+  },
   "navigationBarTitleText": "新建厨房"
 }

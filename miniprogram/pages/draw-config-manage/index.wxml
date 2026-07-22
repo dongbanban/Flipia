@@ -46,72 +46,68 @@
       <text class="add-label">新建方案</text>
     </view>
 
-    <!-- Modal -->
-    <view wx:if="{{modalVisible}}" class="modal-mask" bind:tap="onCloseModal">
-      <view class="modal-panel" catch:tap="noop">
-        <view class="modal-header">
-          <text class="modal-title">{{modalTitle}}</text>
-          <text class="modal-close" bind:tap="onConfirmModal">确认</text>
-        </view>
+    <modal
+      show="{{modalVisible}}"
+      title="{{modalTitle}}"
+      confirmText="确认"
+      bind:confirm="onConfirmModal"
+      bind:close="onCloseModal"
+    >
+      <view class="modal-field">
+        <text class="modal-label">方案名称</text>
+        <input
+          class="modal-input {{modalNameError ? 'modal-input--error' : ''}}"
+          value="{{modalName}}"
+          maxlength="100"
+          bind:input="onModalNameInput"
+        />
+      </view>
+      <text wx:if="{{modalNameError}}" class="modal-error">{{modalNameError}}</text>
 
-        <view class="modal-body">
-          <view class="modal-field">
-            <text class="modal-label">方案名称</text>
-            <input
-              class="modal-input {{modalNameError ? 'modal-input--error' : ''}}"
-              value="{{modalName}}"
-              maxlength="100"
-              bind:input="onModalNameInput"
-            />
-          </view>
-          <text wx:if="{{modalNameError}}" class="modal-error">{{modalNameError}}</text>
+      <view class="modal-divider"></view>
 
-          <view class="modal-divider"></view>
+      <view class="modal-field">
+        <text class="modal-label">分类数量配置</text>
+      </view>
 
-          <view class="modal-field">
-            <text class="modal-label">分类数量配置</text>
+      <view wx:if="{{modalEntries.length > 0}}" class="modal-entries">
+        <view wx:for="{{modalEntries}}" wx:key="categoryId" class="modal-entry">
+          <text class="modal-entry-name">{{item.categoryName}}</text>
+          <view class="stepper">
+            <text
+              class="stepper-btn {{item.count <= 1 ? 'stepper-btn--disabled' : ''}}"
+              data-id="{{item.categoryId}}"
+              bind:tap="onModalDecrement"
+            >−</text>
+            <text class="stepper-value">{{item.count}}</text>
+            <text
+              class="stepper-btn {{item.count >= 5 ? 'stepper-btn--disabled' : ''}}"
+              data-id="{{item.categoryId}}"
+              bind:tap="onModalIncrement"
+            >＋</text>
           </view>
-
-          <view wx:if="{{modalEntries.length > 0}}" class="modal-entries">
-            <view wx:for="{{modalEntries}}" wx:key="categoryId" class="modal-entry">
-              <text class="modal-entry-name">{{item.categoryName}}</text>
-              <view class="stepper">
-                <text
-                  class="stepper-btn {{item.count <= 1 ? 'stepper-btn--disabled' : ''}}"
-                  data-id="{{item.categoryId}}"
-                  bind:tap="onModalDecrement"
-                >−</text>
-                <text class="stepper-value">{{item.count}}</text>
-                <text
-                  class="stepper-btn {{item.count >= 5 ? 'stepper-btn--disabled' : ''}}"
-                  data-id="{{item.categoryId}}"
-                  bind:tap="onModalIncrement"
-                >＋</text>
-              </view>
-              <view
-                wx:if="{{modalEntries.length > 1}}"
-                class="remove-badge modal-entry-remove"
-                data-id="{{item.categoryId}}"
-                bind:tap="onModalRemove"
-              >×</view>
-            </view>
-          </view>
-
-          <view wx:if="{{modalAvailable.length > 0}}" class="modal-add-entry" bind:tap="onModalAdd">
-            <text class="modal-add-icon">＋</text>
-            <text class="modal-add-text">添加分类</text>
-          </view>
-        </view>
-
-        <view class="modal-footer">
-          <view wx:if="{{!modalIsActive}}" class="modal-btn modal-btn--primary" bind:tap="onModalSetActive">
-            设为当前
-          </view>
-          <view wx:else class="modal-btn modal-btn--muted" bind:tap="onModalUnsetActive">
-            取消生效
-          </view>
+          <view
+            wx:if="{{modalEntries.length > 1}}"
+            class="remove-badge modal-entry-remove"
+            data-id="{{item.categoryId}}"
+            bind:tap="onModalRemove"
+          >×</view>
         </view>
       </view>
-    </view>
+
+      <view wx:if="{{modalAvailable.length > 0}}" class="modal-add-entry" bind:tap="onModalAdd">
+        <text class="modal-add-icon">＋</text>
+        <text class="modal-add-text">添加分类</text>
+      </view>
+
+      <view class="modal-footer">
+        <view wx:if="{{!modalIsActive}}" class="modal-btn modal-btn--primary" bind:tap="onModalSetActive">
+          设为当前
+        </view>
+        <view wx:else class="modal-btn modal-btn--muted" bind:tap="onModalUnsetActive">
+          取消生效
+        </view>
+      </view>
+    </modal>
   </view>
 </view>
