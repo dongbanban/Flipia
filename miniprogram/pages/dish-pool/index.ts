@@ -11,7 +11,7 @@ import {
   generateCategoryId,
   validateCategoryName,
 } from "../../lib/category-manage";
-import { checkImage, checkTextWithToast } from "../../lib/content-security";
+import { validateAndCompressImage, checkImageAsync, checkTextWithToast } from "../../lib/content-security";
 
 interface AppInstance {
   globalData: {
@@ -536,18 +536,26 @@ Page({
       success: async (res) => {
         this.setData({ formUploading: true });
         try {
-          // Content security: check each image before upload
+          // 1. Validate + compress each selected image
           const safePaths: string[] = [];
           for (const f of res.tempFiles) {
-            const result = await checkImage(f.tempFilePath);
-            if (result.pass) {
-              safePaths.push(f.tempFilePath);
-            } else {
-              wx.showToast({ title: "图片不合规，请更换", icon: "none" });
+            try {
+              const compressedPath = await validateAndCompressImage(f.tempFilePath);
+              safePaths.push(compressedPath);
+            } catch (reason) {
+              wx.showToast({ title: reason as string || "图片不合规，请更换", icon: "none" });
             }
           }
           if (safePaths.length === 0) return;
+
+          // 2. Upload to cloud storage
           const fileIDs = await this._uploadImages(safePaths);
+
+          // 3. Submit for async content security check (fire-and-forget)
+          for (const fileID of fileIDs) {
+            checkImageAsync(fileID); // no await — non-blocking
+          }
+
           const merged = [...current, ...fileIDs];
           this.setData({ "formData.images": merged, formDirty: true });
         } catch (err) {

@@ -57,7 +57,7 @@
   align-self: flex-start;
   font-size: 20rpx;
   color: var(--color-primary);
-  background: rgba(200, 129, 94, 0.08);
+  background: #fff;
   border: 1rpx solid rgba(200, 129, 94, 0.2);
   border-radius: 16rpx;
   padding: 2rpx 14rpx;
@@ -221,13 +221,13 @@
 .dish-toggle-text--on {
   color: var(--color-primary);
   border-color: var(--color-primary);
-  background-color: rgba(7, 193, 96, 0.06);
+  background-color: #fff;
 }
 
 .dish-toggle-text--off {
   color: #999;
   border-color: #d9d9d9;
-  background-color: #f5f5f5;
+  background-color: #fff;
 }
 
 .dish-delete-btn {
@@ -255,12 +255,12 @@
 }
 
 .form-toggle-btn--on {
-  background-color: rgba(7, 193, 96, 0.1);
+  background-color: #fff;
   color: #07c160;
 }
 
 .form-toggle-btn--off {
-  background-color: #f5f5f5;
+  background-color: #fff;
   color: var(--color-text-secondary);
 }
 

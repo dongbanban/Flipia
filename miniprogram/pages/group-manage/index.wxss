@@ -160,7 +160,7 @@
 .member-tag {
   font-size: 22rpx;
   color: var(--color-primary);
-  background-color: var(--color-primary-light);
+  background-color: #fff;
   padding: 4rpx 14rpx;
   border-radius: 8rpx;
   margin-right: 12rpx;

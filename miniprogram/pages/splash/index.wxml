@@ -3,7 +3,7 @@
     <view class="card {{flipping ? 'flip' : ''}}">
       <view class="card-face card-front">
         <text class="logo">Flipia</text>
-        <text class="tagline">让做饭不再纠结</text>
+        <text class="tagline">让做饭不再纠结～</text>
       </view>
       <view class="card-face card-back">
         <view class="dot-pulse">

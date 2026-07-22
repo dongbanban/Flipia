@@ -1,7 +1,7 @@
 <view class="page">
   <view class="content">
     <!-- Intro text -->
-    <text class="intro">创建你的账号，快点加入 Flipia 吧</text>
+    <text class="intro">创建你的账号，快点加入 Flipia 吧！</text>
 
     <!-- Avatar display area (tap for camera/gallery custom upload) -->
     <view class="avatar-display" bindtap="onTapAvatarDisplay">

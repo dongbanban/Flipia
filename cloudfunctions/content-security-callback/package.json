@@ -1,0 +1,9 @@
+{
+  "name": "content-security-callback",
+  "version": "1.0.0",
+  "description": "WeChat message push callback handler for mediaCheckAsync results",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

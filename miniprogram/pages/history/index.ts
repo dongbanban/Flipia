@@ -5,7 +5,7 @@ import {
   type DayGroup,
   type DrawHistoryRecord,
 } from "../../lib/history";
-import { checkImage } from "../../lib/content-security";
+import { validateAndCompressImage, checkImageAsync } from "../../lib/content-security";
 
 interface AppInstance {
   globalData: {
@@ -91,15 +91,24 @@ Page({
         this.setData({ uploadingRecordId: recordId });
         wx.showLoading({ title: "上传中…", mask: true });
         try {
-          const result = await checkImage(res.tempFilePaths[0]);
-          if (!result.pass) {
+          // 1. Validate + compress
+          let uploadPath = res.tempFilePaths[0];
+          try {
+            uploadPath = await validateAndCompressImage(uploadPath);
+          } catch (reason) {
             wx.hideLoading();
-            wx.showToast({ title: "图片不合规，请更换", icon: "none" });
+            wx.showToast({ title: reason as string || "图片不合规，请更换", icon: "none" });
             return;
           }
-          const fileIDs = await this._uploadHistoryImages([
-            res.tempFilePaths[0],
-          ]);
+
+          // 2. Upload to cloud storage
+          const fileIDs = await this._uploadHistoryImages([uploadPath]);
+
+          // 3. Submit for async content security check (fire-and-forget)
+          for (const fileID of fileIDs) {
+            checkImageAsync(fileID);
+          }
+
           const record = this._findRecord(recordId);
           const currentImages = record?.images || [];
           const merged = [fileIDs[0], ...currentImages].slice(0, 3);

@@ -105,7 +105,7 @@
 .record-drawer {
   font-size: 20rpx;
   color: var(--color-primary);
-  background-color: var(--color-primary-light);
+  background-color: #fff;
   border-radius: 24rpx;
   padding: 2rpx 12rpx;
   margin-left: 10rpx;

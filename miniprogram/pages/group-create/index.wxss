@@ -119,12 +119,12 @@
   align-items: center;
   padding: 14rpx 24rpx;
   border-radius: 48rpx;
-  background-color: var(--color-bg-secondary);
+  background-color: #fff;
   border: 2rpx solid transparent;
 }
 
 .category-chip--selected {
-  background-color: var(--color-primary-light);
+  background-color: #fff;
   border-color: var(--color-primary);
 }
 
