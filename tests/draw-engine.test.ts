@@ -143,6 +143,32 @@ describe("drawDishes", () => {
     // 有 3! = 6 种可能顺序，运行 30 次仅出现 1 种的概率极低
     expect(orders.size).toBeGreaterThan(1);
   });
+
+  it("config entry with categoryId not in pool returns empty dishes", () => {
+    const config: DrawConfigEntry[] = [
+      { categoryId: "nonexistent", categoryName: "不存在", count: 99 },
+    ];
+    const result = drawDishes(POOL, config);
+    expect(result).toHaveLength(1);
+    expect(result[0].categoryId).toBe("nonexistent");
+    expect(result[0].dishes).toEqual([]);
+  });
+
+  it("disabled dishes in pool are still drawn (function does not filter by enabled)", () => {
+    // drawDishes 仅按 categoryId 筛选，不检查 enabled 字段。
+    // 过滤已禁用菜品应由调用方负责。
+    const pool: Dish[] = [
+      makeDish("enabled-dish", MEAT, { enabled: true }),
+      makeDish("disabled-dish", MEAT, { enabled: false }),
+    ];
+    const config: DrawConfigEntry[] = [
+      { categoryId: MEAT, categoryName: "肉菜", count: 2 },
+    ];
+    const result = drawDishes(pool, config);
+    const drawnIds = result[0].dishes.map((d) => d.id);
+    expect(drawnIds).toContain("enabled-dish");
+    expect(drawnIds).toContain("disabled-dish");
+  });
 });
 
 // ── validateDrawConfig ────────────────────────────────────────────────────────

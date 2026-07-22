@@ -215,6 +215,22 @@ pnpm test
 
 ---
 
+## 单元测试覆盖率补充（09-test-coverage）
+
+重构完成后，对现有 7 个 Vitest 测试文件进行逐函数缺口分析，补充 15 个缺失的边界/分支/行为文档化用例：
+
+| 测试文件 | 新增用例数 | 关键缺口 |
+|----------|-----------|---------|
+| `init-data.test.ts` | 2 | `buildPresetDishes` categoryId 匹配、总数验证 |
+| `dish-pool.test.ts` | 2 | `sortDishes` 全无 createdAt 排序、`buildImportDishData` cookingDescription 字段 |
+| `draw-engine.test.ts` | 2 | 未匹配分类空结果、disabled 菜品行为文档化 |
+| `history.test.ts` | 5 | `isYesterday` 跨月边界、`groupByDay` 单条/排序、`getTodaySummary` 3 人边界 |
+| `draw-config-manage.test.ts` | 4 | `validateGroupName` 100 字边界、9→10 方案边界、空 config 删除、多方案名同步 |
+
+不在此范围：4 个依赖 `wx.*` API 的模块（`sanitize`、`confirm`、`content-security`、`upload-image`）因无法在 Vitest Node 环境测试，不新增用例。
+
+验证：`pnpm test` 全部通过。
+
 ## 代码注释中文化
 
 在完成上述重构后，统一将项目所有源代码中的英文注释（包括单行注释、块注释、JSDoc、HTML 注释）翻译为简体中文。这是一个纯文档性质的工作，不涉及任何逻辑或行为变更。

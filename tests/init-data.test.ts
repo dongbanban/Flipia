@@ -109,4 +109,18 @@ describe("buildPresetDishes", () => {
       expect(new Set(names).size).toBe(names.length);
     }
   });
+
+  it("all dishes have correct categoryId from the preset map", () => {
+    const dishes = buildPresetDishes(GROUP_ID, OPENID);
+    for (const cat of DEFAULT_CATEGORIES) {
+      const dishesInCat = dishes.filter((d) => d.categoryId === cat.id);
+      expect(dishesInCat.length).toBeGreaterThan(0);
+      expect(dishesInCat.every((d) => d.categoryId === cat.id)).toBe(true);
+    }
+  });
+
+  it("returns exactly 20 preset dishes total", () => {
+    const dishes = buildPresetDishes(GROUP_ID, OPENID);
+    expect(dishes).toHaveLength(20);
+  });
 });

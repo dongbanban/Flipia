@@ -189,6 +189,12 @@ describe("removeDrawConfigEntry", () => {
     const result = removeDrawConfigEntry(config, "nonexistent");
     expect(result).toEqual(config);
   });
+
+  it("returns empty array unchanged when config is empty", () => {
+    const result = removeDrawConfigEntry([], "any-id");
+    expect(result).toEqual([]);
+    expect(result).toHaveLength(0);
+  });
 });
 
 // ── getAvailableCategories ──────────────────────────────────────────────────
@@ -288,6 +294,14 @@ describe("validateGroupName", () => {
     expect(error).toBeNull();
     expect(value).toHaveLength(100);
   });
+
+  it("name of exactly 100 chars is accepted unchanged", () => {
+    const exact100 = "a".repeat(100);
+    const { value, error } = validateGroupName(exact100, []);
+    expect(error).toBeNull();
+    expect(value).toBe(exact100);
+    expect(value).toHaveLength(100);
+  });
 });
 
 // ── createDrawConfigGroup ───────────────────────────────────────────────────
@@ -321,6 +335,17 @@ describe("createDrawConfigGroup", () => {
   it("returns unchanged when categories is empty (no empty groups)", () => {
     const result = createDrawConfigGroup(groups, []);
     expect(result).toEqual(groups);
+  });
+
+  it("creating at 9 groups succeeds and reaches limit of 10", () => {
+    const nine: DrawConfigGroup[] = Array.from({ length: 9 }, (_, i) => ({
+      id: `grp-${i}`,
+      name: `方案${i}`,
+      entries: [],
+    }));
+    const result = createDrawConfigGroup(nine, categories);
+    expect(result).toHaveLength(10);
+    expect(result[9].name).toBe("");
   });
 });
 
@@ -400,6 +425,31 @@ describe("syncAllGroupNames", () => {
     const original = [...stale];
     syncAllGroupNames(stale, categories);
     expect(stale).toEqual(original);
+  });
+
+  it("updates names across multiple groups", () => {
+    const stale: DrawConfigGroup[] = [
+      {
+        id: "grp-1",
+        name: "方案A",
+        entries: [
+          { categoryId: MEAT, categoryName: "旧名称", count: 2 },
+          { categoryId: VEG, categoryName: "旧名称", count: 1 },
+        ],
+      },
+      {
+        id: "grp-2",
+        name: "方案B",
+        entries: [
+          { categoryId: MEAT, categoryName: "旧名称", count: 3 },
+        ],
+      },
+    ];
+    const result = syncAllGroupNames(stale, categories);
+    expect(result).toHaveLength(2);
+    expect(result[0].entries[0].categoryName).toBe("荤菜");
+    expect(result[0].entries[1].categoryName).toBe("素菜");
+    expect(result[1].entries[0].categoryName).toBe("荤菜");
   });
 });
 

@@ -55,6 +55,16 @@ describe("sortDishes", () => {
     const dishes = [makeDish("only", 999)];
     expect(sortDishes(dishes)).toEqual(dishes);
   });
+
+  it("all dishes without createdAt keep original relative order", () => {
+    const dishes = [
+      makeDish("a"),
+      makeDish("b"),
+      makeDish("c"),
+    ];
+    const sorted = sortDishes(dishes);
+    expect(sorted.map((d) => d._id)).toEqual(["a", "b", "c"]);
+  });
 });
 
 // ── validateDishName ──────────────────────────────────────────────────────────
@@ -277,5 +287,17 @@ describe("buildImportDishData", () => {
     expect(result.images).toBeUndefined();
     expect(result.creatorId).toBeUndefined();
     expect(result.creatorName).toBeUndefined();
+  });
+
+  it("copies cookingDescription from source", () => {
+    const source: DishRecord = {
+      _id: "src1",
+      name: "红烧肉",
+      categoryId: "cat-meat",
+      enabled: true,
+      cookingDescription: "小火慢炖，口感软糯",
+    };
+    const result = buildImportDishData(source, "grp-target");
+    expect(result.cookingDescription).toBe("小火慢炖，口感软糯");
   });
 });

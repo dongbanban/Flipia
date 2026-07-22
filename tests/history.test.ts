@@ -77,6 +77,11 @@ describe("isYesterday", () => {
     setNow(2026, 7, 20, 10);
     expect(isYesterday(local(2026, 7, 20, 8))).toBe(false);
   });
+
+  it("returns true across month boundary (Jan 1 → Dec 31)", () => {
+    setNow(2026, 1, 1, 10);
+    expect(isYesterday(local(2025, 12, 31, 23))).toBe(true);
+  });
 });
 
 describe("formatDateLabel", () => {
@@ -128,6 +133,28 @@ describe("groupByDay", () => {
 
   it("returns empty array for empty input", () => {
     expect(groupByDay([])).toEqual([]);
+  });
+
+  it("single record returns one group", () => {
+    setNow(2026, 7, 20, 10);
+    const records = [makeRecord("r1", "a", local(2026, 7, 20, 8))];
+    const groups = groupByDay(records);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].label).toBe("今天");
+  });
+
+  it("groups sorted by date descending (newest first)", () => {
+    setNow(2026, 7, 20, 10);
+    const records = [
+      makeRecord("r1", "a", local(2026, 7, 20, 8)),
+      makeRecord("r2", "a", local(2026, 7, 19, 18)),
+      makeRecord("r3", "b", local(2026, 7, 18, 19)),
+    ];
+    const groups = groupByDay(records);
+    expect(groups).toHaveLength(3);
+    expect(groups[0].date).toBe("2026-07-20");
+    expect(groups[1].date).toBe("2026-07-19");
+    expect(groups[2].date).toBe("2026-07-18");
   });
 });
 
@@ -218,5 +245,22 @@ describe("getTodaySummary", () => {
   it("falls back to no names when drawer names are empty", () => {
     const records = [makeRecord("r1", "a", 1000)];
     expect(getTodaySummary(records, 3)).toBe("今天抽了 1 次");
+  });
+
+  it("exactly 3 unique drawers shows all names without 等人 suffix", () => {
+    const records = [
+      withDrawerName(makeRecord("r1", "a", 1000), "张三"),
+      withDrawerName(makeRecord("r2", "b", 2000), "李四"),
+      withDrawerName(makeRecord("r3", "c", 3000), "王五"),
+    ];
+    expect(getTodaySummary(records, 4)).toBe("张三、李四、王五 今天抽了 3 次");
+  });
+
+  it("shows names when memberCount is exactly 2", () => {
+    const records = [
+      withDrawerName(makeRecord("r1", "a", 1000), "张三"),
+      withDrawerName(makeRecord("r2", "b", 2000), "李四"),
+    ];
+    expect(getTodaySummary(records, 2)).toBe("张三、李四 今天抽了 2 次");
   });
 });
