@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/splash/index",
     "pages/profile-setup/index",
     "pages/index/index",
     "pages/dish-pool/index",

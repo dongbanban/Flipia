@@ -1,9 +1,5 @@
 import { checkImage } from "../../lib/content-security";
 
-function isDefaultNickname(name: string): boolean {
-  return /^用户[a-z0-9]{6}$/.test(name);
-}
-
 interface AppInstance {
   globalData: {
     openid: string;
@@ -21,26 +17,55 @@ Page({
     avatarUrl: "",        // temp local path after chooseAvatar
     nickName: "",
     hasNewAvatar: false,   // true if user selected a new avatar in this session
+    nicknameFocus: false,  // auto-focus input after avatar selected
+    canConfirm: false,     // computed — true when nickname is non-empty
   },
 
-  onLoad() {
-    const app = getApp<AppInstance>();
-    const gd = app.globalData;
-    // Pre-fill nickname from globalData if it's not the auto-generated one
-    const isDefaultNick = isDefaultNickname(gd.nickName);
-    this.setData({
-      nickName: isDefaultNick ? "" : gd.nickName,
-      avatarUrl: gd.avatarUrl || "",
-    });
+  async onLoad() {
+    wx.hideHomeButton();
+    // Splash page already awaited app.whenReady() and routed here —
+    // globalData is guaranteed ready.
+    await getApp<AppInstance>().whenReady();
   },
 
   onChooseAvatar(e: WechatMiniprogram.CustomEvent) {
     const { avatarUrl } = e.detail;
     this.setData({ avatarUrl, hasNewAvatar: true });
+    // Auto-focus nickname input after avatar selection for sequential flow
+    wx.nextTick(() => {
+      this.setData({ nicknameFocus: true });
+    });
+  },
+
+  /** Tap avatar circle → custom image picker (camera / gallery, no WeChat avatars) */
+  onTapAvatarDisplay() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ["image"],
+      sourceType: ["album", "camera"],
+      sizeType: ["compressed"],
+      success: (res) => {
+        const avatarUrl = res.tempFiles[0]?.tempFilePath;
+        if (avatarUrl) {
+          this.setData({ avatarUrl, hasNewAvatar: true });
+        }
+      },
+      fail: (err) => {
+        if (err.errMsg !== "chooseMedia:fail cancel") {
+          console.error("[profile-setup] chooseMedia failed", err);
+        }
+      },
+    });
+  },
+
+  /** Reset focus flag when nickname input loses focus */
+  onNicknameBlur() {
+    this.setData({ nicknameFocus: false });
   },
 
   onNickInput(e: WechatMiniprogram.Input) {
-    this.setData({ nickName: e.detail.value });
+    const nickName = e.detail.value;
+    this.setData({ nickName, canConfirm: nickName.trim().length > 0 });
   },
 
   async onConfirm() {
@@ -48,13 +73,13 @@ Page({
     const { avatarUrl, nickName, hasNewAvatar } = this.data;
     const trimmedNick = nickName.trim();
 
-    // Validate: at least a nickname or avatar should be provided
-    if (!trimmedNick && !avatarUrl) {
-      wx.showToast({ title: "请设置头像或昵称", icon: "none" });
+    // Validate: nickname is required, avatar is optional
+    if (!trimmedNick) {
+      wx.showToast({ title: "请输入昵称", icon: "none" });
       return;
     }
 
-    wx.showLoading({ title: "保存中…", mask: true });
+    wx.showLoading({ title: "创建中…", mask: true });
 
     try {
       let finalAvatarUrl = "";
@@ -65,7 +90,10 @@ Page({
         const checkResult = await checkImage(avatarUrl);
         if (!checkResult.pass) {
           wx.hideLoading();
-          wx.showToast({ title: checkResult.reason || "图片未通过安全检测", icon: "none" });
+          wx.showToast({
+            title: checkResult.reason || "图片未通过安全检测",
+            icon: "none",
+          });
           return;
         }
 
@@ -91,7 +119,8 @@ Page({
 
       // Update users collection in DB
       const db = wx.cloud.database();
-      const userRes = await db.collection("users")
+      const userRes = await db
+        .collection("users")
         .where({ _openid: app.globalData.openid })
         .limit(1)
         .get();
@@ -101,9 +130,12 @@ Page({
       if (finalAvatarUrl) updateData.avatarUrl = finalAvatarUrl;
 
       if (userRes.data.length > 0) {
-        await db.collection("users").doc(userRes.data[0]._id as string).update({
-          data: updateData,
-        });
+        await db
+          .collection("users")
+          .doc(userRes.data[0]._id as string)
+          .update({
+            data: updateData,
+          });
       } else {
         // User doc doesn't exist, create it
         await db.collection("users").add({
@@ -116,14 +148,14 @@ Page({
       }
 
       wx.hideLoading();
-      wx.showToast({ title: "设置成功", icon: "success" });
+      wx.showToast({ title: "创建成功", icon: "success" });
       setTimeout(() => {
         wx.switchTab({ url: "/pages/index/index" });
       }, 800);
     } catch (err) {
       wx.hideLoading();
       console.error("[profile-setup] save failed", err);
-      wx.showToast({ title: "保存失败，请重试", icon: "none" });
+      wx.showToast({ title: "创建失败，请重试", icon: "none" });
     }
   },
 
@@ -133,7 +165,8 @@ Page({
 
     // Check if user doc exists in DB
     const db = wx.cloud.database();
-    const userRes = await db.collection("users")
+    const userRes = await db
+      .collection("users")
       .where({ _openid: openid })
       .limit(1)
       .get();

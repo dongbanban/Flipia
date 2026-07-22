@@ -49,18 +49,13 @@ App({
       traceUser: true,
     });
 
-    wx.showLoading({ title: "初始化中…", mask: true });
     this._initApp()
       .then(() => {
         this._ready = true;
         const resolvers = this._readyResolvers;
         this._readyResolvers = [];
         for (const resolve of resolvers) resolve();
-        if (this.globalData.needProfileSetup) {
-          wx.redirectTo({ url: "/pages/profile-setup/index" });
-        } else {
-          wx.switchTab({ url: "/pages/index/index" });
-        }
+        // Each page handles its own routing after app is ready
       })
       .catch((err: unknown) => {
         console.error("[app] init failed", err);
@@ -70,8 +65,7 @@ App({
             showCancel: false,
             confirmColor: "#c8815e",
           });
-      })
-      .finally(() => wx.hideLoading());
+      });
   },
 
   whenReady(this: AppInstance): Promise<void> {
@@ -162,17 +156,11 @@ App({
         const user = res.data[0] as { nickName: string; avatarUrl?: string };
         this.globalData.nickName = user.nickName;
         this.globalData.avatarUrl = user.avatarUrl || "";
-        // Detect default auto-generated nicknames: 用户 + 6 hex chars, with no avatar
-        if (/^用户[a-z0-9]{6}$/.test(user.nickName) && !user.avatarUrl) {
-          this.globalData.needProfileSetup = true;
-        }
         return;
       }
 
       const nickName = `用户${openid.slice(-6)}`;
-      await db.collection("users").add({
-        data: { nickName, avatarUrl: "", createdAt: Date.now() },
-      });
+      // Defer user doc creation — the profile-setup page will create it on confirm
       this.globalData.nickName = nickName;
       this.globalData.avatarUrl = "";
       this.globalData.needProfileSetup = true;

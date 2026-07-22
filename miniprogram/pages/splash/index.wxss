@@ -1,0 +1,110 @@
+/* ── Splash layout ── */
+.splash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(175deg, var(--color-primary-light) 0%, var(--color-bg) 50%);
+}
+
+/* ── 3D card stage ── */
+.card-stage {
+  perspective: 800rpx;
+  width: 280rpx;
+  height: 360rpx;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.35s ease;
+}
+
+.card.flip {
+  animation: cardLoop 1.8s ease-in-out infinite;
+}
+
+@keyframes cardLoop {
+  0%   { transform: rotateY(0deg); }
+  30%  { transform: rotateY(0deg); }
+  50%  { transform: rotateY(180deg); }
+  80%  { transform: rotateY(180deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 12rpx 48rpx rgba(200, 129, 94, 0.18);
+}
+
+/* ── Front face ── */
+.card-front {
+  background: linear-gradient(135deg, #c8815e 0%, #e0b398 100%);
+  color: #fff;
+}
+
+.logo {
+  font-size: 48rpx;
+  font-weight: 800;
+  letter-spacing: 4rpx;
+  margin-bottom: 16rpx;
+}
+
+.tagline {
+  font-size: 22rpx;
+  opacity: 0.8;
+  letter-spacing: 2rpx;
+}
+
+/* ── Back face ── */
+.card-back {
+  background: linear-gradient(135deg, #e0b398 0%, #c8815e 100%);
+  transform: rotateY(180deg);
+}
+
+/* ── Dot pulse on back face ── */
+.dot-pulse {
+  display: flex;
+  gap: 12rpx;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  animation: dotBounce 1.4s ease-in-out infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
