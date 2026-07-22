@@ -72,7 +72,7 @@
               </block>
               <block wx:else>
                 <text class="card-placeholder-icon">+</text>
-                <text class="card-placeholder-text">Flipia时刻</text>
+                <text class="card-placeholder-text">{{brandText}}</text>
               </block>
             </view>
 

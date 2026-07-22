@@ -37,6 +37,8 @@ Page({
     deleteBtnPx: 0,
     /** Share image canvas height (dynamic) */
     canvasHeight: 0,
+    /** Share image placeholder brand text */
+    brandText: STRINGS.BRAND_NAME + "时刻",
   },
 
   _db: null as ReturnType<typeof wx.cloud.database> | null,
@@ -569,7 +571,7 @@ Page({
               ctx.fillStyle = C_PRIMARY;
               ctx.font = `${FS_PLACEHOLDER}px sans-serif`;
               ctx.fillText(
-                "Flipia时刻",
+                STRINGS.BRAND_NAME + "时刻",
                 cx,
                 bodyTop + IMG_SIZE / 2 + 4 * scale,
               );
