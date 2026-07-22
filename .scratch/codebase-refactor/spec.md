@@ -244,10 +244,16 @@ pnpm test
 - `pnpm test` 全部通过 —— 纯注释修改，行为不发生任何变化
 - 全局 grep 确认无英文注释遗漏
 
+## Splash 页面延迟跳转（08-splash-delay）
+
+在 `pages/splash/index.ts` 的 `onShow()` 中，`await app.whenReady()` 之后插入 500ms 固定延迟再执行路由跳转。当前快速登录场景下 `whenReady()` 可能在卡片翻转动画中途就 resolve，导致用户看不到完整动画。增加延迟后，splash 页面作为启动 banner 的展示时间得到保证。
+
+改动范围：仅 `pages/splash/index.ts` 一处文件，`onShow()` 第 17 行后插入 `await new Promise(r => setTimeout(r, 500))`。
+
 ## Out of Scope
 
 - 深层架构变更：纯函数模块（draw-engine、dish-pool、history、category-manage 等）的接口和实现不变
-- 新增任何面向用户的功能
+- 新增任何面向用户的功能（splash 延迟除外）
 - 修改任何数据库 Schema 或云函数业务逻辑
 - 引入第三方 UI 库或组件框架
 - 云函数 `content-security` 和 `content-security-callback` 的代码整理（hardcode 极少，当前改动收益低）
