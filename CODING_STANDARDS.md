@@ -1,5 +1,7 @@
 # Coding Standards
 
+> 项目配置文件与公共方法/组件的完整说明见 [docs/config-and-utils.md](docs/config-and-utils.md)。新增常量或工具函数前请先查阅，避免重复造轮子。
+
 ## Remove badge
 
 When an element needs a remove / delete badge, use the shared `.remove-badge` class from `miniprogram/styles/badge.wxss` (imported globally via `app.wxss`).
