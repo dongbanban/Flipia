@@ -1,3 +1,4 @@
+import { buildProfileMap, buildMemberInfoList } from "./lib/helpers";
 import { sanitizeInput } from "../../lib/sanitize";
 import { showConfirm } from "../../lib/confirm";
 import { LIMITS } from "../../config";
@@ -8,13 +9,6 @@ interface GroupInfo {
   name: string;
   members: string[];
   joinCode?: string;
-}
-
-interface MemberInfo {
-  openid: string;
-  nickName: string;
-  initial: string;
-  isOwner: boolean;
 }
 
 interface UserProfile {
@@ -42,7 +36,7 @@ Page({
     groupId: "",
     groupName: "",
     groupOwnerOpenid: "",
-    members: [] as MemberInfo[],
+    members: [] as Array<{ openid: string; nickName: string; initial: string; isOwner: boolean }>,
     isOwner: false,
     myOpenid: "",
     groups: [] as Array<{ _id: string; name: string; members: string[] }>,
@@ -224,27 +218,13 @@ Page({
         .get();
 
       const profiles = userRes.data as UserProfile[];
-      const profileMap: Record<string, string> = {};
-      for (const p of profiles) {
-        profileMap[p._openid] = p.nickName;
-      }
-
-      const members: MemberInfo[] = memberOpenids.map((openid) => ({
-        openid,
-        nickName: profileMap[openid] || `用户${openid.slice(-6)}`,
-        initial: (profileMap[openid] || "用").charAt(0),
-        isOwner: openid === group._openid,
-      }));
+      const profileMap = buildProfileMap(profiles);
+      const members = buildMemberInfoList(memberOpenids, profileMap, group._openid);
 
       this.setData({ members, isOwner });
     } catch (err) {
       console.error("[group-manage] load members failed", err);
-      const members: MemberInfo[] = memberOpenids.map((openid) => ({
-        openid,
-        nickName: `用户${openid.slice(-6)}`,
-        initial: "用",
-        isOwner: openid === group._openid,
-      }));
+      const members = buildMemberInfoList(memberOpenids, {}, group._openid);
       this.setData({ members, isOwner });
     }
   },

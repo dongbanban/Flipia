@@ -1,13 +1,15 @@
 import {
   attachDrawerNames,
-  formatTime,
   groupByDay,
   type DayGroup,
   type DrawHistoryRecord,
 } from "../../lib/history";
+import { getMemberCount } from "../../lib/group-utils";
 import { uploadImages } from "../../lib/upload-image";
 import { showConfirm } from "../../lib/confirm";
 import { LIMITS, QUERY, STRINGS } from "../../config";
+import { buildRecordDisplayFields, type EnrichedRecord } from "./lib/helpers";
+import { roundRect, lineH, measure } from "./lib/canvas";
 
 interface AppInstance {
   globalData: {
@@ -23,9 +25,7 @@ Page({
   data: {
     memberCount: 0,
     dayGroups: [] as (DayGroup & {
-      records: Array<
-        DrawHistoryRecord & { time: string; drawerLabel: string }
-      >;
+      records: EnrichedRecord[];
     })[],
     loading: true,
     empty: false,
@@ -53,7 +53,7 @@ Page({
     await app.whenReady();
     const groupId = app.globalData.groupId;
     this.setData({
-      memberCount: this._getMemberCount(),
+      memberCount: getMemberCount(app.globalData.groups, app.globalData.groupId),
     });
     if (this._groupId !== groupId) {
       this._groupId = groupId;
@@ -72,16 +72,10 @@ Page({
     this._db = wx.cloud.database();
     const sysInfo = wx.getSystemInfoSync();
     this.setData({
-      memberCount: this._getMemberCount(),
+      memberCount: getMemberCount(app.globalData.groups, app.globalData.groupId),
       deleteBtnPx: Math.round(150 * sysInfo.windowWidth / 750),
     });
     this._loadHistory();
-  },
-
-  _getMemberCount(): number {
-    const app = getApp<AppInstance>();
-    const group = app.globalData.groups.find((g) => g._id === app.globalData.groupId);
-    return group ? group.members.length : 0;
   },
 
   async onRecordUploadImage(e: WechatMiniprogram.TouchEvent) {
@@ -192,11 +186,7 @@ Page({
 
       const dayGroups = groupByDay(records).map((group) => ({
         ...group,
-        records: group.records.map((r) => ({
-          ...r,
-          time: formatTime(r.confirmedAt),
-          drawerLabel: r.drawerName ? `${r.drawerName}抽的` : "",
-        })),
+        records: buildRecordDisplayFields(group.records),
       }));
 
       this.setData({ dayGroups, loading: false, empty: false });
@@ -460,29 +450,6 @@ Page({
             const bodyWidth = cardWidth - 2 * CARD_PAD;
             const infoWidth = bodyWidth - IMG_SIZE - BODY_GAP;
 
-            // ── 辅助函数 ──
-            const roundRect = (
-              x: number, y: number, w: number, h: number, r: number,
-            ) => {
-              ctx.beginPath();
-              ctx.moveTo(x + r, y);
-              ctx.lineTo(x + w - r, y);
-              ctx.arcTo(x + w, y, x + w, y + r, r);
-              ctx.lineTo(x + w, y + h - r);
-              ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-              ctx.lineTo(x + r, y + h);
-              ctx.arcTo(x, y + h, x, y + h - r, r);
-              ctx.lineTo(x, y + r);
-              ctx.arcTo(x, y, x + r, y, r);
-              ctx.closePath();
-            };
-
-            const lineH = (fs: number) => fs * LH;
-            const measure = (text: string, fs: number, bold = false) => {
-              ctx.font = `${bold ? "bold " : ""}${fs}px sans-serif`;
-              return ctx.measureText(text).width;
-            };
-
             // ── 加载图片 ──
             let loadedImg: any = null;
             if (record.images && record.images.length > 0) {
@@ -535,7 +502,7 @@ Page({
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 2 * scale;
             ctx.fillStyle = C_BG;
-            roundRect(cardX, cardTop, cardWidth, cardH, CARD_R);
+            roundRect(ctx, cardX, cardTop, cardWidth, cardH, CARD_R);
             ctx.fill();
             ctx.restore();
 
@@ -547,7 +514,7 @@ Page({
             // 左：图片或占位符
             if (hasImage) {
               ctx.save();
-              roundRect(bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
+              roundRect(ctx, bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
               ctx.clip();
               ctx.drawImage(loadedImg, bodyX, bodyTop, IMG_SIZE, IMG_SIZE);
               ctx.restore();
@@ -555,7 +522,7 @@ Page({
               ctx.setLineDash([4 * scale, 4 * scale]);
               ctx.strokeStyle = C_PLACEHOLDER;
               ctx.lineWidth = 2 * scale;
-              roundRect(bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
+              roundRect(ctx, bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
               ctx.stroke();
               ctx.setLineDash([]);
 
@@ -587,13 +554,13 @@ Page({
             ctx.fillText(record.time, infoX, iY);
 
             if (record.drawerLabel) {
-              const tW = measure(record.time, FS_TIME);
-              const dW = measure(record.drawerLabel, FS_DRAWER);
+              const tW = measure(ctx, record.time, FS_TIME);
+              const dW = measure(ctx, record.drawerLabel, FS_DRAWER);
               const bX = infoX + tW + 10 * scale;
               const bW = dW + DR_PAD_H * 2;
               const bH = FS_DRAWER * LH + DR_PAD_V * 2;
               ctx.fillStyle = C_PRIMARY_LIGHT;
-              roundRect(bX, iY, bW, bH, DR_R);
+              roundRect(ctx, bX, iY, bW, bH, DR_R);
               ctx.fill();
               ctx.fillStyle = C_PRIMARY;
               ctx.font = `${FS_DRAWER}px sans-serif`;
@@ -609,14 +576,14 @@ Page({
               const dishText = group.dishes.map((d: typeof group.dishes[number]) => d.dishName).join(" ");
               ctx.font = `bold ${FS_CAT}px sans-serif`;
               ctx.fillText(catText, infoX, iY);
-              const catW = measure(catText, FS_CAT, true);
+              const catW = measure(ctx, catText, FS_CAT, true);
               const remaining = infoWidth - catW;
               if (remaining > 8 * scale && dishText) {
                 let drawText = dishText;
-                let dw = measure(drawText, FS_DISH);
+                let dw = measure(ctx, drawText, FS_DISH);
                 while (dw > remaining - 4 * scale && drawText.length > 1) {
                   drawText = drawText.slice(0, -1);
-                  dw = measure(drawText + "…", FS_DISH);
+                  dw = measure(ctx, drawText + "…", FS_DISH);
                 }
                 if (dw > remaining) drawText = drawText.slice(0, -1) + "…";
                 ctx.font = `${FS_DISH}px sans-serif`;

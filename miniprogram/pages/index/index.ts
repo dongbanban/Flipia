@@ -10,17 +10,8 @@ import { resolveEffectiveGroupId } from "../../lib/draw-config-manage";
 import type { DrawConfigGroup, Category } from "../../lib/init-data";
 import { showConfirm } from "../../lib/confirm";
 import { QUERY, HISTORY_WINDOW_DAYS } from "../../config";
-
-interface DrawCard {
-  id: string;
-  categoryId: string;
-  categoryName: string;
-  dishId: string;
-  dishName: string;
-  imageUrl: string;
-  flipped: boolean;
-  redrawing: boolean;
-}
+import { getMemberCount } from "../../lib/group-utils";
+import { buildDrawCards, cardsToResults, type DrawCard } from "./lib/helpers";
 
 interface AppInstance {
   globalData: {
@@ -67,7 +58,7 @@ Page({
     const app = getApp<AppInstance>();
     await app.whenReady();
     const groupId = app.globalData.groupId;
-    const memberCount = this._getMemberCount(
+    const memberCount = getMemberCount(
       app.globalData.groups,
       groupId,
     );
@@ -111,7 +102,7 @@ Page({
       openid: app.globalData.openid,
       groups,
       activeGroupId: app.globalData.groupId,
-      memberCount: this._getMemberCount(groups, app.globalData.groupId),
+      memberCount: getMemberCount(groups, app.globalData.groupId),
     });
     this._loadConfigAndValidate();
     this._loadTodaySummary();
@@ -120,7 +111,7 @@ Page({
   onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
     const app = getApp<AppInstance>();
     app.switchGroup(e.detail.groupId);
-    const memberCount = this._getMemberCount(
+    const memberCount = getMemberCount(
       app.globalData.groups,
       e.detail.groupId,
     );
@@ -149,14 +140,6 @@ Page({
 
   onGoHistory() {
     wx.switchTab({ url: "/pages/history/index" });
-  },
-
-  _getMemberCount(
-    groups: Array<{ _id: string; name: string; members: string[] }>,
-    groupId: string,
-  ): number {
-    const group = groups.find((g) => g._id === groupId);
-    return group ? group.members.length : 0;
   },
 
   async _loadConfigAndValidate() {
@@ -397,25 +380,7 @@ Page({
     if (this._activeEntries.length === 0) return;
 
     const results = drawDishes(this._dishPool, this._activeEntries);
-
-    let cardIdx = 0;
-    const cards: DrawCard[] = [];
-    for (const group of results) {
-      for (const dish of group.dishes) {
-        const imageUrl = dish.images && dish.images.length > 0 ? dish.images[0] : "";
-        cards.push({
-          id: `card-${cardIdx}`,
-          categoryId: group.categoryId,
-          categoryName: group.categoryName,
-          dishId: dish.id,
-          dishName: dish.name,
-          imageUrl,
-          flipped: false,
-          redrawing: false,
-        });
-        cardIdx++;
-      }
-    }
+    const cards = buildDrawCards(results);
 
     this.setData({
       phase: "drawing",
@@ -497,30 +462,7 @@ Page({
       const app = getApp<AppInstance>();
       const openid = app.globalData.openid;
 
-      const resultMap = new Map<string, {
-        categoryId: string;
-        categoryName: string;
-        dishes: Array<{ dishId: string; dishName: string; imageUrl: string }>;
-      }>();
-
-      for (const card of cards) {
-        let group = resultMap.get(card.categoryId);
-        if (!group) {
-          group = {
-            categoryId: card.categoryId,
-            categoryName: card.categoryName,
-            dishes: [],
-          };
-          resultMap.set(card.categoryId, group);
-        }
-        group.dishes.push({
-          dishId: card.dishId,
-          dishName: card.dishName,
-          imageUrl: card.imageUrl,
-        });
-      }
-
-      const results = [...resultMap.values()];
+      const results = cardsToResults(cards);
 
       await this._db!.collection("draw_history").add({
         data: {

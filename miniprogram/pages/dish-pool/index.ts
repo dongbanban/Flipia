@@ -15,7 +15,9 @@ import { checkTextWithToast } from "../../lib/content-security";
 import { uploadImages } from "../../lib/upload-image";
 import { sanitizeInput } from "../../lib/sanitize";
 import { showConfirm } from "../../lib/confirm";
+import { getMemberCount } from "../../lib/group-utils";
 import { LIMITS, QUERY } from "../../config";
+import { escapeRegex } from "./lib/helpers";
 
 interface AppInstance {
   globalData: {
@@ -93,7 +95,7 @@ Page({
     this._groupId = app.globalData.groupId;
     this._openid = app.globalData.openid;
     this._db = wx.cloud.database();
-    const memberCount = this._getMemberCount();
+    const memberCount = getMemberCount(app.globalData.groups, app.globalData.groupId);
     this.setData({
       memberCount,
     });
@@ -103,7 +105,7 @@ Page({
   async onShow() {
     const app = getApp<AppInstance>();
     await app.whenReady();
-    const memberCount = this._getMemberCount();
+    const memberCount = getMemberCount(app.globalData.groups, app.globalData.groupId);
     this.setData({
       memberCount,
     });
@@ -225,10 +227,6 @@ Page({
 
   // ── 搜索 ─────────────────────────────────────────────────────────────────
 
-  _escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  },
-
   _buildCategoryMap(): Record<string, string> {
     const map: Record<string, string> = {};
     for (const cat of this.data.categories as Category[]) {
@@ -282,7 +280,7 @@ Page({
 
     this.setData({ loading: true });
     try {
-      const escaped = this._escapeRegex(keyword);
+      const escaped = escapeRegex(keyword);
       const res = await this._db!.collection("dishes")
         .where({
           groupId: this._groupId,
@@ -917,12 +915,6 @@ Page({
   // ── 启用/禁用 ─────────────────────────────────────────────────────────────
 
   noop() {},
-
-  _getMemberCount(): number {
-    const app = getApp<AppInstance>();
-    const group = app.globalData.groups.find((g) => g._id === app.globalData.groupId);
-    return group ? group.members.length : 0;
-  },
 
   async onToggleEnabled(e: WechatMiniprogram.TouchEvent) {
     const { dish, idx } = e.currentTarget.dataset as {
