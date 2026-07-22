@@ -49,7 +49,7 @@ Page({
       return;
     }
 
-    wx.showLoading({ title: "正在保存…", mask: true });
+    wx.showLoading({ title: "正在保存…" });
 
     try {
       const openid = app.globalData.openid;

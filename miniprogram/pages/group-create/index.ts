@@ -165,7 +165,7 @@ Page({
     }
 
     this.setData({ submitting: true });
-    wx.showLoading({ title: "创建中…", mask: true });
+    wx.showLoading({ title: "创建中…" });
 
     try {
       const db = this._db!;

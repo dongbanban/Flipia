@@ -77,9 +77,9 @@ export async function drawShareImage(
 
           const canvas = nodeRes[0].node as WechatMiniprogram.Canvas;
           const ctx = canvas.getContext("2d") as any;
-          const dpr = wx.getSystemInfoSync().pixelRatio;
-          const sysInfo = wx.getSystemInfoSync();
-          const scale = sysInfo.windowWidth / 750;
+          const windowInfo = wx.getWindowInfo();
+          const dpr = windowInfo.pixelRatio;
+          const scale = windowInfo.windowWidth / 750;
 
           // ── 颜色 ──
           const C_BG = "#ffffff";
@@ -111,10 +111,9 @@ export async function drawShareImage(
           const DR_PAD_H = 12 * scale;
           const DR_R = 24 * scale;
 
-          const canvasWidth = sysInfo.windowWidth;
+          const canvasWidth = windowInfo.windowWidth;
           const cardWidth = canvasWidth - 2 * MARGIN;
           const bodyWidth = cardWidth - 2 * CARD_PAD;
-          const infoWidth = bodyWidth - IMG_SIZE - BODY_GAP;
 
           // ── 加载图片 ──
           let loadedImg: any = null;
@@ -137,6 +136,7 @@ export async function drawShareImage(
             }
           }
           const hasImage = loadedImg !== null;
+          const infoWidth = hasImage ? bodyWidth - IMG_SIZE - BODY_GAP : bodyWidth;
 
           // ── 高度计算 ──
           let infoH = lineH(FS_TIME);
@@ -145,7 +145,7 @@ export async function drawShareImage(
             infoH += GROUP_MT;
             infoH += lineH(FS_CAT);
           }
-          const bodyH = Math.max(IMG_SIZE, infoH);
+          const bodyH = hasImage ? Math.max(IMG_SIZE, infoH) : infoH;
           const cardH = CARD_PAD + bodyH + CARD_PAD;
           const canvasHeight = Math.ceil(MARGIN + cardH + MARGIN);
 
@@ -184,35 +184,10 @@ export async function drawShareImage(
             ctx.clip();
             ctx.drawImage(loadedImg, bodyX, bodyTop, IMG_SIZE, IMG_SIZE);
             ctx.restore();
-          } else {
-            ctx.setLineDash([4 * scale, 4 * scale]);
-            ctx.strokeStyle = C_PLACEHOLDER;
-            ctx.lineWidth = 2 * scale;
-            roundRect(ctx, bodyX, bodyTop, IMG_SIZE, IMG_SIZE, CARD_R);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            ctx.textAlign = "center";
-            const cx = bodyX + IMG_SIZE / 2;
-            ctx.fillStyle = C_PLACEHOLDER;
-            ctx.font = `${FS_PLUS}px sans-serif`;
-            ctx.fillText(
-              "+",
-              cx,
-              bodyTop + IMG_SIZE / 2 - FS_PLUS / 2 - 4 * scale,
-            );
-            ctx.fillStyle = C_PRIMARY;
-            ctx.font = `${FS_PLACEHOLDER}px sans-serif`;
-            ctx.fillText(
-              STRINGS.BRAND_NAME + "时刻",
-              cx,
-              bodyTop + IMG_SIZE / 2 + 4 * scale,
-            );
-            ctx.textAlign = "left";
           }
 
           // 右：信息区
-          const infoX = bodyX + IMG_SIZE + BODY_GAP;
+          const infoX = hasImage ? bodyX + IMG_SIZE + BODY_GAP : bodyX;
           let iY = bodyTop;
 
           ctx.fillStyle = C_SECONDARY;

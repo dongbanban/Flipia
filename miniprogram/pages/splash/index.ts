@@ -15,6 +15,7 @@ Page({
 
   async onShow() {
     await app.whenReady();
+    await new Promise(r => setTimeout(r, 500));
 
     if (app.globalData.needProfileSetup) {
       wx.redirectTo({ url: "/pages/profile-setup/index" });

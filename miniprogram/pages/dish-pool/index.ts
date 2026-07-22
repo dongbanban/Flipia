@@ -565,7 +565,7 @@ Page({
 
     if (form.cookingDescription && !(await checkTextWithToast(form.cookingDescription))) return;
 
-    wx.showLoading({ title: "保存中…", mask: true });
+    wx.showLoading({ title: "保存中…" });
     try {
       const isEdit = this.data.formMode === "edit";
       const ctx: SaveContext = { db: this._db!, groupId: this._groupId, openid: this._openid };
@@ -671,7 +671,7 @@ Page({
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "下架中…", mask: true });
+    wx.showLoading({ title: "下架中…" });
     try {
       if (dish.images && dish.images.length > 0) {
         await wx.cloud.deleteFile({ fileList: dish.images });

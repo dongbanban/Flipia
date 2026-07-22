@@ -91,32 +91,18 @@
             </view>
           </view>
 
-          <!-- 底部操作按钮：分享给朋友 + 保存为图片 -->
-          <view class="record-actions">
-            <button
-              class="record-action-btn"
-              open-type="share"
-              data-record-id="{{record._id}}"
-              hover-class="record-action-btn--hover"
-            >
-              <text class="record-action-icon">↗</text>
-              <text>分享给朋友</text>
-            </button>
-            <view
-              class="record-action-btn"
-              hover-class="record-action-btn--hover"
-              data-record-id="{{record._id}}"
-              bindtap="onGenerateShareImage"
-            >
-              <text class="record-action-icon">↓</text>
-              <text>保存为图片</text>
-            </view>
+          <!-- 分享图标：点击生成分享图片，使用系统分享菜单 -->
+          <view
+            class="record-share-icon"
+            catchtap="onGenerateShareImage"
+            data-record-id="{{record._id}}"
+          >
+            <text>⬆</text>
           </view>
         </view>
       </view>
     </view>
   </view>
 </view>
-
 <!-- 隐藏 canvas 用于生成分享图片（放在 .page 外避免裁剪） -->
 <canvas type="2d" id="shareCanvas" class="share-canvas"></canvas>

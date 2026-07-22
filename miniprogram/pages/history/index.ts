@@ -70,10 +70,10 @@ Page({
     await app.whenReady();
     this._groupId = app.globalData.groupId;
     this._db = wx.cloud.database();
-    const sysInfo = wx.getSystemInfoSync();
+    const windowInfo = wx.getWindowInfo();
     this.setData({
       memberCount: getMemberCount(app.globalData.groups, app.globalData.groupId),
-      deleteBtnPx: Math.round(150 * sysInfo.windowWidth / 750),
+      deleteBtnPx: Math.round(150 * windowInfo.windowWidth / 750),
     });
     this._loadHistory();
   },
@@ -360,22 +360,13 @@ Page({
     }
     if (!targetRecord) return;
 
-    wx.showLoading({ title: "生成中…", mask: true });
+    wx.showLoading({ title: "生成中…" });
 
     try {
       const tempFilePath = await this._drawShareImage(dateLabel, targetRecord);
       wx.hideLoading();
 
-      wx.showActionSheet({
-        itemList: ["保存到相册", "发送给朋友"],
-        success: (res) => {
-          if (res.tapIndex === 0) {
-            this._saveToAlbum(tempFilePath);
-          } else if (res.tapIndex === 1) {
-            this._shareToFriend(tempFilePath);
-          }
-        },
-      });
+      this._onShareImage(tempFilePath);
     } catch (err) {
       console.error("[history] generate share image failed", err);
       wx.hideLoading();
@@ -390,40 +381,15 @@ Page({
     return drawShareImage(record as EnrichedRecord, dateLabel);
   },
 
-  _saveToAlbum(tempFilePath: string) {
-    wx.saveImageToPhotosAlbum({
-      filePath: tempFilePath,
-      success: () => {
-        wx.showToast({ title: "已保存到相册", icon: "success" });
-      },
+  _onShareImage(tempFilePath: string) {
+    wx.showShareImageMenu({
+      path: tempFilePath,
       fail: (err) => {
-        if (
-          (err as { errMsg?: string }).errMsg?.includes("auth deny") ||
-          (err as { errMsg?: string }).errMsg?.includes("authorize")
-        ) {
-          wx.showModal({
-            title: "提示",
-            content: "请在设置中开启相册权限以保存图片",
-            confirmText: "去设置",
-            success: (modalRes) => {
-              if (modalRes.confirm) {
-                wx.openSetting({});
-              }
-            },
-          });
-        } else {
-          wx.showToast({ title: "保存失败，请重试", icon: "none" });
+        const msg = (err as { errMsg?: string }).errMsg || "";
+        if (!msg.includes("cancel")) {
+          console.error("[history] show share image menu failed", err);
+          wx.showToast({ title: "分享失败", icon: "none" });
         }
-      },
-    });
-  },
-
-  _shareToFriend(tempFilePath: string) {
-    wx.shareFileMessage({
-      filePath: tempFilePath,
-      fail: (err) => {
-        console.error("[history] share file message failed", err);
-        wx.showToast({ title: "分享失败", icon: "none" });
       },
     });
   },

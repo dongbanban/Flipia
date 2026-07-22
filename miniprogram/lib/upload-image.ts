@@ -2,7 +2,7 @@ import { validateAndCompressImage, checkImageAsync } from "@/lib/content-securit
 import { LIMITS } from "@/config";
 
 export interface UploadImageOptions {
-  /** 最多可选择的图片数量（传给 wx.chooseImage count） */
+  /** 最多可选择的图片数量（传给 wx.chooseMedia count） */
   count: number;
   /** 图片来源：相册、相机 */
   sourceType?: Array<"album" | "camera">;
@@ -12,7 +12,7 @@ export interface UploadImageOptions {
 
 /**
  * 完整图片上传流程：
- * 1. wx.chooseImage → 用户选择图片
+ * 1. wx.chooseMedia → 用户选择图片
  * 2. validateAndCompressImage → 格式校验 + 必要时压缩
  * 3. wx.cloud.uploadFile → 上传至云存储
  * 4. checkImageAsync → fire-and-forget 内容安全检测
@@ -23,16 +23,18 @@ export async function uploadImages(options: UploadImageOptions): Promise<string[
   const { count, sourceType = ["album", "camera"], showToast = true } = options;
 
   return new Promise((resolve, reject) => {
-    wx.chooseImage({
+    wx.chooseMedia({
       count,
+      mediaType: ['image'],
       sizeType: ["compressed"],
       sourceType,
       success: async (res) => {
-        if (showToast) wx.showLoading({ title: "上传中…", mask: true });
+        if (showToast) wx.showLoading({ title: "上传中…" });
         try {
           const fileIDs: string[] = [];
 
-          for (const tempPath of res.tempFilePaths) {
+          for (const file of res.tempFiles) {
+            const tempPath = file.tempFilePath;
             // 校验并压缩
             let uploadPath = tempPath;
             try {
@@ -70,8 +72,8 @@ export async function uploadImages(options: UploadImageOptions): Promise<string[
         }
       },
       fail: (err) => {
-        if (err.errMsg !== "chooseImage:fail cancel") {
-          console.error("[uploadImages] chooseImage failed", err);
+        if (err.errMsg !== "chooseMedia:fail cancel") {
+          console.error("[uploadImages] chooseMedia failed", err);
           if (showToast) wx.showToast({ title: "选择图片失败", icon: "none" });
         }
         reject(err);

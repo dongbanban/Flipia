@@ -4,7 +4,7 @@
 
 **Blocked by:** 无 — 可立即开始。
 
-**Status:** completed
+**Status:** done
 
 - [x] `tests/init-data.test.ts`: `buildPresetDishes` 每道菜 categoryId 与预设分类匹配、总数 20 道
 - [x] `tests/dish-pool.test.ts`: `sortDishes` 全部无 createdAt 保持原序、`buildImportDishData` 复制 cookingDescription

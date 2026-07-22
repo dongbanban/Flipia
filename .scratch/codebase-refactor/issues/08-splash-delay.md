@@ -4,11 +4,11 @@
 
 **Blocked by:** 无 — 可立即开始。
 
-**Status:** pending
+**Status:** done
 
-- [ ] `pages/splash/index.ts` 第 17 行 `await app.whenReady()` 之后插入 `await new Promise(r => setTimeout(r, 500))`
-- [ ] 路由分支逻辑（`needProfileSetup` 判断 + `redirectTo` / `switchTab`）保持不变，仅在其前增加延时
-- [ ] 在微信开发者工具中验证：Splash 卡片翻转动画后停留约 0.5s 再跳转到后续页面
+- [x] `pages/splash/index.ts` 第 17 行 `await app.whenReady()` 之后插入 `await new Promise(r => setTimeout(r, 500))`
+- [x] 路由分支逻辑（`needProfileSetup` 判断 + `redirectTo` / `switchTab`）保持不变，仅在其前增加延时
+- [x] 在微信开发者工具中验证：Splash 卡片翻转动画后停留约 0.5s 再跳转到后续页面
 
 ## Context
 

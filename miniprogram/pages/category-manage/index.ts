@@ -127,7 +127,7 @@ Page({
 
     const arr = addCategory(this.data.categories as Category[], sanitized);
 
-    wx.showLoading({ title: "保存中…", mask: true });
+    wx.showLoading({ title: "保存中…" });
     try {
       await this._saveConfig(
         arr,
@@ -198,7 +198,7 @@ Page({
       }),
     );
 
-    wx.showLoading({ title: "保存中…", mask: true });
+    wx.showLoading({ title: "保存中…" });
     try {
       await this._saveConfig(arr, newGroups);
       this.setData({ editingId: "", editValue: "", editError: "" });
@@ -221,7 +221,7 @@ Page({
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "删除中…", mask: true });
+    wx.showLoading({ title: "删除中…" });
     try {
       const result = deleteCategory(
         this.data.categories as Category[],

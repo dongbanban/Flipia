@@ -421,7 +421,7 @@ Page({
   },
 
   async _saveDrawHistory(cards: DrawCard[]) {
-    wx.showLoading({ title: "记录中…", mask: true });
+    wx.showLoading({ title: "记录中…" });
     try {
       const app = getApp<AppInstance>();
       const openid = app.globalData.openid;

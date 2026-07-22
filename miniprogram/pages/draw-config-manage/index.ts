@@ -171,7 +171,7 @@ Page({
 
     const entries = [...this.data.modalEntries] as DrawConfigEntry[];
 
-    wx.showLoading({ title: "保存中…", mask: true });
+    wx.showLoading({ title: "保存中…" });
     try {
       let groups: DrawConfigGroup[];
       if (this._isNewGroup && this._pendingNewGroup) {

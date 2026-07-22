@@ -308,7 +308,7 @@ Page({
     });
     if (!valid) return;
 
-    wx.showLoading({ title: "保存中…", mask: true });
+    wx.showLoading({ title: "保存中…" });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
@@ -355,7 +355,7 @@ Page({
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "移除中…", mask: true });
+    wx.showLoading({ title: "移除中…" });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
@@ -410,7 +410,7 @@ Page({
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "退出中…", mask: true });
+    wx.showLoading({ title: "退出中…" });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
@@ -453,7 +453,7 @@ Page({
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "解散中…", mask: true });
+    wx.showLoading({ title: "解散中…" });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
