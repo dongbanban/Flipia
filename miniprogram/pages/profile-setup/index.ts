@@ -1,16 +1,5 @@
 import { checkImage } from "@/lib/content-security";
-
-interface AppInstance {
-  globalData: {
-    openid: string;
-    nickName: string;
-    avatarUrl: string;
-    groupId: string;
-    groups: Array<{ _id: string; name: string; members: string[] }>;
-    needProfileSetup?: boolean;
-  };
-  whenReady(): Promise<void>;
-}
+import { userStore } from "@/stores/user-store";
 
 Page({
   data: {
@@ -23,9 +12,6 @@ Page({
 
   async onLoad() {
     wx.hideHomeButton();
-    // Splash 页面已经 await app.whenReady() 并路由至此 —
-    // globalData 保证已就绪。
-    await getApp<AppInstance>().whenReady();
   },
 
   onChooseAvatar(e: WechatMiniprogram.CustomEvent) {
@@ -69,7 +55,7 @@ Page({
   },
 
   async onConfirm() {
-    const app = getApp<AppInstance>();
+    const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
     const { avatarUrl, nickName, hasNewAvatar } = this.data;
     const trimmedNick = nickName.trim();
 
@@ -98,7 +84,6 @@ Page({
         }
 
         // 上传至云存储
-        const openid = app.globalData.openid;
         const ext = avatarUrl.split(".").pop() || "jpg";
         const cloudPath = `avatars/${openid}/${Date.now()}_avatar.${ext}`;
         const uploadRes = await wx.cloud.uploadFile({
@@ -108,20 +93,17 @@ Page({
         finalAvatarUrl = uploadRes.fileID;
         this.setData({ hasNewAvatar: false });
       } else {
-        finalAvatarUrl = app.globalData.avatarUrl;
+        finalAvatarUrl = userStore.data.avatarUrl;
       }
 
-      // 立即更新本地 globalData
-      app.globalData.nickName = trimmedNick || app.globalData.nickName;
-      app.globalData.avatarUrl = finalAvatarUrl;
-      // 清除 needProfileSetup 标志
-      app.globalData.needProfileSetup = false;
+      // 立即更新本地 Store
+      userStore.setProfile(trimmedNick || userStore.data.nickName, finalAvatarUrl);
 
       // 更新数据库中的 users 集合
       const db = wx.cloud.database();
       const userRes = await db
         .collection("users")
-        .where({ _openid: app.globalData.openid })
+        .where({ _openid: openid })
         .limit(1)
         .get();
 
@@ -140,7 +122,7 @@ Page({
         // 用户文档不存在，创建之
         await db.collection("users").add({
           data: {
-            nickName: trimmedNick || `用户${app.globalData.openid.slice(-6)}`,
+            nickName: trimmedNick || `用户${openid.slice(-6)}`,
             avatarUrl: finalAvatarUrl,
             createdAt: Date.now(),
           },
@@ -160,8 +142,7 @@ Page({
   },
 
   async onSkip() {
-    const app = getApp<AppInstance>();
-    const openid = app.globalData.openid;
+    const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
 
     // 检查数据库中是否存在用户文档
     const db = wx.cloud.database();
@@ -177,12 +158,11 @@ Page({
       await db.collection("users").add({
         data: { nickName, avatarUrl: "", createdAt: Date.now() },
       });
-      app.globalData.nickName = nickName;
-      app.globalData.avatarUrl = "";
+      userStore.setProfile(nickName, "");
     }
-    // 如果是已有用户，保持当前资料不变（globalData 已有）
+    // 如果是已有用户，保持当前资料不变
 
-    app.globalData.needProfileSetup = false;
+    userStore.skipProfileSetup();
 
     wx.switchTab({ url: "/pages/index/index" });
   },

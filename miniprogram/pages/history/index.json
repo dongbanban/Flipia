@@ -1,5 +1,6 @@
 {
   "usingComponents": {
+    "group-switcher": "/components/group-switcher/index",
     "empty-state": "/components/empty-state/index",
     "app-icon": "/components/app-icon/index"
   }

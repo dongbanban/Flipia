@@ -1,6 +1,9 @@
 import { buildDefaultUserConfig, buildPresetDishes } from "@/lib/init-data";
 import { showConfirm } from "@/lib/confirm";
 import { CLOUD, STRINGS } from "@/config";
+import { userStore } from "@/stores/user-store";
+import { groupStore } from "@/stores/group-store";
+import { ACTIVE_GROUP_KEY } from "@/constants/storage-keys";
 
 interface GroupInfo {
   _id: string;
@@ -10,11 +13,6 @@ interface GroupInfo {
 
 interface AppGlobalData {
   openid: string;
-  nickName: string;
-  avatarUrl: string;
-  groupId: string;
-  groups: GroupInfo[];
-  needProfileSetup?: boolean;
 }
 
 interface AppInstance {
@@ -26,20 +24,12 @@ interface AppInstance {
   ): Promise<void>;
   _readyResolvers: Array<() => void>;
   _ready: boolean;
-  switchGroup(groupId: string): void;
   whenReady(): Promise<void>;
 }
-
-const ACTIVE_GROUP_KEY = "flipia_active_group_id";
 
 App({
   globalData: {
     openid: "",
-    nickName: "",
-    avatarUrl: "",
-    groupId: "",
-    groups: [],
-    needProfileSetup: false,
   } as AppGlobalData,
 
   _readyResolvers: [] as Array<() => void>,
@@ -77,11 +67,6 @@ App({
     });
   },
 
-  switchGroup(this: AppInstance, groupId: string) {
-    this.globalData.groupId = groupId;
-    wx.setStorageSync(ACTIVE_GROUP_KEY, groupId);
-  },
-
   async _initApp(this: AppInstance) {
     const loginRes = await wx.cloud.callFunction({ name: "login" });
     const openid = (loginRes.result as { openid: string }).openid;
@@ -105,7 +90,6 @@ App({
 
     if (groupQuery.data.length > 0) {
       const groups = groupQuery.data as GroupInfo[];
-      this.globalData.groups = groups;
 
       const storedId = wx.getStorageSync(ACTIVE_GROUP_KEY);
       const activeId =
@@ -113,10 +97,12 @@ App({
           ? storedId
           : groups[0]._id;
 
-      this.globalData.groupId = activeId;
-      if (!storedId || storedId !== activeId) {
-        wx.setStorageSync(ACTIVE_GROUP_KEY, activeId);
-      }
+      groupStore.setGroups(groups);
+      groupStore.switchGroup(activeId);
+      console.log("[app] 双写验证 — Store 内容", {
+        userStore: userStore.data,
+        groupStore: groupStore.data,
+      });
       return;
     }
 
@@ -127,11 +113,10 @@ App({
       },
     });
     const groupId = groupRes._id as string;
-    this.globalData.groupId = groupId;
-    this.globalData.groups = [
+    groupStore.setGroups([
       { _id: groupId, name: STRINGS.DEFAULT_GROUP_NAME, members: [openid] },
-    ];
-    wx.setStorageSync(ACTIVE_GROUP_KEY, groupId);
+    ]);
+    groupStore.switchGroup(groupId);
 
     const userConfig = buildDefaultUserConfig(groupId, openid);
     await db.collection("user_config").add({ data: userConfig });
@@ -140,6 +125,10 @@ App({
     await Promise.all(
       dishes.map((dish) => db.collection("dishes").add({ data: dish })),
     );
+    console.log("[app] 双写验证 — Store 内容", {
+      userStore: userStore.data,
+      groupStore: groupStore.data,
+    });
   },
 
   async _ensureUserProfile(
@@ -156,16 +145,16 @@ App({
 
       if (res.data.length > 0) {
         const user = res.data[0] as { nickName: string; avatarUrl?: string };
-        this.globalData.nickName = user.nickName;
-        this.globalData.avatarUrl = user.avatarUrl || "";
+        userStore.setProfile(user.nickName, user.avatarUrl || "");
         return;
       }
 
       const nickName = `用户${openid.slice(-6)}`;
       // 延迟创建用户文档——profile-setup 页面将在确认时创建
-      this.globalData.nickName = nickName;
-      this.globalData.avatarUrl = "";
-      this.globalData.needProfileSetup = true;
+      userStore.data.nickName = nickName;
+      userStore.data.avatarUrl = "";
+      userStore.data.needProfileSetup = true;
+      userStore.update();
     } catch (err) {
       console.error("[app] ensure user profile failed", err);
     }

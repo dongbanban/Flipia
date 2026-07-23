@@ -6,19 +6,8 @@ import type { DrawConfigGroup, Category } from "@/lib/init-data";
 import { showConfirm } from "@/lib/confirm";
 import { getMemberCount } from "@/lib/group-utils";
 import { archiveOldRecords, buildDrawCards, cardsToResults, loadEnabledDishes, loadTodayRecords, type DrawCard } from "@/pages/index/lib/helpers";
-
-interface AppInstance {
-  globalData: {
-    openid: string;
-    groupId: string;
-    groups: Array<{ _id: string; name: string; members: string[] }>;
-  };
-  switchGroup(id: string): void;
-  whenReady(): Promise<void>;
-}
-
-const STORAGE_ACTIVE_CONFIG_KEY = "flipia_active_config_id";
-const STORAGE_LAST_DRAWN_KEY = "flipia_last_drawn_config_id";
+import { userStore } from "@/stores/user-store";
+import { groupStore } from "@/stores/group-store";
 
 Page({
   data: {
@@ -47,17 +36,13 @@ Page({
   _groups: [] as DrawConfigGroup[],
   _categories: [] as Category[],
 
-  async onShow() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    const groupId = app.globalData.groupId;
-    const memberCount = getMemberCount(
-      app.globalData.groups,
-      groupId,
-    );
+  onShow() {
+    if (!this._groupId) return;
+    const groupId = groupStore.data.groupId;
+    const memberCount = getMemberCount(groupStore.data.groups, groupId);
     this.setData({
-      openid: app.globalData.openid,
-      groups: app.globalData.groups,
+      openid: getApp<{ globalData: { openid: string } }>().globalData.openid,
+      groups: groupStore.data.groups,
       activeGroupId: groupId,
       memberCount,
     });
@@ -65,14 +50,8 @@ Page({
       this._groupId = groupId;
       this._db = wx.cloud.database();
       this.setData({
-        phase: "",
-        drawCards: [],
-        validationError: "",
-        totalCards: 0,
-        flippedCount: 0,
-        loadingConfig: true,
-        activeConfigName: "",
-        configGroupNames: [],
+        phase: "", drawCards: [], validationError: "", totalCards: 0,
+        flippedCount: 0, loadingConfig: true, activeConfigName: "", configGroupNames: [],
       });
       this._loadConfigAndValidate();
       this._loadTodaySummary();
@@ -82,30 +61,23 @@ Page({
   },
 
   async onLoad() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    this._groupId = app.globalData.groupId;
+    this._groupId = groupStore.data.groupId;
     this._db = wx.cloud.database();
-    const groups = app.globalData.groups as Array<{
-      _id: string;
-      name: string;
-      members: string[];
-    }>;
+    const groups = groupStore.data.groups;
     this.setData({
-      openid: app.globalData.openid,
+      openid: getApp<{ globalData: { openid: string } }>().globalData.openid,
       groups,
-      activeGroupId: app.globalData.groupId,
-      memberCount: getMemberCount(groups, app.globalData.groupId),
+      activeGroupId: groupStore.data.groupId,
+      memberCount: getMemberCount(groups, groupStore.data.groupId),
     });
     this._loadConfigAndValidate();
     this._loadTodaySummary();
   },
 
   onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
-    const app = getApp<AppInstance>();
-    app.switchGroup(e.detail.groupId);
+    groupStore.switchGroup(e.detail.groupId);
     const memberCount = getMemberCount(
-      app.globalData.groups,
+      groupStore.data.groups,
       e.detail.groupId,
     );
     this.setData({
@@ -152,8 +124,8 @@ Page({
         drawConfigGroups: DrawConfigGroup[];
       };
 
-      const storedActiveId = wx.getStorageSync(STORAGE_ACTIVE_CONFIG_KEY) as string;
-      const storedLastDrawnId = wx.getStorageSync(STORAGE_LAST_DRAWN_KEY) as string;
+      const storedActiveId = groupStore.data.activeConfigId;
+      const storedLastDrawnId = groupStore.data.lastDrawnConfigId;
 
       const effectiveId = resolveEffectiveGroupId(
         config.drawConfigGroups,
@@ -162,7 +134,7 @@ Page({
       );
 
       if (effectiveId && effectiveId !== storedActiveId) {
-        wx.setStorageSync(STORAGE_ACTIVE_CONFIG_KEY, effectiveId);
+        groupStore.setActiveConfig(effectiveId);
       }
 
       if (!effectiveId) {
@@ -252,8 +224,8 @@ Page({
       // 网络错误 — 降级使用本地解析，最坏情况是陈旧数据
     }
 
-    const storedActiveId = wx.getStorageSync(STORAGE_ACTIVE_CONFIG_KEY) as string;
-    const storedLastDrawnId = wx.getStorageSync(STORAGE_LAST_DRAWN_KEY) as string;
+    const storedActiveId = groupStore.data.activeConfigId;
+    const storedLastDrawnId = groupStore.data.lastDrawnConfigId;
 
     const effectiveId = resolveEffectiveGroupId(
       this._groups,
@@ -306,7 +278,7 @@ Page({
         const selected = (this.data.configGroupNames as Array<{ id: string; name: string }>)[res.tapIndex];
         if (!selected) return;
 
-        wx.setStorageSync(STORAGE_ACTIVE_CONFIG_KEY, selected.id);
+        groupStore.setActiveConfig(selected.id);
         this._resolveActiveConfig();
       },
     });
@@ -424,8 +396,7 @@ Page({
   async _saveDrawHistory(cards: DrawCard[]) {
     wx.showLoading({ title: "记录中…" });
     try {
-      const app = getApp<AppInstance>();
-      const openid = app.globalData.openid;
+      const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
 
       const results = cardsToResults(cards);
 
@@ -440,10 +411,8 @@ Page({
         },
       });
 
-      const activeId = wx.getStorageSync(STORAGE_ACTIVE_CONFIG_KEY) as string;
-      if (activeId) {
-        wx.setStorageSync(STORAGE_LAST_DRAWN_KEY, activeId);
-      }
+      const activeId = groupStore.data.activeConfigId;
+      if (activeId) { groupStore.setLastDrawnConfig(activeId); }
 
       await this._archiveOldRecords();
 

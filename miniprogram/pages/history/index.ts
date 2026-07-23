@@ -10,16 +10,7 @@ import { showConfirm } from "@/lib/confirm";
 import { LIMITS, QUERY, STRINGS } from "@/config";
 import { buildRecordDisplayFields, type EnrichedRecord } from "@/pages/history/lib/helpers";
 import { drawShareImage } from "@/pages/history/lib/canvas";
-
-interface AppInstance {
-  globalData: {
-    openid: string;
-    groupId: string;
-    groups: Array<{ _id: string; name: string; members: string[] }>;
-  };
-  switchGroup(id: string): void;
-  whenReady(): Promise<void>;
-}
+import { groupStore } from "@/stores/group-store";
 
 Page({
   data: {
@@ -49,11 +40,9 @@ Page({
   _swipeStartTranslatePx: 0,
 
   async onShow() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    const groupId = app.globalData.groupId;
+    const groupId = groupStore.data.groupId;
     this.setData({
-      memberCount: getMemberCount(app.globalData.groups, app.globalData.groupId),
+      memberCount: getMemberCount(groupStore.data.groups, groupStore.data.groupId),
     });
     if (this._groupId !== groupId) {
       this._groupId = groupId;
@@ -66,16 +55,18 @@ Page({
   },
 
   async onLoad() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    this._groupId = app.globalData.groupId;
+    this._groupId = groupStore.data.groupId;
     this._db = wx.cloud.database();
     const windowInfo = wx.getWindowInfo();
     this.setData({
-      memberCount: getMemberCount(app.globalData.groups, app.globalData.groupId),
+      memberCount: getMemberCount(groupStore.data.groups, groupStore.data.groupId),
       deleteBtnPx: Math.round(150 * windowInfo.windowWidth / 750),
     });
     this._loadHistory();
+  },
+
+  onUnload() {
+    // Cleanup if needed
   },
 
   async onRecordUploadImage(e: WechatMiniprogram.TouchEvent) {

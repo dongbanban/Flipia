@@ -1,7 +1,4 @@
-const app = getApp<{
-  globalData: { needProfileSetup?: boolean };
-  whenReady(): Promise<void>;
-}>();
+import { userStore } from "@/stores/user-store";
 
 Page({
   data: {
@@ -14,10 +11,10 @@ Page({
   },
 
   async onShow() {
-    await app.whenReady();
+    await getApp<{ whenReady(): Promise<void> }>().whenReady();
     await new Promise((r) => setTimeout(r, 1000));
 
-    if (app.globalData.needProfileSetup) {
+    if (userStore.data.needProfileSetup) {
       wx.redirectTo({ url: "/pages/profile-setup/index" });
     } else {
       wx.switchTab({ url: "/pages/index/index" });
