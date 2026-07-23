@@ -165,97 +165,157 @@
 
       <!-- 手动添加标签页 / 编辑模式 -->
       <block wx:if="{{formMode === 'edit' || formTab === 'manual'}}">
-        <!-- 菜品名 -->
-        <view class="form-field">
-          <text class="form-label">菜品名</text>
-          <input
-            class="form-input {{formNameError ? 'form-input--error' : ''}}"
-            value="{{formData.name}}"
-            placeholder="最多 20 字"
-            maxlength="20"
-            bind:input="onFormNameInput"
-          />
-          <text wx:if="{{formNameError}}" class="form-error">{{formNameError}}</text>
-        </view>
+        <!-- 编辑模式：可滚动字段区 + 底部固定按钮 -->
+        <view wx:if="{{formMode === 'edit'}}" class="form-editor">
+          <scroll-view class="form-editor-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+            <!-- 菜品名 + 分类 -->
+            <view class="form-field form-field--row">
+              <view class="form-field-col form-field-col--name">
+                <text class="form-label">菜品名</text>
+                <input
+                  class="form-input {{formNameError ? 'form-input--error' : ''}}"
+                  value="{{formData.name}}"
+                  placeholder="最多 20 字"
+                  maxlength="20"
+                  bind:input="onFormNameInput"
+                />
+                <text wx:if="{{formNameError}}" class="form-error">{{formNameError}}</text>
+              </view>
+              <view class="form-field-col form-field-col--category">
+                <text class="form-label">分类</text>
+                <picker
+                  mode="selector"
+                  range="{{formCategoriesForPicker}}"
+                  range-key="name"
+                  value="{{formCategoryIdx}}"
+                  bind:change="onFormCategoryChange"
+                >
+                  <view class="form-picker">{{formCategoriesForPicker[formCategoryIdx].name}}</view>
+                </picker>
+              </view>
+            </view>
 
-        <!-- 分类 -->
-        <view class="form-field">
-          <text class="form-label">分类</text>
-          <picker
-            mode="selector"
-            range="{{formCategoriesForPicker}}"
-            range-key="name"
-            value="{{formCategoryIdx}}"
-            bind:change="onFormCategoryChange"
-          >
-            <view class="form-picker">{{formCategoriesForPicker[formCategoryIdx].name}}</view>
-          </picker>
-        </view>
+            <!-- 图片上传 -->
+            <view class="form-field">
+              <text class="form-label">图片</text>
+              <view class="image-list">
+                <view
+                  wx:for="{{formData.images}}"
+                  wx:key="*this"
+                  class="image-item"
+                >
+                  <image class="image-preview" src="{{item}}" mode="aspectFill" />
+                  <view class="remove-badge image-remove" data-idx="{{index}}" bind:tap="onRemoveImage"><app-icon name="CLOSE" size="{{24}}" color="$primary" /></view>
+                </view>
+                <view
+                  wx:if="{{formData.images.length < 1}}"
+                  class="image-add {{formUploading ? 'image-add--uploading' : ''}}"
+                  bind:tap="onChooseImages"
+                >
+                  <text wx:if="{{formUploading}}">上传中…</text>
+                  <app-icon wx:else name="ADD" size="{{56}}" color="#bbb" />
+                </view>
+              </view>
+            </view>
 
-        <!-- 新建分类（仅添加模式） -->
-        <view wx:if="{{showNewCategory}}" class="form-field form-new-cat">
-          <input
-            class="form-input {{newCategoryError ? 'form-input--error' : ''}}"
-            value="{{newCategoryName}}"
-            placeholder="输入分类名称（最多 10 字）"
-            maxlength="10"
-            bind:input="onNewCategoryNameInput"
-            focus="{{showNewCategory}}"
-          />
-          <text wx:if="{{newCategoryError}}" class="form-error">{{newCategoryError}}</text>
-          <view class="form-new-cat-actions">
-            <view class="form-new-cat-cancel" bind:tap="onCancelNewCategory">取消</view>
-            <view class="form-new-cat-confirm {{creatingCategory ? 'form-new-cat-confirm--loading' : ''}}" bind:tap="onConfirmNewCategory">
-              {{creatingCategory ? '创建中…' : '确认'}}
+            <!-- 烹饪描述 -->
+            <view class="form-field">
+              <text class="form-label">烹饪描述</text>
+              <textarea
+                class="form-textarea"
+                value="{{formData.cookingDescription}}"
+                placeholder="烹饪要点、备注…"
+                maxlength="200"
+                bind:input="onCookingDescriptionInput"
+              />
+            </view>
+          </scroll-view>
+
+          <view class="form-editor-actions">
+            <view class="form-submit {{formDirty ? '' : 'form-submit--disabled'}}" bind:tap="onSaveDish">保存</view>
+            <view class="form-secondary-actions">
+              <view
+                class="form-toggle-btn {{formData.enabled ? 'form-toggle-btn--on' : 'form-toggle-btn--off'}}"
+                bind:tap="onFormToggleEnabled"
+              ><view class="form-toggle-icon"><app-icon wx:if="{{formData.enabled}}" name="TOGGLE_ON" size="{{28}}" color="$green" /><app-icon wx:else name="TOGGLE_OFF" size="{{28}}" color="$text-secondary" /></view><view class="form-toggle-label">{{formData.enabled ? '今日供应' : '今日停供'}}</view></view>
+              <view class="form-delete-btn" bind:tap="onFormDeleteDish">下架菜品</view>
             </view>
           </view>
         </view>
 
-        <!-- 图片上传 -->
-        <view class="form-field">
-          <text class="form-label">图片</text>
-          <view class="image-list">
-            <view
-              wx:for="{{formData.images}}"
-              wx:key="*this"
-              class="image-item"
-            >
-              <image class="image-preview" src="{{item}}" mode="aspectFill" />
-              <view class="remove-badge image-remove" data-idx="{{index}}" bind:tap="onRemoveImage"><app-icon name="CLOSE" size="{{24}}" color="$primary" /></view>
+        <!-- 添加模式：普通布局 -->
+        <block wx:else>
+          <!-- 菜品名 + 分类 -->
+          <view class="form-field form-field--row">
+            <view class="form-field-col form-field-col--name">
+              <text class="form-label">菜品名</text>
+              <input
+                class="form-input {{formNameError ? 'form-input--error' : ''}}"
+                value="{{formData.name}}"
+                placeholder="最多 20 字"
+                maxlength="20"
+                bind:input="onFormNameInput"
+              />
+              <text wx:if="{{formNameError}}" class="form-error">{{formNameError}}</text>
             </view>
-            <view
-              wx:if="{{formData.images.length < 1}}"
-              class="image-add {{formUploading ? 'image-add--uploading' : ''}}"
-              bind:tap="onChooseImages"
-            >
-              <text wx:if="{{formUploading}}">上传中…</text>
-              <app-icon wx:else name="ADD" size="{{56}}" color="#bbb" />
+            <view class="form-field-col form-field-col--category">
+              <text class="form-label">分类</text>
+              <picker
+                mode="selector"
+                range="{{formCategoriesForPicker}}"
+                range-key="name"
+                value="{{formCategoryIdx}}"
+                bind:change="onFormCategoryChange"
+              >
+                <view class="form-picker">{{formCategoriesForPicker[formCategoryIdx].name}}</view>
+              </picker>
             </view>
           </view>
-        </view>
 
-        <!-- 烹饪描述（仅编辑模式） -->
-        <view wx:if="{{formMode === 'edit'}}" class="form-field">
-          <text class="form-label">烹饪描述</text>
-          <textarea
-            class="form-textarea"
-            value="{{formData.cookingDescription}}"
-            placeholder="烹饪要点、备注…"
-            maxlength="200"
-            bind:input="onCookingDescriptionInput"
-          />
-        </view>
+          <!-- 新建分类（仅添加模式） -->
+          <view wx:if="{{showNewCategory}}" class="form-field form-new-cat">
+            <input
+              class="form-input {{newCategoryError ? 'form-input--error' : ''}}"
+              value="{{newCategoryName}}"
+              placeholder="输入分类名称（最多 10 字）"
+              maxlength="10"
+              bind:input="onNewCategoryNameInput"
+              focus="{{showNewCategory}}"
+            />
+            <text wx:if="{{newCategoryError}}" class="form-error">{{newCategoryError}}</text>
+            <view class="form-new-cat-actions">
+              <view class="form-new-cat-cancel" bind:tap="onCancelNewCategory">取消</view>
+              <view class="form-new-cat-confirm {{creatingCategory ? 'form-new-cat-confirm--loading' : ''}}" bind:tap="onConfirmNewCategory">
+                {{creatingCategory ? '创建中…' : '确认'}}
+              </view>
+            </view>
+          </view>
 
-        <view class="form-submit {{formDirty ? '' : 'form-submit--disabled'}}" bind:tap="onSaveDish">保存</view>
+          <!-- 图片上传 -->
+          <view class="form-field">
+            <text class="form-label">图片</text>
+            <view class="image-list">
+              <view
+                wx:for="{{formData.images}}"
+                wx:key="*this"
+                class="image-item"
+              >
+                <image class="image-preview" src="{{item}}" mode="aspectFill" />
+                <view class="remove-badge image-remove" data-idx="{{index}}" bind:tap="onRemoveImage"><app-icon name="CLOSE" size="{{24}}" color="$primary" /></view>
+              </view>
+              <view
+                wx:if="{{formData.images.length < 1}}"
+                class="image-add {{formUploading ? 'image-add--uploading' : ''}}"
+                bind:tap="onChooseImages"
+              >
+                <text wx:if="{{formUploading}}">上传中…</text>
+                <app-icon wx:else name="ADD" size="{{56}}" color="#bbb" />
+              </view>
+            </view>
+          </view>
 
-        <!-- 编辑模式：启用/禁用 + 下架 -->
-        <view wx:if="{{formMode === 'edit'}}" class="form-secondary-actions">
-          <view
-            class="form-toggle-btn {{formData.enabled ? 'form-toggle-btn--on' : 'form-toggle-btn--off'}}"
-            bind:tap="onFormToggleEnabled"
-          ><app-icon wx:if="{{formData.enabled}}" name="TOGGLE_ON" size="{{28}}" color="$green" /><app-icon wx:else name="TOGGLE_OFF" size="{{28}}" color="$text-secondary" /><text>{{formData.enabled ? '今日供应' : '今日停供'}}</text></view>
-          <view class="form-delete-btn" bind:tap="onFormDeleteDish">下架菜品</view>
-        </view>
+          <view class="form-submit {{formDirty ? '' : 'form-submit--disabled'}}" bind:tap="onSaveDish">保存</view>
+        </block>
       </block>
 
       <!-- 批量导入标签页（仅添加模式） -->
