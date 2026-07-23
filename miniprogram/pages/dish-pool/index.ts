@@ -11,8 +11,8 @@ import {
   validateCategoryName,
 } from "@/lib/category-manage";
 import { checkTextWithToast } from "@/lib/content-security";
-import { svgToImageSrc } from "@/lib/svg-icon";
-import { iconSearch, iconClose, iconAdd } from "@/assets/icons";
+import { svgToImageSrc } from "../../lib/svg-icon";
+import { iconSearch, iconClose, iconAdd } from "../../assets/icons";
 import { uploadImages } from "@/lib/upload-image";
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
