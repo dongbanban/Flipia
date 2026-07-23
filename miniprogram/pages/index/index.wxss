@@ -79,11 +79,6 @@
   font-weight: 500;
 }
 
-.config-arrow {
-  font-size: 26rpx;
-  color: var(--color-primary);
-}
-
 /* ── Drawing / Cards ────────────────────────────────────────────────── */
 
 .drawing-area {
@@ -178,12 +173,6 @@
   justify-content: center;
   background: linear-gradient(135deg, #c8815e 0%, #d9a98c 100%);
   gap: 16rpx;
-}
-
-.card-back-icon {
-  font-size: 64rpx;
-  font-weight: 700;
-  color: #fff;
 }
 
 .card-back-label {
@@ -345,8 +334,4 @@
   font-weight: 500;
 }
 
-.summary-arrow {
-  font-size: 28rpx;
-  color: var(--color-primary);
-  font-weight: 600;
-}
+
