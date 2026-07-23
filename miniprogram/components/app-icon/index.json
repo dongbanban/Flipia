@@ -1,6 +1,6 @@
 {
   "component": true,
   "usingComponents": {
-    "mp-icon": "weui-miniprogram/icon/icon"
+    "t-icon": "@mp-svg-icons/wechat/icon"
   }
 }

@@ -12,4 +12,6 @@
 
 ## Comments
 
-`4cbc075` — 创建图标系统基础层：语义映射表、adapter 类型定义、21 个单元测试全部通过。
+- `4cbc075` — 创建图标系统基础层：语义映射表、adapter 类型定义、21 个单元测试全部通过。
+- **2026-07-23 — TDesign 迁移**：ICON_SEMANTIC_MAP 从 WeUI 映射切换为 TDesign 映射（11 个语义名 → TDesign 原生名，全部精确匹配）。DEFAULT_ICON_BACKEND 从 `"weui"` 改为 `"tdesign"`。测试重写为 20 个 TDesign 用例。
+- **2026-07-23 — 颜色 token 系统**：新增 `lib/theme.ts`（6 个颜色 token，唯一真相源），`icon-config.ts` 导出 `COLOR_TOKENS`。测试新增 COLOR_TOKENS 验证（6 个映射 + 1 个结构完整性）。

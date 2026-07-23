@@ -1,10 +1,10 @@
-import { weuiAdapter } from "./adapters/weui";
+import { tdesignAdapter } from "./adapters/tdesign";
 import type { AdapterOutput } from "./adapters/types";
 
 /**
  * app-icon 统一图标组件。
  *
- * 接收跨后端的统一 props，通过 adapter 翻译为当前后端（WeUI）所需的渲染参数。
+ * 接收跨后端的统一 props，通过 adapter 翻译为当前后端（TDesign）所需的渲染参数。
  * observers 监听所有 props 变化，任一变化时重新计算 adapter 输出并 setData。
  */
 
@@ -16,14 +16,14 @@ Component({
     size: { type: Number, value: 24 },
     /** 单色图标颜色（CSS 颜色值） */
     color: { type: String, value: "" },
-    /** 填充色（多色 SVG 后端使用，WeUI 忽略） */
+    /** 填充色（多色 SVG 后端使用） */
     fillColor: { type: String, value: "" },
-    /** 描边色（多色 SVG 后端使用，WeUI 忽略） */
+    /** 描边色（多色 SVG 后端使用） */
     strokeColor: { type: String, value: "" },
-    /** 描边宽度（多色 SVG 后端使用，WeUI 忽略） */
+    /** 描边宽度（多色 SVG 后端使用） */
     strokeWidth: { type: Number, value: 2 },
-    /** 是否为品牌色图标 */
-    brand: { type: Boolean, value: false },
+    /** 品牌色标识（如 `'tdesign'`） */
+    brand: { type: String, value: "" },
     /** 覆盖全局配置的后端选择，不传则使用全局默认 */
     backend: { type: String, value: "" },
   },
@@ -40,10 +40,10 @@ Component({
       fillColor: string,
       strokeColor: string,
       strokeWidth: number,
-      brand: boolean,
+      brand: string,
       backend: string
     ): void {
-      const output = weuiAdapter({
+      const output = tdesignAdapter({
         name,
         size,
         color,
@@ -62,7 +62,7 @@ Component({
       // 组件挂载时初始化 adapter 输出
       const { name, size, color, fillColor, strokeColor, strokeWidth, brand, backend } =
         this.properties;
-      const output = weuiAdapter({
+      const output = tdesignAdapter({
         name,
         size,
         color,

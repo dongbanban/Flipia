@@ -59,6 +59,26 @@ All `.page` containers MUST use absolute positioning instead of `100vh`. See [AD
 
 Never use `100vh`, `min-height: 100vh`, or `height: 100vh` in any `.wxss` file.
 
+## Package manager
+
+本项目的所有依赖安装统一使用 **pnpm**。禁止使用 npm 或 yarn。
+
+```bash
+# 根目录安装 dev 依赖
+pnpm add -w -D <package>
+
+# miniprogram 目录安装运行时依赖
+cd miniprogram && pnpm add <package>
+```
+
+## Icons
+
+所有图标通过 `<app-icon>` 统一组件使用，详见 [docs/icon-guide.md](docs/icon-guide.md)。关键规则：
+
+- 调用方始终使用语义名（如 `CLOSE`、`ADD`），不感知后端实现
+- `<app-icon color="...">` 必须用具体色值（`#c8815e`、`#fff`），禁止 CSS 变量（`var(--color-*)` 在 Data URI 中不生效）
+- 新增图标需同步更新 `ICON_SEMANTIC_MAP`、`icon:clear` 脚本、tree-shaking、npm 构建、测试
+
 ## Comments
 
 所有注释统一使用简体中文。这是硬性规则，不允许混用中英文注释。

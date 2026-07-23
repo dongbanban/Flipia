@@ -22,3 +22,7 @@
 - 替换了 7 处 Unicode 图标为 `<app-icon>` 组件：SEARCH(搜索栏) / CLOSE×2(清除搜索+图片移除) / ADD×2(FAB+图片添加) / TOGGLE_ON(供应开关+导入checkbox) / TOGGLE_OFF(供应开关)
 - CSS 清理：移除 `.search-bar__icon`、`.search-bar__clear`、`.fab`、`.image-add`、`.import-cat-check` 中的 `font-size`/`color` 等图标渲染属性，保留容器布局样式
 - 注册 `app-icon` 组件到 `dish-pool/index.json`
+- **2026-07-23 — TDesign 迁移**：
+  - 所有 `color="var(--color-primary)"` → `#c8815e`，`color="var(--color-text-secondary)"` → `#888888`
+  - 供应开关 TOGGLE_ON `color="#07c160"` 保持不变（绿色，设计意图）
+  - ADD（FAB）`color="#fff"` 保持不变（白色浮动按钮，设计意图）

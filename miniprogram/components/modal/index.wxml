@@ -18,7 +18,7 @@
           name="CLOSE"
           class="modal-header-btn modal-header-btn--close"
           size="{{32}}"
-          color="var(--color-text-secondary)"
+          color="$text-secondary"
           bind:tap="onClose"
         />
       </view>

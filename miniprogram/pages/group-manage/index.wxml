@@ -41,7 +41,7 @@
           />
           <text wx:else class="info-value">{{groupName}}</text>
           <view class="info-arrow">
-            <app-icon name="CHEVRON_RIGHT" size="{{28}}" color="#999" />
+            <app-icon name="CHEVRON_RIGHT" size="{{28}}" color="$text-muted" />
           </view>
         </view>
       </view>
@@ -64,7 +64,7 @@
           data-name="{{item.nickName}}"
           bind:tap="onKick"
         >
-          <app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" />
+          <app-icon name="CLOSE" size="{{24}}" color="$primary" />
         </view>
       </view>
     </view>

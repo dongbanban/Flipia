@@ -15,7 +15,7 @@
 
     <view class="import-toggle" bind:tap="onToggleImport">
       <view class="toggle-box {{importEnabled ? 'toggle-box--checked' : ''}}">
-        <app-icon wx:if="{{importEnabled}}" name="TOGGLE_ON" size="{{24}}" color="#fff" />
+        <app-icon wx:if="{{importEnabled}}" name="TOGGLE_ON" size="{{24}}" color="$white" />
       </view>
       <text class="toggle-label">从已有厨房导入</text>
     </view>
@@ -51,7 +51,7 @@
           >
             <text class="category-chip__text">{{item.name}}</text>
             <view wx:if="{{c.hasItem(selectedCategoryIds, item.id)}}" class="category-chip__check">
-              <app-icon name="TOGGLE_ON" size="{{22}}" color="var(--color-primary)" />
+              <app-icon name="TOGGLE_ON" size="{{22}}" color="$primary" />
             </view>
           </view>
         </view>

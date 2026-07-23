@@ -28,18 +28,18 @@
   <view class="menu-list">
     <view class="menu-item" bind:tap="onTapCategoryManage">
       <text class="menu-label">分类配置</text>
-      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="#ccc" />
+      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
     </view>
     <view class="menu-item" bind:tap="onTapDrawConfig">
       <text class="menu-label">抽取方案</text>
-      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="#ccc" />
+      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
     </view>
     <view class="menu-item" bind:tap="onTapGroupManage">
       <view class="menu-item-left">
         <text class="menu-label">厨房管理</text>
         <text class="menu-sub" wx:if="{{activeGroupName}}">{{activeGroupName}}</text>
       </view>
-      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="#ccc" />
+      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
     </view>
   </view>
 </view>

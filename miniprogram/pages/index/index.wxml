@@ -14,7 +14,7 @@
       <view wx:if="{{activeConfigName}}" class="config-switcher" bind:tap="onSwitchConfig">
         <text class="config-label">抽取方案:</text>
         <text class="config-name">{{activeConfigName}}</text>
-        <app-icon wx:if="{{configGroupNames.length > 1}}" name="CHEVRON_RIGHT" size="{{26}}" color="var(--color-primary)" />
+        <app-icon wx:if="{{configGroupNames.length > 1}}" name="CHEVRON_RIGHT" size="{{26}}" color="$primary" />
       </view>
       <button
         class="draw-btn {{validationError ? 'draw-btn--disabled' : ''}}"
@@ -42,7 +42,7 @@
       >
         <view class="card-inner {{item.flipped ? 'card-inner--flipped' : ''}} {{item.redrawing ? 'card-inner--redrawing' : ''}}" bind:tap="onFlipCard" data-idx="{{index}}">
           <view class="card-face card-back">
-            <app-icon name="?" size="{{64}}" color="#fff" />
+            <app-icon name="HELP" size="{{64}}" color="$white" />
             <text class="card-back-label">{{item.categoryName}}</text>
           </view>
           <view class="card-face card-front">
@@ -87,6 +87,6 @@
 
   <view wx:if="{{todaySummary}}" class="summary-bar" bind:tap="onGoHistory">
     <text class="summary-text">{{todaySummary}}</text>
-    <app-icon name="CHEVRON_RIGHT" size="{{28}}" color="var(--color-primary)" />
+    <app-icon name="CHEVRON_RIGHT" size="{{28}}" color="$primary" />
   </view>
 </view>

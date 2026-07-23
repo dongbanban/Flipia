@@ -21,8 +21,8 @@ export interface UnifiedIconProps {
   strokeColor?: string;
   /** 描边宽度，数值 */
   strokeWidth?: number;
-  /** 是否为品牌色图标 */
-  brand?: boolean;
+  /** 品牌色标识（如 `'tdesign'`） */
+  brand?: string;
   /** 覆盖后端标识，优先级高于全局默认 */
   backend?: string;
 }

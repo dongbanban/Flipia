@@ -25,3 +25,10 @@
 - `styles/badge.wxss` 中的 `.remove-badge` 类已精简为纯容器样式（移除 `color`/`font-size`/`font-weight`/`line-height`），与 `<app-icon>` 集成无冲突
 - 全局搜索确认：11 个 Unicode 图标字符在全部 WXML/WXSS 文件中均已清零（排除 app-icon 组件自身）
 - 本次迁移至此全部完成，总计 11 个语义名覆盖 10 个文件，约 35 处 `<app-icon>` 替换点
+- **2026-07-23 — TDesign 迁移**：
+  - 所有 `color="var(--color-primary)"` → `#c8815e`，`color="var(--color-text-secondary)"` → `#888888`
+  - `group-switcher` CHEVRON_DOWN：CSS 变量替换为 `#888888`（之前漏替换 `--color-text-secondary`）
+  - `history` SHARE：CSS 变量替换为 `#888888`
+  - `modal` CLOSE：CSS 变量替换为 `#888888`
+  - `group-manage` CHEVRON_RIGHT `color="#999"` 保持不变（设计意图）
+  - `history` ADD `color="#999"` 保持不变（设计意图）

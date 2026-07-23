@@ -1,30 +1,30 @@
 /**
- * 图标系统核心配置：语义名 → WeUI 原生名的映射表、全局后端默认值、后端解析函数。
+ * 图标系统核心配置：语义名 → TDesign 原生名的映射表、全局后端默认值、后端解析函数。
  *
  * 本模块仅导出纯数据与纯函数，不依赖任何 UI 或运行时环境。
  */
 
 // ── 语义映射 ──────────────────────────────────────────────────
 
-/** 语义图标名到 WeUI 原生 icon 类型的映射表。共 11 个语义名，覆盖 9 种 WeUI 原生类型。 */
+/** 语义图标名到 TDesign 原生 icon 类型的映射表。共 11 个语义名。 */
 export const ICON_SEMANTIC_MAP: Record<string, string> = {
-  success: "success",
-  info: "info",
-  warning: "warn",
-  error: "cancel",
-  loading: "waiting",
-  search: "search",
-  close: "clear",
-  download: "download",
-  confirm: "success_no_circle",
-  hint: "info",
-  "safe-success": "success",
+  CLOSE: "close",
+  ADD: "add",
+  CHEVRON_RIGHT: "chevron-right",
+  CHEVRON_DOWN: "chevron-down",
+  TOGGLE_ON: "check-circle-filled",
+  TOGGLE_OFF: "circle",
+  SEARCH: "search",
+  SHARE: "share",
+  AVATAR: "user-avatar",
+  MINUS: "minus",
+  HELP: "help",
 };
 
 // ── 全局后端配置 ──────────────────────────────────────────────
 
 /** 默认图标后端标识，全局生效。 */
-export const DEFAULT_ICON_BACKEND = "weui";
+export const DEFAULT_ICON_BACKEND = "tdesign";
 
 /** 当前全局后端值，可被外部修改。 */
 let globalBackend: string = DEFAULT_ICON_BACKEND;
@@ -52,3 +52,7 @@ export function setIconBackend(backend: string): void {
 export function resetIconBackend(): void {
   globalBackend = DEFAULT_ICON_BACKEND;
 }
+
+// ── 颜色令牌 ──────────────────────────────────────────────────
+
+export { THEME_COLORS as COLOR_TOKENS } from './theme';

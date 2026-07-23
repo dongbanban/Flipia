@@ -3,7 +3,18 @@
   "private": true,
   "version": "0.0.1",
   "description": "微信小程序宿主包",
+  "scripts": {
+    "icon:clear": "mp-svg-icons-clear --pkg-dir ./miniprogram_npm/@mp-svg-icons/wechat --icons close,add,chevron-right,chevron-down,check-circle-filled,circle,search,share,user-avatar,minus,help"
+  },
   "devDependencies": {
     "miniprogram-api-typings": "~5.2.1"
+  },
+  "dependencies": {
+    "@mp-svg-icons/wechat": "^0.0.2"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@mp-svg-icons/wechat": "patches/@mp-svg-icons__wechat.patch"
+    }
   }
 }

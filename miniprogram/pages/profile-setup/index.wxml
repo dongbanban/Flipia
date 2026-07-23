@@ -11,7 +11,7 @@
         src="{{avatarUrl}}"
         mode="aspectFill"
       />
-      <app-icon wx:else name="AVATAR" size="{{80}}" color="#999" />
+      <app-icon wx:else name="AVATAR" size="{{80}}" color="$text-muted" />
       <view class="avatar-ring-inner"></view>
     </view>
 

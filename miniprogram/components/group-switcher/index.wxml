@@ -1,7 +1,7 @@
 <view class="group-switcher">
   <view class="group-switcher__bar" bind:tap="onToggle">
     <text class="group-name">{{activeGroupName}}</text>
-    <app-icon name="CHEVRON_DOWN" class="arrow" size="{{24}}" color="var(--color-text-secondary)" />
+    <app-icon name="CHEVRON_DOWN" class="arrow" size="{{24}}" color="$text-secondary" />
   </view>
 
   <view wx:if="{{showPopup}}" class="popup-mask" bind:tap="onClose" catchtouchmove="noop" />
@@ -20,14 +20,14 @@
           <text class="popup-item__name">{{item.name}}</text>
           <text class="popup-item__count">{{item.members.length}} 名成员</text>
         </view>
-        <app-icon wx:if="{{item._id === activeGroupId}}" name="TOGGLE_ON" size="{{28}}" color="var(--color-primary)" />
+        <app-icon wx:if="{{item._id === activeGroupId}}" name="TOGGLE_ON" size="{{28}}" color="$primary" />
       </view>
     </scroll-view>
 
     <empty-state wx:else text="还没有厨房，快去创建一个吧" />
 
     <view class="popup-create" bind:tap="onCreateGroup">
-      <app-icon name="ADD" class="popup-create__icon" size="{{44}}" color="var(--color-primary)" />
+      <app-icon name="ADD" class="popup-create__icon" size="{{44}}" color="$primary" />
       <text class="popup-create__label">新建厨房</text>
     </view>
   </view>

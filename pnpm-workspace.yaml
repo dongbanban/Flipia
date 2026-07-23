@@ -4,3 +4,5 @@ packages:
 allowBuilds:
   esbuild: set this to true or false
   protobufjs: set this to true or false
+patchedDependencies:
+  '@mp-svg-icons/wechat': patches/@mp-svg-icons__wechat.patch

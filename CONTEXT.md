@@ -41,7 +41,7 @@ _Avoid_: 配置组、抽签模板、抽取配置
 一次抽取的输出，由每分类的菜品列表组成。用户手动确认后写入历史，记录抽取人。
 
 **图标 (Icon)**：
-UI 中使用的语义化图标，通过 `<app-icon>` 组件以语义名引用（如 `CLOSE`、`ADD`、`SEARCH`）。底层适配 WeUI 等后端库，语义名与后端原生名的映射由 icon-config 维护。调用方不感知后端实现。
+UI 中使用的语义化图标，通过 `<app-icon>` 组件以语义名引用（如 `CLOSE`、`ADD`、`SEARCH`）。底层使用 `@mp-svg-icons/wechat`（TDesign SVG 图标库），语义名与 TDesign 原生名的映射由 `icon-config` 维护。调用方不感知后端实现。
 _Avoid_: 图标名、icon font、glyph
 
 **历史记录 (Draw History)**：

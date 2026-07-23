@@ -4,10 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@mp-svg-icons/wechat': ed45445965e691e496ff84ce6a7c7dd4c97569f23dc469801b84e9d71a2729a5
+
 importers:
 
   .:
     devDependencies:
+      '@mp-svg-icons/utils':
+        specifier: ^0.0.2
+        version: 0.0.2
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
@@ -47,6 +53,10 @@ importers:
         version: 26.1.1
 
   miniprogram:
+    dependencies:
+      '@mp-svg-icons/wechat':
+        specifier: ^0.0.2
+        version: 0.0.2(patch_hash=ed45445965e691e496ff84ce6a7c7dd4c97569f23dc469801b84e9d71a2729a5)
     devDependencies:
       miniprogram-api-typings:
         specifier: ~5.2.1
@@ -280,6 +290,14 @@ packages:
   '@mattiasbuelens/web-streams-adapter@0.1.0':
     resolution: {integrity: sha512-oV4PyZfwJNtmFWhvlJLqYIX1Nn22ML8FZpS16ZUKv0hg7414xV1fjsGqxQzLT2dyK92TKxsJSwMOd7VNHAtPmA==}
     engines: {node: '>= 12'}
+
+  '@mp-svg-icons/utils@0.0.2':
+    resolution: {integrity: sha512-EKqwa79fIhvZZzFszcwUNctDVNIdFVcFVOCVoD3Kj/XE3GWGSP7AfDJsUczEp9oBk0ZjFsa4QfpFYLEyiidf3g==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
+
+  '@mp-svg-icons/wechat@0.0.2':
+    resolution: {integrity: sha512-/1Rndffv+f9e4LMmE/zvaqWIEaUokRDCD+vKf9GeAp0JjjTuM2mtjHMwsMpbKiAXn0XtC4KGSvqQWcPTvCAg/g==}
 
   '@protobufjs/aspromise@1.1.2':
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -1441,6 +1459,10 @@ snapshots:
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
   '@mattiasbuelens/web-streams-adapter@0.1.0': {}
+
+  '@mp-svg-icons/utils@0.0.2': {}
+
+  '@mp-svg-icons/wechat@0.0.2(patch_hash=ed45445965e691e496ff84ce6a7c7dd4c97569f23dc469801b84e9d71a2729a5)': {}
 
   '@protobufjs/aspromise@1.1.2': {}
 

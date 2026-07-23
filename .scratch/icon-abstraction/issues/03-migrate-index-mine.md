@@ -15,3 +15,6 @@
 
 - `0fc90ee` — migrate: replace Unicode icons with `<app-icon>` in index + mine pages
 - `cc7bd9d` — feat(app-icon): fallthrough unmapped names to plain text render（`?` 卡片背面图标生效）
+- **2026-07-23 — TDesign 迁移**：
+  - `pages/index/index.wxml`：`name="?"` 改为 `name="HELP"`（TDesign 原生支持 help 图标，不再依赖降级文本渲染）
+  - 所有 `color="var(--color-primary)"` → `color="$primary"`，`color="#ccc"` → `color="$text-light"`

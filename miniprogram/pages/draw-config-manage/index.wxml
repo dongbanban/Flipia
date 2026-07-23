@@ -35,14 +35,14 @@
             class="remove-badge card-remove"
             data-id="{{item.id}}"
             catch:tap="onDelete"
-          ><app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" /></view>
+          ><app-icon name="CLOSE" size="{{24}}" color="$primary" /></view>
         </view>
       </block>
     </view>
 
     <!-- 添加 -->
     <view wx:if="{{drawConfigGroups.length < 10}}" class="add-row" bind:tap="onStartAdd">
-      <app-icon name="ADD" size="{{48}}" color="var(--color-primary)" />
+      <app-icon name="ADD" size="{{48}}" color="$primary" />
       <text class="add-label">新建方案</text>
     </view>
 
@@ -78,25 +78,25 @@
               class="stepper-btn {{item.count <= 1 ? 'stepper-btn--disabled' : ''}}"
               data-id="{{item.categoryId}}"
               bind:tap="onModalDecrement"
-            ><app-icon name="MINUS" size="{{32}}" color="var(--color-primary)" /></view>
+            ><app-icon name="MINUS" size="{{32}}" color="$primary" /></view>
             <text class="stepper-value">{{item.count}}</text>
             <view
               class="stepper-btn {{item.count >= 5 ? 'stepper-btn--disabled' : ''}}"
               data-id="{{item.categoryId}}"
               bind:tap="onModalIncrement"
-            ><app-icon name="ADD" size="{{32}}" color="var(--color-primary)" /></view>
+            ><app-icon name="ADD" size="{{32}}" color="$primary" /></view>
           </view>
           <view
             wx:if="{{modalEntries.length > 1}}"
             class="remove-badge modal-entry-remove"
             data-id="{{item.categoryId}}"
             bind:tap="onModalRemove"
-          ><app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" /></view>
+          ><app-icon name="CLOSE" size="{{24}}" color="$primary" /></view>
         </view>
       </view>
 
       <view wx:if="{{modalAvailable.length > 0}}" class="modal-add-entry" bind:tap="onModalAdd">
-        <app-icon name="ADD" size="{{48}}" color="var(--color-primary)" />
+        <app-icon name="ADD" size="{{48}}" color="$primary" />
         <text class="modal-add-text">添加分类</text>
       </view>
 
