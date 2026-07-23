@@ -5,8 +5,5 @@
   "description": "微信小程序宿主包",
   "devDependencies": {
     "miniprogram-api-typings": "~5.2.1"
-  },
-  "dependencies": {
-    "js-base64": "^3.9.1"
   }
 }

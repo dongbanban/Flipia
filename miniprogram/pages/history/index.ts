@@ -10,7 +10,6 @@ import { showConfirm } from "@/lib/confirm";
 import { LIMITS, QUERY, STRINGS } from "@/config";
 import { buildRecordDisplayFields, type EnrichedRecord } from "@/pages/history/lib/helpers";
 import { drawShareImage } from "@/pages/history/lib/canvas";
-import { shareIcon } from "@/assets/icons/index";
 
 interface AppInstance {
   globalData: {
@@ -38,8 +37,6 @@ Page({
     deleteBtnPx: 0,
     /** 分享图片 canvas 高度（动态） */
     canvasHeight: 0,
-    /** Icon Data URI（图标系统） */
-    shareIconSrc: shareIcon,
     /** 分享图片占位品牌文案 */
     brandText: STRINGS.BRAND_NAME + "时刻",
   },

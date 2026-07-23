@@ -1,5 +1,4 @@
 import { checkImage } from "@/lib/content-security";
-import { arrowRightIcon, userIcon } from "@/assets/icons/index";
 
 interface AppInstance {
   globalData: {
@@ -20,10 +19,6 @@ Page({
     nickName: "微信用户",
     avatarUrl: "",
     activeGroupName: "",
-
-    // Icon Data URIs（图标系统）
-    arrowRightIconSrc: arrowRightIcon,
-    userIconSrc: userIcon,
   },
 
   async onShow() {

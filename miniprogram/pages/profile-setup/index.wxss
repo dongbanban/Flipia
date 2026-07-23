@@ -72,8 +72,8 @@
 
 /* Avatar placeholder emoji */
 .avatar-placeholder {
-  width: 52rpx;
-  height: 52rpx;
+  font-size: 64rpx;
+  line-height: 1;
   opacity: 0.45;
 }
 

@@ -11,7 +11,6 @@ import {
   validateCategoryName,
 } from "@/lib/category-manage";
 import { checkTextWithToast } from "@/lib/content-security";
-import { searchIcon, closeIcon, addIcon } from "@/assets/icons/index";
 import { uploadImages } from "@/lib/upload-image";
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
@@ -81,11 +80,6 @@ Page({
     >,
     importLoadingCategories: false,
     importing: false,
-
-    // Icon Data URIs（图标系统）
-    searchIconSrc: searchIcon,
-    closeIconSrc: closeIcon,
-    addIconSrc: addIcon,
   },
 
   _db: null as ReturnType<typeof wx.cloud.database> | null,

@@ -1,5 +1,4 @@
 import { checkImage } from "@/lib/content-security";
-import { userIcon } from "@/assets/icons/index";
 
 interface AppInstance {
   globalData: {
@@ -20,9 +19,6 @@ Page({
     hasNewAvatar: false,   // 用户在本会话中选择了新头像时为 true
     nicknameFocus: false,  // 选择头像后自动聚焦输入框
     canConfirm: false,     // 计算得出 — 昵称非空时为 true
-
-    // Icon Data URI（图标系统）
-    userIconSrc: userIcon,
   },
 
   async onLoad() {

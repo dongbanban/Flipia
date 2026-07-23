@@ -11,7 +11,7 @@
         src="{{avatarUrl}}"
         mode="aspectFill"
       />
-      <image wx:else class="avatar-placeholder" src="{{userIconSrc}}" mode="aspectFit" />
+      <text wx:else class="avatar-placeholder">👤</text>
       <view class="avatar-ring-inner"></view>
     </view>
 

@@ -2,7 +2,7 @@
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-bar__inner">
-      <image class="search-bar__icon" src="{{searchIconSrc}}" mode="aspectFit" />
+      <text class="search-bar__icon">🔍</text>
       <input
         class="search-bar__input"
         type="text"
@@ -14,7 +14,7 @@
         wx:if="{{searchKeyword}}"
         class="search-bar__clear"
         bind:tap="onClearSearch"
-      ><image class="search-bar__clear-icon" src="{{closeIconSrc}}" mode="aspectFit" /></view>
+      >✕</view>
     </view>
   </view>
 
@@ -140,7 +140,7 @@
   </view>
 
   <!-- 浮动添加按钮 — 搜索时隐藏 -->
-  <view wx:if="{{categories.length > 0 && !searchKeyword}}" class="fab" bind:tap="onOpenAdd"><image class="fab-icon" src="{{addIconSrc}}" mode="aspectFit" /></view>
+  <view wx:if="{{categories.length > 0 && !searchKeyword}}" class="fab" bind:tap="onOpenAdd">+</view>
 
   <!-- 添加/编辑表单弹层 -->
   <modal
