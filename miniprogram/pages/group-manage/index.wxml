@@ -40,7 +40,9 @@
             bind:confirm="onConfirmName"
           />
           <text wx:else class="info-value">{{groupName}}</text>
-          <text class="info-arrow">›</text>
+          <view class="info-arrow">
+            <app-icon name="CHEVRON_RIGHT" size="{{28}}" color="#999" />
+          </view>
         </view>
       </view>
     </view>
@@ -62,7 +64,7 @@
           data-name="{{item.nickName}}"
           bind:tap="onKick"
         >
-          <text class="member-remove__icon">×</text>
+          <app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" />
         </view>
       </view>
     </view>

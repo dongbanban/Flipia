@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "app-icon": "/components/app-icon/index"
+  },
   "navigationBarTitleText": "加入 Flipia",
   "navigationBarBackgroundColor": "#faf0e9"
 }

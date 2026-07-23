@@ -26,7 +26,6 @@
 }
 
 .search-bar__icon {
-  font-size: 28rpx;
   margin-right: 12rpx;
   flex-shrink: 0;
 }
@@ -43,11 +42,9 @@
   height: 40rpx;
   border-radius: 50%;
   background: #ccc;
-  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
   flex-shrink: 0;
 }
 
@@ -273,8 +270,6 @@
   height: 100rpx;
   border-radius: 50%;
   background-color: var(--color-primary);
-  color: #fff;
-  font-size: 56rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -445,13 +440,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 56rpx;
-  color: #bbb;
 }
 
 .image-add--uploading {
   font-size: 24rpx;
-  color: var(--color-text-secondary);
 }
 
 /* ── Save button ── */
@@ -509,14 +501,11 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 26rpx;
-  color: #d9d9d9;
 }
 
 .import-cat-check--on {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
-  color: #fff;
 }
 
 .import-cat-name {

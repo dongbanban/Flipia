@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "modal": "/components/modal/index"
+    "modal": "/components/modal/index",
+    "app-icon": "/components/app-icon/index"
   },
   "navigationBarTitleText": "方案配置"
 }

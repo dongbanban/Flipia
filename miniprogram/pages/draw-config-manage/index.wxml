@@ -35,14 +35,14 @@
             class="remove-badge card-remove"
             data-id="{{item.id}}"
             catch:tap="onDelete"
-          >×</view>
+          ><app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" /></view>
         </view>
       </block>
     </view>
 
     <!-- 添加 -->
     <view wx:if="{{drawConfigGroups.length < 10}}" class="add-row" bind:tap="onStartAdd">
-      <text class="add-icon">＋</text>
+      <app-icon name="ADD" size="{{48}}" color="var(--color-primary)" />
       <text class="add-label">新建方案</text>
     </view>
 
@@ -74,29 +74,29 @@
         <view wx:for="{{modalEntries}}" wx:key="categoryId" class="modal-entry">
           <text class="modal-entry-name">{{item.categoryName}}</text>
           <view class="stepper">
-            <text
+            <view
               class="stepper-btn {{item.count <= 1 ? 'stepper-btn--disabled' : ''}}"
               data-id="{{item.categoryId}}"
               bind:tap="onModalDecrement"
-            >−</text>
+            ><app-icon name="MINUS" size="{{32}}" color="var(--color-primary)" /></view>
             <text class="stepper-value">{{item.count}}</text>
-            <text
+            <view
               class="stepper-btn {{item.count >= 5 ? 'stepper-btn--disabled' : ''}}"
               data-id="{{item.categoryId}}"
               bind:tap="onModalIncrement"
-            >＋</text>
+            ><app-icon name="ADD" size="{{32}}" color="var(--color-primary)" /></view>
           </view>
           <view
             wx:if="{{modalEntries.length > 1}}"
             class="remove-badge modal-entry-remove"
             data-id="{{item.categoryId}}"
             bind:tap="onModalRemove"
-          >×</view>
+          ><app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" /></view>
         </view>
       </view>
 
       <view wx:if="{{modalAvailable.length > 0}}" class="modal-add-entry" bind:tap="onModalAdd">
-        <text class="modal-add-icon">＋</text>
+        <app-icon name="ADD" size="{{48}}" color="var(--color-primary)" />
         <text class="modal-add-text">添加分类</text>
       </view>
 

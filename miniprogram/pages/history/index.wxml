@@ -71,7 +71,7 @@
                 <text class="card-placeholder-uploading">上传中…</text>
               </block>
               <block wx:else>
-                <text class="card-placeholder-icon">+</text>
+                <app-icon name="ADD" size="{{48}}" color="#999" />
                 <text class="card-placeholder-text">{{brandText}}</text>
               </block>
             </view>
@@ -97,7 +97,7 @@
             catchtap="onGenerateShareImage"
             data-record-id="{{record._id}}"
           >
-            <text>⬆</text>
+            <app-icon name="SHARE" size="{{28}}" color="var(--color-text-secondary)" />
           </view>
         </view>
       </view>

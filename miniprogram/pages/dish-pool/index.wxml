@@ -2,7 +2,7 @@
   <!-- 搜索栏 -->
   <view class="search-bar">
     <view class="search-bar__inner">
-      <text class="search-bar__icon">🔍</text>
+      <app-icon class="search-bar__icon" name="SEARCH" size="{{28}}" color="#999" />
       <input
         class="search-bar__input"
         type="text"
@@ -14,7 +14,7 @@
         wx:if="{{searchKeyword}}"
         class="search-bar__clear"
         bind:tap="onClearSearch"
-      >✕</view>
+      ><app-icon name="CLOSE" size="{{24}}" color="#fff" /></view>
     </view>
   </view>
 
@@ -140,7 +140,7 @@
   </view>
 
   <!-- 浮动添加按钮 — 搜索时隐藏 -->
-  <view wx:if="{{categories.length > 0 && !searchKeyword}}" class="fab" bind:tap="onOpenAdd">+</view>
+  <view wx:if="{{categories.length > 0 && !searchKeyword}}" class="fab" bind:tap="onOpenAdd"><app-icon name="ADD" size="{{56}}" color="#fff" /></view>
 
   <!-- 添加/编辑表单弹层 -->
   <modal
@@ -221,7 +221,7 @@
               class="image-item"
             >
               <image class="image-preview" src="{{item}}" mode="aspectFill" />
-              <view class="remove-badge image-remove" data-idx="{{index}}" bind:tap="onRemoveImage">×</view>
+              <view class="remove-badge image-remove" data-idx="{{index}}" bind:tap="onRemoveImage"><app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" /></view>
             </view>
             <view
               wx:if="{{formData.images.length < 1}}"
@@ -229,7 +229,7 @@
               bind:tap="onChooseImages"
             >
               <text wx:if="{{formUploading}}">上传中…</text>
-              <text wx:else>+</text>
+              <app-icon wx:else name="ADD" size="{{56}}" color="#bbb" />
             </view>
           </view>
         </view>
@@ -253,7 +253,7 @@
           <view
             class="form-toggle-btn {{formData.enabled ? 'form-toggle-btn--on' : 'form-toggle-btn--off'}}"
             bind:tap="onFormToggleEnabled"
-          >{{formData.enabled ? '✓ 今日供应' : '○ 今日停供'}}</view>
+          ><app-icon wx:if="{{formData.enabled}}" name="TOGGLE_ON" size="{{28}}" color="#07c160" /><app-icon wx:else name="TOGGLE_OFF" size="{{28}}" color="var(--color-text-secondary)" /><text>{{formData.enabled ? '今日供应' : '今日停供'}}</text></view>
           <view class="form-delete-btn" bind:tap="onFormDeleteDish">下架菜品</view>
         </view>
       </block>
@@ -294,7 +294,7 @@
               bind:tap="onImportToggleCategory"
             >
               <view class="import-cat-check {{item.checked ? 'import-cat-check--on' : ''}}">
-                <text wx:if="{{item.checked}}">✓</text>
+                <app-icon wx:if="{{item.checked}}" name="TOGGLE_ON" size="{{26}}" color="#fff" />
               </view>
               <text class="import-cat-name">{{item.name}}</text>
               <text class="import-cat-count">{{item.dishCount}}道</text>

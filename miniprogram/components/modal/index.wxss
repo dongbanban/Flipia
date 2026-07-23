@@ -60,8 +60,6 @@
 }
 
 .modal-header-btn--close {
-  font-size: 36rpx;
-  color: var(--color-text-secondary);
   padding: 8rpx;
 }
 

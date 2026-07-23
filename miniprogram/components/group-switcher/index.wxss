@@ -23,8 +23,6 @@
 }
 
 .arrow {
-  font-size: 20rpx;
-  color: var(--color-text-secondary);
   margin-left: 8rpx;
 }
 
@@ -94,12 +92,6 @@
   margin-top: 4rpx;
 }
 
-.popup-item__check {
-  font-size: 32rpx;
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
 .popup-create {
   display: flex;
   align-items: center;
@@ -113,9 +105,6 @@
 }
 
 .popup-create__icon {
-  font-size: 36rpx;
-  color: var(--color-primary);
-  font-weight: 600;
   margin-right: 8rpx;
 }
 

@@ -1,6 +1,7 @@
 {
   "usingComponents": {
-    "group-switcher": "/components/group-switcher/index"
+    "group-switcher": "/components/group-switcher/index",
+    "app-icon": "/components/app-icon/index"
   },
   "navigationBarTitleText": "厨房管理"
 }

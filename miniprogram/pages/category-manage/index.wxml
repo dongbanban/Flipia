@@ -18,12 +18,12 @@
             class="remove-badge tag-delete"
             data-id="{{item.id}}"
             catch:tap="onDelete"
-          >×</view>
+          ><app-icon name="CLOSE" size="{{24}}" color="var(--color-primary)" /></view>
         </view>
       </block>
 
       <view class="tag-item tag-item--add" bind:tap="onStartAdd">
-        <text class="tag-add-icon">＋</text>
+        <app-icon name="ADD" size="{{48}}" color="var(--color-primary)" />
       </view>
     </view>
 

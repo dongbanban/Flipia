@@ -83,11 +83,6 @@
   border-color: var(--color-primary);
 }
 
-.toggle-check {
-  font-size: 28rpx;
-  color: #fff;
-  font-weight: 600;
-}
 
 .toggle-label {
   font-size: 28rpx;
@@ -138,9 +133,6 @@
 }
 
 .category-chip__check {
-  font-size: 22rpx;
-  color: var(--color-primary);
-  font-weight: 600;
   margin-left: 8rpx;
 }
 

@@ -13,11 +13,14 @@
           class="modal-header-btn modal-header-btn--confirm"
           bind:tap="onConfirm"
         >{{confirmText}}</text>
-        <text
+        <app-icon
           wx:if="{{!cancelText && !confirmText}}"
+          name="CLOSE"
           class="modal-header-btn modal-header-btn--close"
+          size="{{32}}"
+          color="var(--color-text-secondary)"
           bind:tap="onClose"
-        >✕</text>
+        />
       </view>
     </view>
     <view class="modal-body">

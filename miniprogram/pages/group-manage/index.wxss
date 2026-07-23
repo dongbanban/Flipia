@@ -114,8 +114,6 @@
 }
 
 .info-arrow {
-  font-size: 32rpx;
-  color: #ccc;
   margin-left: 8rpx;
 }
 
@@ -174,11 +172,6 @@
   justify-content: center;
 }
 
-.member-remove__icon {
-  font-size: 36rpx;
-  color: #cc6666;
-  font-weight: 300;
-}
 
 .action-btn {
   margin: 28rpx 24rpx 0;
