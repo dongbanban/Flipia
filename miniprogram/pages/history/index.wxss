@@ -185,7 +185,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32rpx;
   color: var(--color-text-secondary);
   opacity: 0.55;
   z-index: 2;
@@ -195,6 +194,11 @@
 .record-share-icon:active {
   opacity: 0.25;
   transform: scale(0.9);
+}
+
+.record-share-icon-img {
+  width: 32rpx;
+  height: 32rpx;
 }
 
 /* ── Hidden share image canvas ────────────────── */

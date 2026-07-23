@@ -1,4 +1,6 @@
 import { checkImage } from "@/lib/content-security";
+import { svgToImageSrc } from "@/lib/svg-icon";
+import { iconArrowRight, iconUser } from "@/assets/icons";
 
 interface AppInstance {
   globalData: {
@@ -19,6 +21,10 @@ Page({
     nickName: "微信用户",
     avatarUrl: "",
     activeGroupName: "",
+
+    // Icon Data URIs（图标系统 — 预计算 base64）
+    arrowRightIconSrc: svgToImageSrc(iconArrowRight, "#cccccc"),
+    userIconSrc: svgToImageSrc(iconUser, "#c8815e"),
   },
 
   async onShow() {

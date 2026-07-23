@@ -50,7 +50,8 @@
 }
 
 .profile-avatar__icon {
-  font-size: 44rpx;
+  width: 44rpx;
+  height: 44rpx;
 }
 
 /* Nickname input — looks like text but is editable */
@@ -99,6 +100,7 @@
 }
 
 .menu-arrow {
-  font-size: 36rpx;
+  width: 28rpx;
+  height: 28rpx;
   color: #ccc;
 }

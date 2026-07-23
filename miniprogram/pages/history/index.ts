@@ -10,6 +10,8 @@ import { showConfirm } from "@/lib/confirm";
 import { LIMITS, QUERY, STRINGS } from "@/config";
 import { buildRecordDisplayFields, type EnrichedRecord } from "@/pages/history/lib/helpers";
 import { drawShareImage } from "@/pages/history/lib/canvas";
+import { svgToImageSrc } from "@/lib/svg-icon";
+import { iconShare } from "@/assets/icons";
 
 interface AppInstance {
   globalData: {
@@ -37,6 +39,8 @@ Page({
     deleteBtnPx: 0,
     /** 分享图片 canvas 高度（动态） */
     canvasHeight: 0,
+    /** Icon Data URIs（图标系统 — 预计算 base64） */
+    shareIconSrc: svgToImageSrc(iconShare, "#888888"),
     /** 分享图片占位品牌文案 */
     brandText: STRINGS.BRAND_NAME + "时刻",
   },

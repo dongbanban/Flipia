@@ -97,7 +97,7 @@
             catchtap="onGenerateShareImage"
             data-record-id="{{record._id}}"
           >
-            <text>⬆</text>
+            <image class="record-share-icon-img" src="{{shareIconSrc}}" mode="aspectFit" />
           </view>
         </view>
       </view>

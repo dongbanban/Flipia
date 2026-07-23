@@ -360,13 +360,19 @@ pnpm test
 ### 工具函数
 
 ```ts
-// utils/svg-icon.ts
+// lib/svg-icon.ts
 import { Base64 } from 'js-base64';
 
-export function svgToImageSrc(svg: string): string {
-  return `data:image/svg+xml;base64,${Base64.encode(svg)}`;
+export function svgToImageSrc(svg: string, color?: string): string {
+  let processed = svg;
+  if (color) {
+    processed = svg.replace(/fill="[^"]*"/g, `fill="${color}"`);
+  }
+  return `data:image/svg+xml;base64,${Base64.encode(processed)}`;
 }
 ```
+
+颜色参数 `color` 传入主题色 `#c8815e`（CSS 变量 `--color-primary` 的对应值），即可将 iconfont 下载的 SVG 中硬编码的 fill 统一替换为主题色。
 
 ### 图标管理流程
 
