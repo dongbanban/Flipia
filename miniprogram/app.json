@@ -32,5 +32,8 @@
   "lazyCodeLoading": "requiredComponents",
   "resolveAlias": {
     "@/*": "/*"
+  },
+  "useExtendedLib": {
+    "weui": true
   }
 }

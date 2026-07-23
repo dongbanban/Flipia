@@ -1,0 +1,11 @@
+/**
+ * app-icon 基础样式。
+ *
+ * - inline-flex 内联布局，与文字基线对齐
+ * - CHEVRON_DOWN 旋转由 adapter 内联 style 处理，此处不重复定义
+ */
+
+:host {
+  display: inline-flex;
+  align-items: center;
+}

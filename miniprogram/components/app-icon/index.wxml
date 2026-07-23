@@ -1,0 +1,17 @@
+<!--
+  app-icon 统一图标组件
+
+  通过 adapter 模式将语义图标名翻译为后端原生组件 props。
+  当前后端：WeUI 扩展库 <mp-icon>。
+  后续扩展：添加 TDesign adapter 文件 + 在 index.json 声明
+  "t-icon": "@mp-svg-icons/wechat/icon" + 在 WXML 加 wx:elif 分支。
+
+  用法示例：
+    <app-icon name="CLOSE" size="{{32}}" color="#c8815e" />
+    <app-icon name="CHEVRON_DOWN" />
+-->
+<mp-icon
+  icon="{{output.props.icon}}"
+  type="outline"
+  style="{{output.inlineStyle}}"
+/>
