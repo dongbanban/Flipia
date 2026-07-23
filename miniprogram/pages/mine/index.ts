@@ -1,6 +1,5 @@
 import { checkImage } from "@/lib/content-security";
-import { svgToImageSrc } from "@/lib/svg-icon";
-import { iconArrowRight, iconUser } from "@/assets/icons/index";
+import { arrowRightIcon, userIcon } from "@/assets/icons/index";
 
 interface AppInstance {
   globalData: {
@@ -22,9 +21,9 @@ Page({
     avatarUrl: "",
     activeGroupName: "",
 
-    // Icon Data URIs（图标系统 — 预计算 base64）
-    arrowRightIconSrc: svgToImageSrc(iconArrowRight, "#cccccc"),
-    userIconSrc: svgToImageSrc(iconUser, "#c8815e"),
+    // Icon Data URIs（图标系统）
+    arrowRightIconSrc: arrowRightIcon,
+    userIconSrc: userIcon,
   },
 
   async onShow() {

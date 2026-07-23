@@ -1,6 +1,5 @@
 import { checkImage } from "@/lib/content-security";
-import { svgToImageSrc } from "@/lib/svg-icon";
-import { iconUser } from "@/assets/icons/index";
+import { userIcon } from "@/assets/icons/index";
 
 interface AppInstance {
   globalData: {
@@ -22,8 +21,8 @@ Page({
     nicknameFocus: false,  // 选择头像后自动聚焦输入框
     canConfirm: false,     // 计算得出 — 昵称非空时为 true
 
-    // Icon Data URIs（图标系统 — 预计算 base64）
-    userIconSrc: svgToImageSrc(iconUser, "#c8815e"),
+    // Icon Data URI（图标系统）
+    userIconSrc: userIcon,
   },
 
   async onLoad() {

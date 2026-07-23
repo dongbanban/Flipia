@@ -11,8 +11,7 @@ import {
   validateCategoryName,
 } from "@/lib/category-manage";
 import { checkTextWithToast } from "@/lib/content-security";
-import { svgToImageSrc } from "@/lib/svg-icon";
-import { iconSearch, iconClose, iconAdd } from "@/assets/icons/index";
+import { searchIcon, closeIcon, addIcon } from "@/assets/icons/index";
 import { uploadImages } from "@/lib/upload-image";
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
@@ -83,10 +82,10 @@ Page({
     importLoadingCategories: false,
     importing: false,
 
-    // Icon Data URIs（图标系统 — 预计算 base64）
-    searchIconSrc: svgToImageSrc(iconSearch, "#999999"),
-    closeIconSrc: svgToImageSrc(iconClose, "#ffffff"),
-    addIconSrc: svgToImageSrc(iconAdd, "#ffffff"),
+    // Icon Data URIs（图标系统）
+    searchIconSrc: searchIcon,
+    closeIconSrc: closeIcon,
+    addIconSrc: addIcon,
   },
 
   _db: null as ReturnType<typeof wx.cloud.database> | null,
