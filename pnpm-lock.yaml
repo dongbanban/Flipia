@@ -57,6 +57,9 @@ importers:
       '@mp-svg-icons/wechat':
         specifier: ^0.0.2
         version: 0.0.2(patch_hash=ed45445965e691e496ff84ce6a7c7dd4c97569f23dc469801b84e9d71a2729a5)
+      westore:
+        specifier: ^0.1.12
+        version: 0.1.12
     devDependencies:
       miniprogram-api-typings:
         specifier: ~5.2.1
@@ -997,6 +1000,9 @@ packages:
     resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
     engines: {node: '>= 4'}
 
+  rfdc@1.4.1:
+    resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
+
   rollup@4.62.2:
     resolution: {integrity: sha512-RFnrW4lhXA3s3eqHDZvN654g8OTjzRfqpIRJYczCGB6HzphckVAi/Qh4tbPUbRuDi7s1Llv8g/NspLkttY3gTA==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -1216,6 +1222,9 @@ packages:
   web-streams-polyfill@4.3.0:
     resolution: {integrity: sha512-/Gnggvj9oSrEvJbDyyPtAnxBt5fGQM2iWOKQNu7ie1OxDgK40iZpyV3TKaRiEzVj1oA1UxKnEy9XPXh6PW3eVw==}
     engines: {node: '>= 8'}
+
+  westore@0.1.12:
+    resolution: {integrity: sha512-DHtc8vBFarztR+/OCxlmRpztDZiLrz42ugyFAf5YGH4mZNswTU5ULU85yFXXc8w/L9kqktjLvOLud7ny8z1Zfw==}
 
   why-is-node-running@2.3.0:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
@@ -2139,6 +2148,8 @@ snapshots:
 
   retry@0.13.1: {}
 
+  rfdc@1.4.1: {}
+
   rollup@4.62.2:
     dependencies:
       '@types/estree': 1.0.9
@@ -2343,6 +2354,10 @@ snapshots:
       - msw
 
   web-streams-polyfill@4.3.0: {}
+
+  westore@0.1.12:
+    dependencies:
+      rfdc: 1.4.1
 
   why-is-node-running@2.3.0:
     dependencies:
