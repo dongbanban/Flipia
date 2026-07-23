@@ -1,17 +1,5 @@
 import { checkImage } from "@/lib/content-security";
-
-interface AppInstance {
-  globalData: {
-    openid: string;
-    nickName: string;
-    avatarUrl: string;
-    needProfileSetup?: boolean;
-    groupId: string;
-    groups: Array<{ _id: string; name: string; members: string[] }>;
-  };
-  switchGroup(id: string): void;
-  whenReady(): Promise<void>;
-}
+import { userStore, groupStore } from "@/stores";
 
 Page({
   data: {
@@ -22,24 +10,21 @@ Page({
   },
 
   async onShow() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    const nickName = app.globalData.nickName || "微信用户";
-    const avatarUrl = app.globalData.avatarUrl || "";
-    const groups = app.globalData.groups;
-    const activeGroupId = app.globalData.groupId;
-    const activeGroup = groups.find((g) => g._id === activeGroupId);
+    const { nickName, avatarUrl } = userStore.data;
+    const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
+    const groups = groupStore.data.groups;
+    const activeGroupId = groupStore.data.groupId;
+    const activeGroup = groups.find((g: { _id: string; name: string }) => g._id === activeGroupId);
     this.setData({
-      openid: app.globalData.openid,
-      nickName,
-      avatarUrl,
+      openid,
+      nickName: nickName || "微信用户",
+      avatarUrl: avatarUrl || "",
       activeGroupName: activeGroup ? activeGroup.name : "",
     });
   },
 
   async onChooseAvatar(e: WechatMiniprogram.CustomEvent) {
     const { avatarUrl } = e.detail;
-    const app = getApp<AppInstance>();
 
     // 安全检测
     const checkResult = await checkImage(avatarUrl);
@@ -52,7 +37,7 @@ Page({
     wx.showLoading({ title: "正在保存…" });
 
     try {
-      const openid = app.globalData.openid;
+      const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
       let fileID = "";
 
       if (avatarUrl) {
@@ -65,9 +50,8 @@ Page({
         fileID = uploadRes.fileID;
       }
 
-      // 更新 globalData
-      app.globalData.avatarUrl = fileID;
-      app.globalData.needProfileSetup = false;
+      // 更新 userStore
+      userStore.setProfile(userStore.data.nickName, fileID);
 
       // 持久化到数据库
       const db = wx.cloud.database();
@@ -96,13 +80,11 @@ Page({
     const newNickName = e.detail.value.trim();
     if (!newNickName) return;
 
-    const app = getApp<AppInstance>();
-    const openid = app.globalData.openid;
+    const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
 
     try {
-      // 更新 globalData
-      app.globalData.nickName = newNickName;
-      app.globalData.needProfileSetup = false;
+      // 更新 userStore
+      userStore.setProfile(newNickName, userStore.data.avatarUrl);
 
       // 持久化到数据库
       const db = wx.cloud.database();
@@ -137,5 +119,8 @@ Page({
 
   onAvatarError() {
     this.setData({ avatarUrl: "" });
+  },
+
+  onUnload() {
   },
 });

@@ -2,6 +2,7 @@ import { buildProfileMap, buildMemberInfoList } from "@/pages/group-manage/lib/h
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
 import { LIMITS } from "@/config";
+import { groupStore } from "@/stores";
 
 interface GroupInfo {
   _id: string;
@@ -14,21 +15,6 @@ interface GroupInfo {
 interface UserProfile {
   _openid: string;
   nickName: string;
-}
-
-type AppInstance = WechatMiniprogram.App.Instance<Record<string, unknown>> & {
-  globalData: {
-    openid: string;
-    nickName: string;
-    groupId: string;
-    groups: GroupInfo[];
-  };
-  switchGroup(id: string): void;
-  whenReady(): Promise<void>;
-};
-
-interface PageOptions {
-  joinCode?: string;
 }
 
 Page({
@@ -56,23 +42,19 @@ Page({
   _db: null as ReturnType<typeof wx.cloud.database> | null,
   _group: null as GroupInfo | null,
 
-  async onLoad(options: PageOptions) {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-
-    const db = wx.cloud.database();
-    this._db = db;
+  async onLoad(options: { joinCode?: string }) {
+    this._db = wx.cloud.database();
     this.setData({
-      myOpenid: app.globalData.openid,
-      groups: app.globalData.groups,
-      activeGroupId: app.globalData.groupId,
-      openid: app.globalData.openid,
+      myOpenid: getApp<{ globalData: { openid: string } }>().globalData.openid,
+      groups: groupStore.data.groups,
+      activeGroupId: groupStore.data.groupId,
+      openid: getApp<{ globalData: { openid: string } }>().globalData.openid,
     });
 
     if (options.joinCode) {
       this.setData({ joinCode: options.joinCode, joining: true });
       try {
-        const res = await db
+        const res = await this._db!
           .collection("groups")
           .where({ joinCode: options.joinCode })
           .limit(1)
@@ -92,11 +74,11 @@ Page({
         const group = res.data[0] as GroupInfo;
         this._group = group;
 
-        const alreadyInGroup = app.globalData.groups.some(
-          (g: GroupInfo) => g._id === group._id,
+        const alreadyInGroup = groupStore.data.groups.some(
+          (g) => g._id === group._id,
         );
         if (alreadyInGroup) {
-          app.switchGroup(group._id);
+          groupStore.switchGroup(group._id);
           wx.showToast({ title: "你已在该厨房中", icon: "none" });
           setTimeout(() => wx.navigateBack(), 1200);
           return;
@@ -119,8 +101,8 @@ Page({
       return;
     }
 
-    const groupId = app.globalData.groupId;
-    const groups = app.globalData.groups as GroupInfo[];
+    const groupId = groupStore.data.groupId;
+    const groups = groupStore.data.groups as GroupInfo[];
     const group = groups.find((g) => g._id === groupId);
     if (!group) {
       wx.showToast({ title: "厨房不存在", icon: "none" });
@@ -141,11 +123,10 @@ Page({
   },
 
   onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
-    const app = getApp<AppInstance>();
-    app.switchGroup(e.detail.groupId);
+    groupStore.switchGroup(e.detail.groupId);
 
-    const groups = app.globalData.groups;
-    const group = groups.find((g: GroupInfo) => g._id === e.detail.groupId);
+    const groups = groupStore.data.groups as GroupInfo[];
+    const group = groups.find((g) => g._id === e.detail.groupId);
     this._group = (group as GroupInfo | undefined) || null;
 
     this.setData({
@@ -251,15 +232,15 @@ Page({
         return;
       }
 
-      const app = getApp<AppInstance>();
+      const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
       const newGroup: GroupInfo = {
         _id: result.groupId!,
-        _openid: app.globalData.openid,
+        _openid: openid,
         name: result.name!,
-        members: [app.globalData.openid],
+        members: [openid],
       };
-      app.globalData.groups = [...app.globalData.groups, newGroup];
-      app.switchGroup(result.groupId!);
+      groupStore.setGroups([...groupStore.data.groups as GroupInfo[], newGroup]);
+      groupStore.switchGroup(result.groupId!);
 
       wx.showToast({ title: "加入成功", icon: "success" });
       setTimeout(() => {
@@ -325,11 +306,10 @@ Page({
         return;
       }
 
-      const app = getApp<AppInstance>();
-      const groups = app.globalData.groups.map((g: GroupInfo) =>
+      const groups = groupStore.data.groups.map((g) =>
         g._id === this.data.groupId ? { ...g, name: result.name! } : g,
-      );
-      app.globalData.groups = groups;
+      ) as GroupInfo[];
+      groupStore.setGroups(groups);
 
       this.setData({ groupName: result.name!, editingName: false });
       wx.showToast({ title: "已保存", icon: "success" });
@@ -375,13 +355,12 @@ Page({
       const members = this.data.members.filter((m) => m.openid !== openid);
       this.setData({ members });
 
-      const app = getApp<AppInstance>();
-      const groups = app.globalData.groups.map((g: GroupInfo) =>
+      const groups = groupStore.data.groups.map((g) =>
         g._id === this.data.groupId
           ? { ...g, members: g.members.filter((id: string) => id !== openid) }
           : g,
-      );
-      app.globalData.groups = groups;
+      ) as GroupInfo[];
+      groupStore.setGroups(groups);
 
       wx.showToast({ title: "已移除", icon: "success" });
     } catch (err) {
@@ -481,14 +460,12 @@ Page({
   },
 
   _removeFromLocal() {
-    const app = getApp<AppInstance>();
-    const groups = app.globalData.groups.filter(
-      (g: GroupInfo) => g._id !== this.data.groupId,
-    );
-    app.globalData.groups = groups;
-
-    if (app.globalData.groupId === this.data.groupId) {
-      app.switchGroup(groups.length > 0 ? groups[0]._id : "");
+    const groups = groupStore.data.groups.filter(
+      (g) => g._id !== this.data.groupId,
+    ) as GroupInfo[];
+    groupStore.setGroups(groups);
+    if (groupStore.data.groupId === this.data.groupId) {
+      groupStore.switchGroup(groups.length > 0 ? groups[0]._id : "");
     }
   },
 });

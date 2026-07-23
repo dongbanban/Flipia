@@ -19,16 +19,7 @@ import { LIMITS, QUERY } from "@/config";
 import { searchDishes } from "./lib/search";
 import { getImportSources, loadSourceCategories, executeImport, type ImportSourceCategory } from "./lib/import";
 import { addDishToDb, updateDishInDb, type SaveContext } from "./lib/save";
-
-interface AppInstance {
-  globalData: {
-    groupId: string;
-    openid: string;
-    groups: Array<{ _id: string; name: string; members: string[] }>;
-  };
-  switchGroup(id: string): void;
-  whenReady(): Promise<void>;
-}
+import { groupStore } from "@/stores";
 
 interface FormData {
   _id: string;
@@ -91,50 +82,26 @@ Page({
   _searchTimer: null as number | null,
 
   async onLoad() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    this._groupId = app.globalData.groupId;
-    this._openid = app.globalData.openid;
+    this._groupId = groupStore.data.groupId;
+    this._openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
     this._db = wx.cloud.database();
-    const memberCount = getMemberCount(app.globalData.groups, app.globalData.groupId);
+    const memberCount = getMemberCount(groupStore.data.groups, groupStore.data.groupId);
     this.setData({
       memberCount,
     });
     this._init();
   },
 
-  async onShow() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    const memberCount = getMemberCount(app.globalData.groups, app.globalData.groupId);
-    this.setData({
-      memberCount,
-    });
-    if (!this._shown) {
-      this._shown = true;
-      return;
-    }
-    if (this._groupId !== app.globalData.groupId) {
-      this._groupId = app.globalData.groupId;
-      if (this._searchTimer) {
-        clearTimeout(this._searchTimer);
-        this._searchTimer = null;
-      }
-      this.setData({
-        loading: false,
-        formVisible: false,
-        dishes: [],
-        searchKeyword: "",
-        searchResults: [],
-        activeTab: 0,
-      });
+  onShow() {
+    if (!this._shown) { this._shown = true; return; }
+    if (this._groupId !== groupStore.data.groupId) {
+      this._groupId = groupStore.data.groupId;
+      if (this._searchTimer) { clearTimeout(this._searchTimer); this._searchTimer = null; }
+      this.setData({ loading: false, formVisible: false, dishes: [], searchKeyword: "", searchResults: [], activeTab: 0 });
       this._init();
       return;
     }
-    if (this._searchTimer) {
-      clearTimeout(this._searchTimer);
-      this._searchTimer = null;
-    }
+    if (this._searchTimer) { clearTimeout(this._searchTimer); this._searchTimer = null; }
     this.setData({ searchKeyword: "", searchResults: [] });
     this._refreshCategories();
   },
@@ -691,8 +658,7 @@ Page({
   // ── 导入菜品（表单内标签页）────────────────────────────────────────────────
 
   _initImportForm() {
-    const app = getApp<AppInstance>();
-    const sources = getImportSources(app.globalData.groups, this._groupId);
+    const sources = getImportSources(groupStore.data.groups, this._groupId);
     if (sources.length === 0) {
       wx.showToast({ title: "没有可导入的厨房", icon: "none" });
       this.setData({ formTab: "manual" });

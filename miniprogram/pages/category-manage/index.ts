@@ -12,10 +12,7 @@ import type { Category, DrawConfigGroup } from "@/lib/init-data";
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
 import { LIMITS, QUERY } from "@/config";
-
-interface AppGlobalData {
-  groupId: string;
-}
+import { groupStore } from "@/stores";
 
 Page({
   data: {
@@ -33,20 +30,10 @@ Page({
   _db: null as ReturnType<typeof wx.cloud.database> | null,
   _groupId: "",
   _configId: "",
-  _shown: false,
 
   onLoad() {
-    const app = getApp<{ globalData: AppGlobalData }>();
-    this._groupId = app.globalData.groupId;
+    this._groupId = groupStore.data.groupId;
     this._db = wx.cloud.database();
-    this._loadConfig();
-  },
-
-  onShow() {
-    if (!this._shown) {
-      this._shown = true;
-      return;
-    }
     this._loadConfig();
   },
 

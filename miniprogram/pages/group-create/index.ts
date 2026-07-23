@@ -1,5 +1,6 @@
 import { sanitizeInput } from "@/lib/sanitize";
 import { LIMITS, QUERY, STRINGS } from "@/config";
+import { groupStore } from "@/stores";
 import {
   type Category,
   generateGroupId,
@@ -22,16 +23,6 @@ interface SourceDish {
   createdAt: number;
 }
 
-interface AppInstance {
-  globalData: {
-    openid: string;
-    groupId: string;
-    groups: GroupInfo[];
-  };
-  switchGroup(id: string): void;
-  whenReady(): Promise<void>;
-}
-
 Page({
   data: {
     groupName: "",
@@ -50,12 +41,10 @@ Page({
   _openid: "",
 
   async onLoad() {
-    const app = getApp<AppInstance>();
-    await app.whenReady();
-    this._openid = app.globalData.openid;
+    this._openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
     this._db = wx.cloud.database();
 
-    const existing = app.globalData.groups as GroupInfo[];
+    const existing = groupStore.data.groups;
     this.setData({ sourceGroups: existing });
   },
 
@@ -138,8 +127,7 @@ Page({
 
     const name = this.data.groupName.trim();
 
-    const app = getApp<AppInstance>();
-    const duplicate = (app.globalData.groups as GroupInfo[]).some(
+    const duplicate = groupStore.data.groups.some(
       (g) => g.name === name,
     );
     if (duplicate) {
@@ -187,11 +175,11 @@ Page({
         );
       }
 
-      app.globalData.groups = [
-        ...(app.globalData.groups as GroupInfo[]),
+      groupStore.setGroups([
+        ...groupStore.data.groups,
         { _id: newGroupId, name: sanitized, members: [openid] },
-      ];
-      app.switchGroup(newGroupId);
+      ]);
+      groupStore.switchGroup(newGroupId);
 
       wx.showToast({ title: "创建成功", icon: "success" });
       setTimeout(() => {

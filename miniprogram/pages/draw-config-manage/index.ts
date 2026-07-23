@@ -12,13 +12,9 @@ import type { Category, DrawConfigEntry, DrawConfigGroup } from "@/lib/init-data
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
 import { LIMITS } from "@/config";
+import { groupStore } from "@/stores";
 
-interface AppGlobalData {
-  groupId: string;
-}
 
-const STORAGE_ACTIVE_CONFIG_KEY = "flipia_active_config_id";
-const STORAGE_LAST_DRAWN_KEY = "flipia_last_drawn_config_id";
 
 Page({
   data: {
@@ -43,28 +39,23 @@ Page({
   _saving: false,
 
   onLoad() {
-    const app = getApp<{ globalData: AppGlobalData }>();
-    this._groupId = app.globalData.groupId;
+    this._groupId = groupStore.data.groupId;
     this._db = wx.cloud.database();
     this._loadConfig();
   },
 
-  onShow() {
-    if (!this._configId) return;
-    this._loadConfig();
-  },
+  onUnload() {},
 
   _getActiveId(): string {
-    return (wx.getStorageSync(STORAGE_ACTIVE_CONFIG_KEY) as string) || "";
+    return groupStore.data.activeConfigId;
   },
 
   _setActiveId(id: string) {
-    wx.setStorageSync(STORAGE_ACTIVE_CONFIG_KEY, id);
-    wx.removeStorageSync(STORAGE_LAST_DRAWN_KEY);
+    groupStore.setActiveConfig(id);
   },
 
   _clearActiveId() {
-    wx.removeStorageSync(STORAGE_ACTIVE_CONFIG_KEY);
+    groupStore.setActiveConfig("");
   },
 
   async _loadConfig() {
@@ -87,7 +78,7 @@ Page({
       this._configId = config._id;
       const synced = syncAllGroupNames(config.drawConfigGroups, config.categories);
 
-      const storedActiveId = wx.getStorageSync(STORAGE_ACTIVE_CONFIG_KEY) as string;
+      const storedActiveId = groupStore.data.activeConfigId;
       const activeId = storedActiveId && synced.some((g) => g.id === storedActiveId)
         ? storedActiveId
         : "";
