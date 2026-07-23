@@ -10,7 +10,8 @@
     "miniprogram-api-typings": "~5.2.1"
   },
   "dependencies": {
-    "@mp-svg-icons/wechat": "^0.0.2"
+    "@mp-svg-icons/wechat": "^0.0.2",
+    "westore": "^0.1.12"
   },
   "pnpm": {
     "patchedDependencies": {
