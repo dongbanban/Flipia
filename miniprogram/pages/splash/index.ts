@@ -1,7 +1,3 @@
-/*
- * @file: /Users/i104/Flipia/miniprogram/pages/splash/index.ts
- * @author: dongyang
- */
 const app = getApp<{
   globalData: { needProfileSetup?: boolean };
   whenReady(): Promise<void>;
