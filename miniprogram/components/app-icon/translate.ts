@@ -1,8 +1,8 @@
 /**
  * 语义图标名到 WeUI 原生 icon 类型的映射表。
  *
- * 11 个 Flipia 语义名映射到 WeUI 原生图标。未命中映射的名称原样透传，
- * 保证未来新增图标无需改映射表即可使用。
+ * 11 个 Flipia 语义名映射到 WeUI 原生图标。未命中映射的名称由 adapter
+ * 层降级为纯文本渲染，在页面上原样展示。
  */
 
 /** Flipia 语义名 → WeUI 原生 icon 类型映射 */
@@ -17,7 +17,7 @@ export const SEMANTIC_TO_WEUI: Record<string, string> = {
   SHARE: "share",
   AVATAR: "me",
   MINUS: "delete",
-  // HELP 未映射 — fallthrough 原样透传，WeUI 无法识别时显示为空
+  // HELP 未映射 — adapter 层将降级为纯文本渲染
 };
 
 /**
@@ -32,4 +32,17 @@ export function translate(name: string, backend: string): string {
   }
   // 其他后端暂未实现，原样透传
   return name;
+}
+
+/**
+ * 检查语义图标名是否在后端中有对应映射。
+ * @param name - Flipia 语义图标名
+ * @param backend - 目标后端标识
+ * @returns 是否命中映射
+ */
+export function isMapped(name: string, backend: string): boolean {
+  if (backend === "weui") {
+    return name in SEMANTIC_TO_WEUI;
+  }
+  return false;
 }

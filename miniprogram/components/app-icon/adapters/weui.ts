@@ -1,4 +1,4 @@
-import { translate } from "../translate";
+import { translate, isMapped } from "../translate";
 import type { UnifiedIconProps, AdapterOutput } from "./types";
 
 /**
@@ -9,12 +9,12 @@ import type { UnifiedIconProps, AdapterOutput } from "./types";
  * - `size` → CSS `font-size` 内联样式（WeUI 图标尺寸由字号决定）
  * - 多色 props（`fillColor`、`strokeColor`、`strokeWidth`、`brand`）被静默忽略
  * - `CHEVRON_DOWN` 附加 `transform: rotate(90deg)` 实现下箭头旋转
+ * - 未命中映射的 name 降级为纯文本渲染（componentType: "text"）
  *
  * @param props - 统一图标属性（语义名）
  * @returns WeUI 渲染参数
  */
 export function weuiAdapter(props: UnifiedIconProps): AdapterOutput {
-  const weuiIcon = translate(props.name, "weui");
   const styleParts: string[] = [];
 
   // 单色：通过 CSS color 控制
@@ -22,9 +22,22 @@ export function weuiAdapter(props: UnifiedIconProps): AdapterOutput {
     styleParts.push(`color:${props.color}`);
   }
 
-  // 尺寸：通过 CSS font-size 控制（WeUI icon 是字体图标）
+  // 尺寸：通过 CSS font-size 控制
   const size = props.size ?? 24;
   styleParts.push(`font-size:${size}rpx`);
+
+  const inlineStyle = styleParts.join(";");
+
+  // 未命中映射 → 降级为纯文本渲染
+  if (!isMapped(props.name, "weui")) {
+    return {
+      componentType: "text",
+      props: { text: props.name },
+      inlineStyle,
+    };
+  }
+
+  const weuiIcon = translate(props.name, "weui");
 
   // CHEVRON_DOWN 旋转为下箭头（与 CHEVRON_RIGHT 共用 `arrow` 图标）
   if (props.name === "CHEVRON_DOWN") {
