@@ -12,7 +12,6 @@ interface UserData {
 
 /**
  * 用户信息 Store，持有当前用户的昵称、头像和 setup 状态。
- * 此时不连接任何页面，仅作为独立 Store 骨架存在。
  */
 class UserStore extends Store<UserData> {
   constructor() {

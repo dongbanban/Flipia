@@ -12,7 +12,7 @@ import type { Category, DrawConfigGroup } from "@/lib/init-data";
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
 import { LIMITS, QUERY } from "@/config";
-import { groupStore } from "@/stores";
+import { groupStore } from "@/stores/group-store";
 
 Page({
   data: {

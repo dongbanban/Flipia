@@ -2,7 +2,7 @@ import { buildProfileMap, buildMemberInfoList } from "@/pages/group-manage/lib/h
 import { sanitizeInput } from "@/lib/sanitize";
 import { showConfirm } from "@/lib/confirm";
 import { LIMITS } from "@/config";
-import { groupStore } from "@/stores";
+import { groupStore } from "@/stores/group-store";
 
 interface GroupInfo {
   _id: string;

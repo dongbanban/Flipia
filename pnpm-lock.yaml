@@ -57,6 +57,9 @@ importers:
       '@mp-svg-icons/wechat':
         specifier: ^0.0.2
         version: 0.0.2(patch_hash=ed45445965e691e496ff84ce6a7c7dd4c97569f23dc469801b84e9d71a2729a5)
+      rfdc:
+        specifier: ^1.4.1
+        version: 1.4.1
       westore:
         specifier: ^0.1.12
         version: 0.1.12

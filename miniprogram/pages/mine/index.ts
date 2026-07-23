@@ -1,5 +1,6 @@
 import { checkImage } from "@/lib/content-security";
-import { userStore, groupStore } from "@/stores";
+import { userStore } from "@/stores/user-store";
+import { groupStore } from "@/stores/group-store";
 
 Page({
   data: {

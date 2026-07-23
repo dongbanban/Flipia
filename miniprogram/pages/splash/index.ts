@@ -1,4 +1,4 @@
-import { userStore } from "@/stores";
+import { userStore } from "@/stores/user-store";
 
 Page({
   data: {

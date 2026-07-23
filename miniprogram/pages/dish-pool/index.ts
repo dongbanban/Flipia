@@ -19,7 +19,7 @@ import { LIMITS, QUERY } from "@/config";
 import { searchDishes } from "./lib/search";
 import { getImportSources, loadSourceCategories, executeImport, type ImportSourceCategory } from "./lib/import";
 import { addDishToDb, updateDishInDb, type SaveContext } from "./lib/save";
-import { groupStore } from "@/stores";
+import { groupStore } from "@/stores/group-store";
 
 interface FormData {
   _id: string;

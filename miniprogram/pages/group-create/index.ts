@@ -1,6 +1,6 @@
 import { sanitizeInput } from "@/lib/sanitize";
 import { LIMITS, QUERY, STRINGS } from "@/config";
-import { groupStore } from "@/stores";
+import { groupStore } from "@/stores/group-store";
 import {
   type Category,
   generateGroupId,

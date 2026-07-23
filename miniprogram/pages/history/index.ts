@@ -10,7 +10,7 @@ import { showConfirm } from "@/lib/confirm";
 import { LIMITS, QUERY, STRINGS } from "@/config";
 import { buildRecordDisplayFields, type EnrichedRecord } from "@/pages/history/lib/helpers";
 import { drawShareImage } from "@/pages/history/lib/canvas";
-import { groupStore } from "@/stores";
+import { groupStore } from "@/stores/group-store";
 
 Page({
   data: {

@@ -21,7 +21,6 @@ interface GroupData {
 /**
  * 厨房/群组 Store，管理厨房列表、活跃厨房和抽签方案的选中状态。
  * 关键方法含 Storage 持久化，与现有 wx.setStorageSync 键名保持一致。
- * 此时不连接任何页面，仅作为独立 Store 骨架存在。
  */
 class GroupStore extends Store<GroupData> {
   constructor() {

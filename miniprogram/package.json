@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@mp-svg-icons/wechat": "^0.0.2",
+    "rfdc": "^1.4.1",
     "westore": "^0.1.12"
   },
   "pnpm": {

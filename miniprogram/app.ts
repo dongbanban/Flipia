@@ -1,7 +1,8 @@
 import { buildDefaultUserConfig, buildPresetDishes } from "@/lib/init-data";
 import { showConfirm } from "@/lib/confirm";
 import { CLOUD, STRINGS } from "@/config";
-import { userStore, groupStore } from "@/stores";
+import { userStore } from "@/stores/user-store";
+import { groupStore } from "@/stores/group-store";
 import { ACTIVE_GROUP_KEY } from "@/constants/storage-keys";
 
 interface GroupInfo {

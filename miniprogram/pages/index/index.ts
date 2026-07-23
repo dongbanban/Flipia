@@ -6,7 +6,8 @@ import type { DrawConfigGroup, Category } from "@/lib/init-data";
 import { showConfirm } from "@/lib/confirm";
 import { getMemberCount } from "@/lib/group-utils";
 import { archiveOldRecords, buildDrawCards, cardsToResults, loadEnabledDishes, loadTodayRecords, type DrawCard } from "@/pages/index/lib/helpers";
-import { groupStore, userStore } from "@/stores";
+import { userStore } from "@/stores/user-store";
+import { groupStore } from "@/stores/group-store";
 
 Page({
   data: {
