@@ -1,6 +1,7 @@
 import { buildDefaultUserConfig, buildPresetDishes } from "@/lib/init-data";
 import { showConfirm } from "@/lib/confirm";
 import { CLOUD, STRINGS } from "@/config";
+import { userStore, groupStore } from "@/stores";
 
 interface GroupInfo {
   _id: string;
@@ -80,6 +81,7 @@ App({
   switchGroup(this: AppInstance, groupId: string) {
     this.globalData.groupId = groupId;
     wx.setStorageSync(ACTIVE_GROUP_KEY, groupId);
+    groupStore.switchGroup(groupId);
   },
 
   async _initApp(this: AppInstance) {
@@ -114,9 +116,15 @@ App({
           : groups[0]._id;
 
       this.globalData.groupId = activeId;
+      groupStore.setGroups(groups);
+      groupStore.switchGroup(activeId);
       if (!storedId || storedId !== activeId) {
         wx.setStorageSync(ACTIVE_GROUP_KEY, activeId);
       }
+      console.log("[app] 双写验证 — Store 内容", {
+        userStore: userStore.data,
+        groupStore: groupStore.data,
+      });
       return;
     }
 
@@ -132,6 +140,10 @@ App({
       { _id: groupId, name: STRINGS.DEFAULT_GROUP_NAME, members: [openid] },
     ];
     wx.setStorageSync(ACTIVE_GROUP_KEY, groupId);
+    groupStore.setGroups([
+      { _id: groupId, name: STRINGS.DEFAULT_GROUP_NAME, members: [openid] },
+    ]);
+    groupStore.switchGroup(groupId);
 
     const userConfig = buildDefaultUserConfig(groupId, openid);
     await db.collection("user_config").add({ data: userConfig });
@@ -140,6 +152,10 @@ App({
     await Promise.all(
       dishes.map((dish) => db.collection("dishes").add({ data: dish })),
     );
+    console.log("[app] 双写验证 — Store 内容", {
+      userStore: userStore.data,
+      groupStore: groupStore.data,
+    });
   },
 
   async _ensureUserProfile(
@@ -158,6 +174,7 @@ App({
         const user = res.data[0] as { nickName: string; avatarUrl?: string };
         this.globalData.nickName = user.nickName;
         this.globalData.avatarUrl = user.avatarUrl || "";
+        userStore.setProfile(user.nickName, user.avatarUrl || "");
         return;
       }
 
@@ -166,6 +183,10 @@ App({
       this.globalData.nickName = nickName;
       this.globalData.avatarUrl = "";
       this.globalData.needProfileSetup = true;
+      userStore.data.nickName = nickName;
+      userStore.data.avatarUrl = "";
+      userStore.data.needProfileSetup = true;
+      userStore.update();
     } catch (err) {
       console.error("[app] ensure user profile failed", err);
     }
