@@ -1,6 +1,6 @@
 import { checkImage } from "@/lib/content-security";
-import { svgToImageSrc } from "../../lib/svg-icon";
-import { iconArrowRight, iconUser } from "../../assets/icons";
+import { svgToImageSrc } from "@/lib/svg-icon";
+import { iconArrowRight, iconUser } from "@/assets/icons/index";
 
 interface AppInstance {
   globalData: {

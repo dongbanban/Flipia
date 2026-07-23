@@ -10,8 +10,8 @@ import { showConfirm } from "@/lib/confirm";
 import { LIMITS, QUERY, STRINGS } from "@/config";
 import { buildRecordDisplayFields, type EnrichedRecord } from "@/pages/history/lib/helpers";
 import { drawShareImage } from "@/pages/history/lib/canvas";
-import { svgToImageSrc } from "../../lib/svg-icon";
-import { iconShare } from "../../assets/icons";
+import { svgToImageSrc } from "@/lib/svg-icon";
+import { iconShare } from "@/assets/icons/index";
 
 interface AppInstance {
   globalData: {
