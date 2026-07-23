@@ -409,10 +409,9 @@ Page({
     const tab = (e.currentTarget.dataset as { tab: string }).tab;
     if (tab === "batch") {
       this._initImportForm();
-    } else {
-      this.setData({ showNewCategory: false, newCategoryName: "", newCategoryError: "" });
+      return;
     }
-    this.setData({ formTab: tab as "manual" | "batch" });
+    this.setData({ formTab: "manual", showNewCategory: false, newCategoryName: "", newCategoryError: "" });
   },
 
   // ── 新建分类 ──────────────────────────────────────────────────────────────
@@ -700,6 +699,7 @@ Page({
       return;
     }
     this.setData({
+      formTab: "batch",
       importStep: "selectGroup",
       importSourceGroups: sources,
       importSourceGroupIdx: 0,
