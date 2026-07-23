@@ -28,8 +28,8 @@
   <view wx:elif="{{phase === 'drawing'}}" class="drawing-area">
     <view class="auto-flip-bar">
       <button
-        class="auto-flip-btn {{autoFlipping ? 'auto-flip-btn--disabled' : ''}}"
-        disabled="{{autoFlipping}}"
+        class="auto-flip-btn {{(autoFlipping || flippedCount === drawCards.length) ? 'auto-flip-btn--disabled' : ''}}"
+        disabled="{{autoFlipping || flippedCount === drawCards.length}}"
         bind:tap="onAutoFlip"
       >一键翻牌</button>
     </view>

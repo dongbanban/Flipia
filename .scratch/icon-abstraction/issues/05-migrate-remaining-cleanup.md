@@ -19,7 +19,7 @@
 
 ## Comments
 
-- `N/A` — 暂未提交
+- `ec1ad89` — 迁移所有页面 Unicode 图标为 <app-icon> + badge 样式整合
 - 替换了 8 个文件中的 ~20 处 Unicode 图标为 `<app-icon>`：CLOSE×5 / ADD×5 / MINUS×1 / CHEVRON_RIGHT×1 / CHEVRON_DOWN×1 / TOGGLE_ON×4 / SHARE×1 / AVATAR×1
 - CSS 清理：移除各页面/组件中 `font-size`/`color`/`font-weight`/`line-height`（图标渲染属性），保留容器布局样式
 - `styles/badge.wxss` 中的 `.remove-badge` 类已精简为纯容器样式（移除 `color`/`font-size`/`font-weight`/`line-height`），与 `<app-icon>` 集成无冲突

@@ -315,6 +315,7 @@ Page({
   onAutoFlip() {
     const cards = this.data.drawCards as DrawCard[];
     if (this.data.autoFlipping) return;
+    if (cards.every((c) => c.flipped)) return;
 
     this.setData({ autoFlipping: true });
 
