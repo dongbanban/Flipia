@@ -1,3 +1,7 @@
+/*
+ * @file: /Users/i104/Flipia/miniprogram/pages/splash/index.ts
+ * @author: dongyang
+ */
 const app = getApp<{
   globalData: { needProfileSetup?: boolean };
   whenReady(): Promise<void>;
@@ -15,7 +19,7 @@ Page({
 
   async onShow() {
     await app.whenReady();
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 1000));
 
     if (app.globalData.needProfileSetup) {
       wx.redirectTo({ url: "/pages/profile-setup/index" });
