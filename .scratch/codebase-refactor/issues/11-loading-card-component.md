@@ -1,6 +1,6 @@
 # 11-loading-card-component: 提取 loading-card 可复用组件
 
-**Label:** in-progress
+**Label:** done
 **Created:** 2026-07-24
 **Blocked by:** None — 可直接开始
 **Spec:** `spec.md#loading-ux-重构`
@@ -38,7 +38,18 @@
 
 ## 验证
 
-- [ ] 组件在页面 loading 时展示卡片翻转动画
-- [ ] 传入 text/subtext 时正面显示文案，不传时仅显示渐变色底
-- [ ] 默认文案与 splash 页面一致（Flipia / 让做饭不再纠结～）
-- [ ] 动画连续播放，无闪烁或跳帧
+- [x] 组件在页面 loading 时展示卡片翻转动画
+- [x] 传入 text/subtext 时正面显示文案，不传时仅显示渐变色底
+- [x] 默认文案与 splash 页面一致（Flipia / 让做饭不再纠结～）
+- [x] 动画连续播放，无闪烁或跳帧
+
+---
+
+## Comments
+
+**1b3b4ce** — `feat: loading-card 组件 + 全局加载态替换`
+
+- 创建 `miniprogram/components/loading/` 组件，properties: `loading`/`text`/`subtext`
+- 修复 `loading-overlay` 使用 `position: fixed` 替代 `min-height: 100vh`（符合 ADR-0003）
+- 替换 group-create 页面内联 `.loading-hint` 为 `<loading-card>` 组件
+- 其他页面的替换由关联 tickets #12/#13 完成（同 commit）

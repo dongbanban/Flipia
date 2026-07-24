@@ -8,3 +8,6 @@ export const STORAGE_ACTIVE_CONFIG_KEY = "flipia_active_config_id";
 
 /** 上次抽签使用的方案 ID */
 export const STORAGE_LAST_DRAWN_KEY = "flipia_last_drawn_config_id";
+
+/** splash → 首页预取数据缓存键（一次性消费后清除） */
+export const HOME_PREFETCH_KEY = "flipia_home_prefetch";

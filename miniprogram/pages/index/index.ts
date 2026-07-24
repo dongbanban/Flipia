@@ -8,6 +8,7 @@ import { getMemberCount } from "@/lib/group-utils";
 import { archiveOldRecords, buildDrawCards, cardsToResults, loadEnabledDishes, loadTodayRecords, type DrawCard } from "@/pages/index/lib/helpers";
 import { userStore } from "@/stores/user-store";
 import { groupStore } from "@/stores/group-store";
+import { HOME_PREFETCH_KEY } from "@/constants/storage-keys";
 
 Page({
   data: {
@@ -70,9 +71,9 @@ Page({
 
   async onLoad() {
     // 检查 splash 页面是否已完成数据预取
-    const prefetched = getApp<{ globalData: Record<string, unknown> }>().globalData._homePrefetch;
-    if (prefetched && (prefetched as Record<string, unknown>).groupId === groupStore.data.groupId) {
-      this._fromPrefetch(prefetched as Record<string, unknown>);
+    const prefetched = wx.getStorageSync(HOME_PREFETCH_KEY) as Record<string, unknown> | undefined;
+    if (prefetched && prefetched.groupId === groupStore.data.groupId) {
+      this._fromPrefetch(prefetched);
       return;
     }
 
@@ -117,7 +118,7 @@ Page({
     });
 
     // 清除预取缓存，标记已预取（防止 onShow 重复加载）
-    delete getApp<{ globalData: Record<string, unknown> }>().globalData._homePrefetch;
+    wx.removeStorageSync(HOME_PREFETCH_KEY);
     this._prefetched = true;
   },
 

@@ -6,6 +6,7 @@ import { resolveEffectiveGroupId } from "@/lib/draw-config-manage";
 import { loadEnabledDishes, loadTodayRecords } from "@/pages/index/lib/helpers";
 import type { Category, DrawConfigGroup } from "@/lib/init-data";
 import type { DrawHistoryRecord } from "@/lib/history";
+import { HOME_PREFETCH_KEY } from "@/constants/storage-keys";
 
 /** splash → 首页传递的预取数据结构 */
 interface HomePrefetch {
@@ -124,7 +125,7 @@ Page({
         }
       }
 
-      getApp<{ globalData: Record<string, unknown> }>().globalData._homePrefetch = prefetch;
+      wx.setStorageSync(HOME_PREFETCH_KEY, prefetch);
     } catch (err) {
       console.error("[splash] 预取首页数据失败", err);
       // 预取失败不阻塞导航，首页将自行加载

@@ -5,7 +5,7 @@
 
 # 12-replace-inline-loading: 全部页面内联加载态替换为 loading-card
 
-**Label:** done
+**Status:** done
 **Created:** 2026-07-24
 **Blocked by:** 11-loading-card-component
 **Spec:** `spec.md#loading-ux-重构`
@@ -37,7 +37,11 @@ plugin-manage 页面额外移除页面加载时的 `wx.showLoading("加载中…
 
 ## 验证
 
-- [ ] 5 个页面加载时显示卡片翻转动画，不再显示"加载中…"文字
-- [ ] 加载完成后内容正常渲染，无 `wx:else`/`wx:elif` 孤儿错误
-- [ ] plugin-manage 页面进入时仅显示卡片动画，无系统弹窗
-- [ ] 所有页面 `.wxss` 中不再残留 `.loading-state` / `.loading-hint` 规则
+- [x] 5 个页面加载时显示卡片翻转动画，不再显示"加载中…"文字
+- [x] 加载完成后内容正常渲染，无 `wx:else`/`wx:elif` 孤儿错误
+- [x] plugin-manage 页面进入时仅显示卡片动画，无系统弹窗
+- [x] 所有页面 `.wxss` 中不再残留 `.loading-state` / `.loading-hint` 规则
+
+## Comments
+
+已通过 `1b3b4ce` 完成全部实现。5 个页面均已集成 `<loading-card>`，CSS 残留已清理，条件链无孤儿，typecheck 通过。
