@@ -36,14 +36,20 @@
         wx:for="{{drawCards}}"
         wx:key="id"
         data-idx="{{index}}"
-        class="card-container"
+        class="card-wrapper"
+        bind:tap="onFlipCard"
       >
-        <view class="card-inner {{item.flipped ? 'card-inner--flipped' : ''}} {{item.redrawing ? 'card-inner--redrawing' : ''}}" bind:tap="onFlipCard" data-idx="{{index}}">
-          <view class="card-face card-back">
+        <flip-card
+          flipped="{{item.flipped}}"
+          redrawing="{{item.redrawing}}"
+          width="300rpx"
+          height="400rpx"
+        >
+          <view slot="back" class="card-back-content">
             <app-icon name="HELP" size="{{64}}" color="$white" />
             <text class="card-back-label">{{item.categoryName}}</text>
           </view>
-          <view class="card-face card-front">
+          <view slot="front" class="card-front-content">
             <image
               wx:if="{{item.imageUrl}}"
               class="card-image"
@@ -62,7 +68,7 @@
               <text class="redraw-text">换一道</text>
             </view>
           </view>
-        </view>
+        </flip-card>
       </view>
     </view>
 
