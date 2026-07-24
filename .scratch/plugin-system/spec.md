@@ -39,7 +39,7 @@
 
 - 通过 `action` 参数区分三种操作：
   - `list`：返回所有插件定义（名称、描述）+ 用户当前状态（unlocked/enabled）+ 未解锁插件的评估进度（progressHint、current、target）
-  - `unlock`：接收插件 ID，对该插件运行 `assess` 评估函数。若 `passed: true`，将 `user_plugin` 文档中对应条目设为 `unlocked: true`；若 `passed: false`，返回评估结果（进度信息），不修改状态
+  - `unlock`：接收插件 ID，对该插件运行 `assess` 评估函数。若 `passed: true`，将 `user_plugin` 文档中对应条目设为 `unlocked: true, enabled: true`；若 `passed: false`，返回评估结果（进度信息），不修改状态
   - `toggle`：接收插件 ID 和 `enabled: boolean`，仅对 `unlocked: true` 的插件写入。已锁定插件拒绝操作
 - 插件定义集中在 `plugin-registry.js` 中声明，是一个数组，每个条目包含 `id`、`name`、`description`。各插件的评估逻辑放在 `custom-handlers/` 目录下，每个插件自带 `assess(db, openid)` 函数
 - `assess` 函数签名返回：
@@ -75,9 +75,18 @@ interface PluginAssessment {
 ### 前端
 
 - `stores/plugin-store.ts`：轻量缓存模块。暴露 `load()`（调 `plugin-manage` 的 `list`，由 `app.ts` 在启动时调用）、获取 enabled 状态映射供各页面 `wx:if` 使用。不继承现有 westore Store。管理页进入时独立调用 `list` 获取实时进度数据，不依赖 `plugin-store` 缓存
-- 插件管理页：调用 `plugin-manage` 的 `list` 渲染列表。解锁（调用 `unlock`）和开关切换（调用 `toggle`）均通过该云函数
+- **插件管理页**：`miniprogram/pages/plugin-manage/`
+  - 2 列网格布局（`grid-template-columns: 1fr 1fr`），每张卡片使用 `<flip-card>` 通用组件
+  - 调用 `plugin-manage` 的 `list` 渲染列表。解锁（调用 `unlock`）和开关切换（调用 `toggle`）均通过该云函数
+  - 未解锁卡片（背面，默认可见）：插件名称 → 环形进度指示器（`conic-gradient`，中心显示百分比）→ 说明文字 → 解锁按钮（进度未满时 `disabled`）
+  - 解锁后触发 3D 翻转动画（`rotateY(180deg)`），展示正面
+  - 已解锁卡片（正面）：插件名称 → 功能说明 → 启用/禁用开关（`<switch>`，左侧状态文案，右侧开关）
+  - 色值方案复用首页抽取卡片：背面 `linear-gradient(135deg, #c8815e, #d9a98c)`，正面 `var(--color-primary-light)` 底 + `var(--color-primary)` 边框
+- **`components/flip-card/`**：通用 3D 翻牌卡片组件。属性 `flipped`（控制翻转）、`redrawing`（快速过渡）、`width`/`height`（尺寸）。两个具名 slot：`back`（背面，渐变背景）和 `front`（正面，浅色背景）。动画参数：`perspective: 1200rpx`, `transition: transform 0.6s ease`, `backface-visibility: hidden`。首页抽取卡片和插件管理页共用此组件
+- `handleUnlock` 解锁达标时同时写入 `unlocked: true` + `enabled: true`，前端不再冗余判断解锁条件（按钮 `disabled` 已兜底）
 - 目标页面 WXML：硬编码插件组件标签，`wx:if` 绑定 `plugin-store` 的启用状态。无中心化 `<plugin-injector>` 组件
 - 插件专属页面：在 `app.json` 的 `pages` 数组中直接声明路径
+- 导航入口位于「我的」页面菜单列表（`mine/index.wxml` 中新增"插件管理"菜单项）
 
 ### 废弃插件处理
 
@@ -111,11 +120,9 @@ interface PluginAssessment {
 
 - 插件间的依赖关系（如 B 依赖 A 已解锁）
 - 插件的卸载或从包体中删除的条件
-- 解锁后的动画/动效反馈
 - 基于用户操作自动触发解锁（全部手动触发）
 - 插件条件的新维度（如积分、连续签到）——各插件可自行扩展 `assess` 查询，暂不定义
 - 插件的 A/B 测试或灰度发布
-- 插件管理页的具体 UI 布局（待 @designer）
 
 ## Further Notes
 
