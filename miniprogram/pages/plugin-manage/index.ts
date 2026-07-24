@@ -100,15 +100,6 @@ Page({
     const pluginId = (e.currentTarget.dataset as { id: string }).id;
     if (!pluginId) return;
 
-    const plugin = this.data.plugins.find((p) => p.id === pluginId);
-    if (!plugin) return;
-
-    // 进度未满 —— 按钮本应 disabled，兜底提示
-    if (plugin.current < plugin.target) {
-      wx.showToast({ title: "条件未满足", icon: "none" });
-      return;
-    }
-
     wx.showLoading({ title: "检查中…" });
 
     try {
