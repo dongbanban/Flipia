@@ -18,4 +18,4 @@
 
 ## Comments
 
-<!-- commit: TODO -->
+2dde898 — feat: 实现插件管理页 — 列表展示、解锁进度、启用/禁用切换
