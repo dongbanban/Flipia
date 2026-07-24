@@ -54,8 +54,8 @@
 }
 
 .plugin-card--unlocked {
-  border-color: #e8e8e8;
-  background-color: #fff;
+  border-color: #e8c8b0;
+  background-color: #f5e1d2;
 }
 
 /* ── 卡片头部 ────────────────────────────────────────────── */
@@ -169,7 +169,7 @@
   justify-content: space-between;
   margin-top: 24rpx;
   padding-top: 20rpx;
-  border-top: 1rpx solid #f5f0eb;
+  border-top: 1rpx solid #ecd9c8;
 }
 
 .toggle-label {
