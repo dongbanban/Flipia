@@ -1,16 +1,14 @@
 <view class="page">
   <!-- 加载中 -->
-  <view wx:if="{{loading}}" class="loading-state">
-    <text class="loading-hint">加载中…</text>
-  </view>
+  <loading-card loading="{{loading}}" />
 
   <!-- 加载出错 -->
-  <view wx:elif="{{error}}" class="error-state">
+  <view wx:if="{{!loading && error}}" class="error-state">
     <empty-state text="{{error}}" actionText="重试" bind:action="_fetchPlugins" />
   </view>
 
   <!-- 正常内容 -->
-  <view wx:else class="content">
+  <view wx:if="{{!loading && !error}}" class="content">
     <!-- 空列表 -->
     <empty-state wx:if="{{plugins.length === 0}}" text="暂无可用插件" />
 
@@ -34,19 +32,25 @@
           </view>
         </view>
 
-        <!-- 未解锁：进度提示 + 解锁按钮 -->
+        <!-- 未解锁：环形进度 + 解锁按钮 -->
         <view wx:if="{{!item.unlocked}}" class="plugin-locked">
-          <view class="progress-bar">
-            <view class="progress-fill" style="width: {{item.target > 0 ? item.current / item.target * 100 : 0}}%"></view>
-          </view>
-          <view class="locked-footer">
-            <text class="progress-hint">{{item.progressHint}}</text>
-            <text class="progress-num">{{item.current}}/{{item.target}}</text>
-            <button
-              class="unlock-btn"
-              data-id="{{item.id}}"
-              bind:tap="onUnlock"
-            >解锁</button>
+          <view class="locked-row">
+            <view
+              class="progress-ring"
+              style="--p: {{item.target > 0 ? item.current / item.target : 0}}"
+            >
+              <view class="progress-ring-inner">
+                <text class="progress-ring-text">{{item.current}}/{{item.target}}</text>
+              </view>
+            </view>
+            <view class="locked-info">
+              <text class="progress-hint">{{item.progressHint}}</text>
+              <button
+                class="unlock-btn"
+                data-id="{{item.id}}"
+                bind:tap="onUnlock"
+              >解锁</button>
+            </view>
           </view>
         </view>
 

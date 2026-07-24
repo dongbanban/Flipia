@@ -10,19 +10,6 @@
   overflow-y: auto;
 }
 
-/* ── 加载态 ──────────────────────────────────────────────── */
-
-.loading-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100%;
-}
-
-.loading-hint {
-  color: var(--color-text-secondary);
-  font-size: 28rpx;
-}
 
 /* ── 错误态 ──────────────────────────────────────────────── */
 
@@ -102,47 +89,65 @@
   font-weight: 500;
 }
 
-/* ── 未解锁：进度条 + 解锁按钮 ───────────────────────────── */
+/* ── 未解锁：环形进度 + 解锁按钮 ──────────────────────────── */
 
 .plugin-locked {
   margin-top: 24rpx;
 }
 
-.progress-bar {
-  height: 8rpx;
-  background-color: #fff;
-  border-radius: 4rpx;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background-color: var(--color-primary);
-  border-radius: 4rpx;
-  transition: width 0.3s ease;
-}
-
-.locked-footer {
+.locked-row {
   display: flex;
   align-items: center;
-  margin-top: 16rpx;
+  gap: 20rpx;
+}
+
+/* 环形进度指示器 */
+.progress-ring {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--color-primary) calc(var(--p) * 1turn),
+    #e8e8e8 calc(var(--p) * 1turn)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.progress-ring-inner {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring-text {
+  font-size: 20rpx;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* 右侧信息列 */
+.locked-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 12rpx;
 }
 
 .progress-hint {
   font-size: 24rpx;
   color: var(--color-text-secondary);
-  flex: 1;
-}
-
-.progress-num {
-  font-size: 24rpx;
-  color: var(--color-primary);
-  font-weight: 500;
+  line-height: 1.4;
 }
 
 .unlock-btn {
-  flex-shrink: 0;
+  align-self: flex-end;
   width: 120rpx;
   height: 56rpx;
   line-height: 56rpx;
