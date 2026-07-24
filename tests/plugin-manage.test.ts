@@ -372,7 +372,7 @@ describe("handleList", () => {
 // ═══════════════════════════════════════════════════════════════════
 
 describe("handleUnlock", () => {
-  it("条件达标时写入 unlocked: true", async () => {
+  it("条件达标时写入 unlocked: true, enabled: true", async () => {
     const db = createMockDb();
     seedUserWithAvatar(db);
 
@@ -388,8 +388,9 @@ describe("handleUnlock", () => {
     expect(result.unlocked).toBe(true);
 
     const docs = db.getAll("user_plugin");
-    const plugins = docs[0].plugins as Record<string, { unlocked: boolean }>;
+    const plugins = docs[0].plugins as Record<string, { unlocked: boolean; enabled: boolean }>;
     expect(plugins[PLUGIN_ID].unlocked).toBe(true);
+    expect(plugins[PLUGIN_ID].enabled).toBe(true);
   });
 
   it("条件不达标时返回进度不修改状态", async () => {

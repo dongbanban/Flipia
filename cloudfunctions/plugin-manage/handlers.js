@@ -165,6 +165,7 @@ async function handleUnlock(db, event, openid) {
   });
   updatedPlugins[pluginId] = Object.assign({}, updatedPlugins[pluginId], {
     unlocked: true,
+    enabled: true,
   });
 
   await db
