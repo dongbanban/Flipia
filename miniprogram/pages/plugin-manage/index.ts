@@ -73,10 +73,8 @@ Page({
       const plugins: PluginItem[] = result.plugins.map((p) => ({
         ...p,
         toggling: false,
-        flipped: p.unlocked,                    // 已解锁的直接展示正面
-        percent: p.target > 0
-          ? Math.round((p.current / p.target) * 100)
-          : 0,
+        flipped: p.unlocked, // 已解锁的直接展示正面
+        percent: p.target > 0 ? Math.round((p.current / p.target) * 100) : 0,
       }));
 
       this.setData({ plugins, loading: false });
@@ -100,7 +98,7 @@ Page({
     const pluginId = (e.currentTarget.dataset as { id: string }).id;
     if (!pluginId) return;
 
-    wx.showLoading({ title: "检查中…" });
+    wx.showLoading({ title: "解锁中…" });
 
     try {
       const res = await wx.cloud.callFunction({
