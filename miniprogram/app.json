@@ -9,7 +9,8 @@
     "pages/category-manage/index",
     "pages/draw-config-manage/index",
     "pages/group-create/index",
-    "pages/group-manage/index"
+    "pages/group-manage/index",
+    "pages/plugin-manage/index"
   ],
   "tabBar": {
     "color": "#888888",

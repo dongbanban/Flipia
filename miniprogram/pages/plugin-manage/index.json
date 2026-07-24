@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "modal": "/components/modal/index",
+    "app-icon": "/components/app-icon/index",
+    "empty-state": "/components/empty-state/index"
+  },
+  "navigationBarTitleText": "插件管理"
+}

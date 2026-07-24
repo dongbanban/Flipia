@@ -34,6 +34,10 @@
       <text class="menu-label">抽取方案</text>
       <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
     </view>
+    <view class="menu-item" bind:tap="onTapPluginManage">
+      <text class="menu-label">插件管理</text>
+      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
+    </view>
     <view class="menu-item" bind:tap="onTapGroupManage">
       <view class="menu-item-left">
         <text class="menu-label">厨房管理</text>

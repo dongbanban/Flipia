@@ -106,6 +106,10 @@ Page({
     }
   },
 
+  onTapPluginManage() {
+    wx.navigateTo({ url: "/pages/plugin-manage/index" });
+  },
+
   onTapGroupManage() {
     wx.navigateTo({ url: "/pages/group-manage/index" });
   },
