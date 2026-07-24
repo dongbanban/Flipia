@@ -35,6 +35,7 @@ Page({
   _activeEntries: [] as DrawConfigEntry[],
   _groups: [] as DrawConfigGroup[],
   _categories: [] as Category[],
+  _prefetched: false,
 
   onShow() {
     if (!this._groupId) return;
@@ -46,6 +47,13 @@ Page({
       activeGroupId: groupId,
       memberCount,
     });
+
+    // 数据已从 splash 预取恢复，跳过本次加载
+    if (this._prefetched) {
+      this._prefetched = false;
+      return;
+    }
+
     if (this._groupId !== groupId) {
       this._groupId = groupId;
       this._db = wx.cloud.database();
@@ -61,6 +69,13 @@ Page({
   },
 
   async onLoad() {
+    // 检查 splash 页面是否已完成数据预取
+    const prefetched = getApp<{ globalData: Record<string, unknown> }>().globalData._homePrefetch;
+    if (prefetched && (prefetched as Record<string, unknown>).groupId === groupStore.data.groupId) {
+      this._fromPrefetch(prefetched as Record<string, unknown>);
+      return;
+    }
+
     this._groupId = groupStore.data.groupId;
     this._db = wx.cloud.database();
     const groups = groupStore.data.groups;
@@ -72,6 +87,38 @@ Page({
     });
     this._loadConfigAndValidate();
     this._loadTodaySummary();
+  },
+
+  /**
+   * 从 splash 预取数据直接恢复页面状态，跳过加载态。
+   */
+  _fromPrefetch(p: Record<string, unknown>) {
+    this._groupId = p.groupId as string;
+    this._db = wx.cloud.database();
+    this._groups = p._groups as DrawConfigGroup[];
+    this._categories = p._categories as Category[];
+    this._activeEntries = p._activeEntries as DrawConfigEntry[];
+    this._dishPool = p._dishPool as Dish[];
+
+    const groups = groupStore.data.groups;
+    this.setData({
+      openid: getApp<{ globalData: { openid: string } }>().globalData.openid,
+      groups,
+      activeGroupId: groupStore.data.groupId,
+      memberCount: p.memberCount as number,
+      phase: p.phase as "" | "idle" | "drawing" | "allRevealed",
+      validationError: p.validationError as string,
+      totalCards: p.totalCards as number,
+      activeConfigName: p.activeConfigName as string,
+      configGroupNames: p.configGroupNames as Array<{ id: string; name: string }>,
+      todaySummary: p.todaySummary as string,
+      todayRecords: p.todayRecords as DrawHistoryRecord[],
+      loadingConfig: false,
+    });
+
+    // 清除预取缓存，标记已预取（防止 onShow 重复加载）
+    delete getApp<{ globalData: Record<string, unknown> }>().globalData._homePrefetch;
+    this._prefetched = true;
   },
 
   onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
