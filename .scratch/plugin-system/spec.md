@@ -82,7 +82,7 @@ interface PluginAssessment {
   - 解锁后触发 3D 翻转动画（`rotateY(180deg)`），展示正面
   - 已解锁卡片（正面）：插件名称 → 功能说明 → 启用/禁用开关（`<switch>`，左侧状态文案，右侧开关）
   - 色值方案复用首页抽取卡片：背面 `linear-gradient(135deg, #c8815e, #d9a98c)`，正面 `var(--color-primary-light)` 底 + `var(--color-primary)` 边框
-- **`components/flip-card/`**：通用 3D 翻牌卡片组件。属性 `flipped`（控制翻转）、`redrawing`（快速过渡）、`width`/`height`（尺寸）。两个具名 slot：`back`（背面，渐变背景）和 `front`（正面，浅色背景）。动画参数：`perspective: 1200rpx`, `transition: transform 0.6s ease`, `backface-visibility: hidden`。首页抽取卡片和插件管理页共用此组件
+- **`components/flip-card/`**：通用 3D 翻牌卡片组件。属性 `flipped`（控制翻转）、`redrawing`（快速过渡）、`width`/`height`（尺寸）。两个具名 slot：`back`（背面，渐变背景）和 `front`（正面，浅色背景）。动画参数：`perspective: 1200rpx`, `transition: transform 0.6s ease`, `backface-visibility: hidden`。首页抽取卡片（`pages/index/index`）和插件管理页共用此组件，首页已从内联实现迁移到该组件
 - `handleUnlock` 解锁达标时同时写入 `unlocked: true` + `enabled: true`，前端不再冗余判断解锁条件（按钮 `disabled` 已兜底）
 - 目标页面 WXML：硬编码插件组件标签，`wx:if` 绑定 `plugin-store` 的启用状态。无中心化 `<plugin-injector>` 组件
 - 插件专属页面：在 `app.json` 的 `pages` 数组中直接声明路径
