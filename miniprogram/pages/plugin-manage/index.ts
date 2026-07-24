@@ -38,7 +38,6 @@ Page({
 
   /** 从云函数获取插件列表及用户状态 */
   async _fetchPlugins() {
-    wx.showLoading({ title: "加载中…" });
     this.setData({ loading: true, error: "" });
 
     try {
@@ -80,8 +79,7 @@ Page({
         error: "加载失败，请下拉刷新重试",
       });
       wx.showToast({ title: "加载失败", icon: "none" });
-    } finally {
-      wx.hideLoading();
+      // inline loading state already dismissed above
     }
   },
 

@@ -1,5 +1,6 @@
 <wxs module="c" src="./category-filter.wxs" />
 <view class="page">
+  <loading-card loading="{{sourceLoading}}" text="" subtext="" />
   <view class="form">
     <view class="form-field">
       <text class="form-label">厨房名</text>
@@ -37,9 +38,6 @@
 
       <view wx:if="{{sourceGroupIdx >= 0}}" class="category-section">
         <text class="form-label">勾选要导入的分类</text>
-        <view wx:if="{{sourceLoading}}" class="loading-row">
-          <text class="loading-hint">加载中…</text>
-        </view>
         <empty-state wx:if="{{!sourceLoading && sourceCategories.length === 0}}" text="该厨房暂无分类" />
         <view wx:if="{{!sourceLoading && sourceCategories.length > 0}}" class="category-grid">
           <view

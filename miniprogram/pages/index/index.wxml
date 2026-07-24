@@ -7,10 +7,8 @@
 />
 <view class="page">
   <view wx:if="{{phase === 'idle' || phase === ''}}" class="idle-area">
-    <view wx:if="{{loadingConfig}}" class="loading-hint">
-      <text>加载中…</text>
-    </view>
-    <block wx:else>
+    <loading-card loading="{{loadingConfig}}" />
+    <block wx:if="{{!loadingConfig}}">
       <view wx:if="{{activeConfigName}}" class="config-switcher" bind:tap="onSwitchConfig">
         <text class="config-label">抽取方案:</text>
         <text class="config-name">{{activeConfigName}}</text>

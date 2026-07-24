@@ -1,9 +1,7 @@
 <view class="page">
-  <view wx:if="{{loading}}" class="loading-state">
-    <text class="loading-hint">加载中…</text>
-  </view>
+  <loading-card loading="{{loading}}" />
 
-  <view wx:else class="content">
+  <view wx:if="{{!loading}}" class="content">
     <view class="section-title">当前分类</view>
 
     <view class="tag-grid">

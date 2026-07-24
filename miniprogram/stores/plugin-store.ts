@@ -8,8 +8,6 @@
  * 不参与 westore 的 setData 更新周期。
  */
 
-import { CLOUD } from "@/config";
-
 /** 插件启用状态缓存：pluginId → enabled */
 const enabledMap = new Map<string, boolean>();
 

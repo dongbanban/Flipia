@@ -367,3 +367,48 @@ pnpm test
 - config.ts 中不包含需要运行时动态计算的值（如从云函数获取的 appid 等）
 - 所有函数签名遵循项目已有的 TypeScript 规范（`CODING_STANDARDS.md`）
 - 本次重构产生的所有改动应在一次代码审查中审视，分阶段实施但合并为一个功能分支
+
+---
+
+## Loading UX 重构（#11–#13）
+
+### Problem Statement
+
+当前所有页面使用内联 `<text>加载中…</text>` 作为加载态，视觉效果单调；splash 页面有卡片翻转动画但代码无法复用；plugin-manage 页面同时显示系统弹窗 `wx.showLoading` 和内联加载文字，冗余。
+
+### Solution
+
+1. 从 splash 页面提取卡片翻转动画为可复用组件 `<loading-card>`，支持可选文案（默认 splash 品牌文案）
+2. 全部 5 个页面替换内联加载文字为组件
+3. Splash 页面自身也改用组件，消除 ~98 行重复 CSS
+
+### 组件接口
+
+```
+<loading-card
+  loading="{{Boolean}}"   // 显隐控制
+  text="Flipia"           // 正面主文案，默认 "Flipia"
+  subtext="让做饭不再纠结～" // 正面副文案，默认 "让做饭不再纠结～"
+/>
+```
+
+### 实施
+
+| Ticket | 内容 | 依赖 |
+|--------|------|------|
+| #11 | 创建 `loading-card` 组件 | 无 |
+| #12 | 替换 5 个页面的内联加载态 + 移除 plugin-manage 冗余 toast | #11 |
+| #13 | Splash 页面改用组件 | #11 |
+
+### 涉及页面
+
+- `category-manage`、`draw-config-manage`、`history`、`plugin-manage`、`index` — 替换内联 `loading-state`/`loading-hint`
+- `splash` — 删除内联卡片动画，委托给组件
+- plugin-manage — 额外移除 `wx.showLoading("加载中…")` 系统弹窗
+
+### 验证
+
+- 所有页面加载时展示统一卡片翻转动画，无文字闪烁
+- Splash 启动视觉与改动前一致
+- 无 `wx:else`/`wx:elif` 孤儿条件链错误
+- 各页面 WXSS 中 `.loading-state`/`.loading-hint` 已清除

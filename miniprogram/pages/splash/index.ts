@@ -1,14 +1,7 @@
 import { userStore } from "@/stores/user-store";
 
 Page({
-  data: {
-    flipping: false,
-  },
-
-  onReady() {
-    // 立即开始翻牌动画
-    this.setData({ flipping: true });
-  },
+  data: {},
 
   async onShow() {
     await getApp<{ whenReady(): Promise<void> }>().whenReady();

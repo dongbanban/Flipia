@@ -6,15 +6,13 @@
   bind:create="onGroupCreate"
 />
 <view class="page">
-  <view wx:if="{{loading}}" class="loading-state">
-    <text class="loading-hint">加载中…</text>
-  </view>
+  <loading-card loading="{{loading}}" />
 
-  <empty-state wx:elif="{{empty}}" text="暂无记录">
+  <empty-state wx:if="{{!loading && empty}}" text="暂无记录">
     <text class="empty-sub">抽取确认后记录将出现在这里</text>
   </empty-state>
 
-  <view wx:else class="list">
+  <view wx:if="{{!loading && !empty}}" class="list">
     <view wx:for="{{dayGroups}}" wx:key="date" class="day-group">
       <view class="day-header">{{item.label}}</view>
 

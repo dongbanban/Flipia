@@ -1,0 +1,17 @@
+<view wx:if="{{loading}}" class="loading-overlay">
+  <view class="card-stage">
+    <view class="card">
+      <view class="card-face card-front">
+        <text wx:if="{{text}}" class="logo">{{text}}</text>
+        <text wx:if="{{subtext}}" class="tagline">{{subtext}}</text>
+      </view>
+      <view class="card-face card-back">
+        <view class="dot-pulse">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
