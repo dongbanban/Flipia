@@ -3,6 +3,7 @@ import { showConfirm } from "@/lib/confirm";
 import { CLOUD, STRINGS } from "@/config";
 import { userStore } from "@/stores/user-store";
 import { groupStore } from "@/stores/group-store";
+import { load as loadPluginStore } from "@/stores/plugin-store";
 import { ACTIVE_GROUP_KEY } from "@/constants/storage-keys";
 
 interface GroupInfo {
@@ -71,6 +72,9 @@ App({
     const loginRes = await wx.cloud.callFunction({ name: "login" });
     const openid = (loginRes.result as { openid: string }).openid;
     this.globalData.openid = openid;
+
+    // 启动时加载插件状态缓存（不阻塞主流程）
+    loadPluginStore();
 
     const db = wx.cloud.database();
 

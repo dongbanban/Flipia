@@ -88,7 +88,7 @@ Page({
         .doc(recordId)
         .update({ data: { images: merged } });
       this._updateRecordImages(recordId, merged);
-      wx.showToast({ title: "上传成功", icon: "success" });
+      wx.showToast({ title: "图传好啦", icon: "success" });
     } catch (err) {
       // uploadImages 已显示错误 toast；取消操作时 err 包含
       // "chooseImage:fail cancel" — 静默忽略
@@ -258,7 +258,7 @@ Page({
 
     const confirmed = await showConfirm({
       title: "确认删除",
-      content: "确认删除该条记录？删除后不可恢复",
+      content: "确定删掉？删了就找不回了",
     });
     if (!confirmed) return;
 
@@ -296,7 +296,7 @@ Page({
         empty: dayGroups.length === 0,
       });
 
-      wx.showToast({ title: "删除成功", icon: "success" });
+      wx.showToast({ title: "已删掉", icon: "success" });
     } catch (err) {
       console.error("[history] delete failed", err);
       this.setData({
@@ -304,7 +304,7 @@ Page({
         _swipeActiveId: "",
         translateXPx: 0,
       });
-      wx.showToast({ title: "删除失败，请重试", icon: "none" });
+      wx.showToast({ title: "没删成，再试一下？", icon: "none" });
     }
   },
 
@@ -323,7 +323,7 @@ Page({
       record?.results?.[0]?.dishes?.[0]?.imageUrl || "";
 
     return {
-      title: `【${STRINGS.BRAND_NAME}】今天吃了这些`,
+      title: `今天吃的 — ${STRINGS.BRAND_NAME}`,
       imageUrl,
       path: "/pages/index/index",
     };
@@ -361,7 +361,7 @@ Page({
     } catch (err) {
       console.error("[history] generate share image failed", err);
       wx.hideLoading();
-      wx.showToast({ title: "生成失败，请重试", icon: "none" });
+      wx.showToast({ title: "没生成，再试一下？", icon: "none" });
     }
   },
 
@@ -379,7 +379,7 @@ Page({
         const msg = (err as { errMsg?: string }).errMsg || "";
         if (!msg.includes("cancel")) {
           console.error("[history] show share image menu failed", err);
-          wx.showToast({ title: "分享失败", icon: "none" });
+          wx.showToast({ title: "分享没成", icon: "none" });
         }
       },
     });

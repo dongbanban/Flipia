@@ -68,7 +68,7 @@ export function validateDrawConfig(
     if (available < count) {
       return {
         valid: false,
-        reason: `${categoryName}可用菜品不足，需至少 ${count} 道`,
+        reason: `${categoryName}的菜不太够，至少 ${count} 道哦`,
       };
     }
   }

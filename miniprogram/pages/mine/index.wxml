@@ -21,22 +21,26 @@
       class="profile-nickname"
       value="{{nickName}}"
       bindblur="onNicknameBlur"
-      placeholder="请输入昵称"
+      placeholder="取个名字吧"
     />
   </view>
 
   <view class="menu-list">
     <view class="menu-item" bind:tap="onTapCategoryManage">
-      <text class="menu-label">分类配置</text>
+      <text class="menu-label">分类整理</text>
       <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
     </view>
     <view class="menu-item" bind:tap="onTapDrawConfig">
-      <text class="menu-label">抽取方案</text>
+      <text class="menu-label">抽签规则</text>
+      <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
+    </view>
+    <view class="menu-item" bind:tap="onTapPluginManage">
+      <text class="menu-label">更多功能</text>
       <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />
     </view>
     <view class="menu-item" bind:tap="onTapGroupManage">
       <view class="menu-item-left">
-        <text class="menu-label">厨房管理</text>
+        <text class="menu-label">我的厨房</text>
         <text class="menu-sub" wx:if="{{activeGroupName}}">{{activeGroupName}}</text>
       </view>
       <app-icon name="CHEVRON_RIGHT" size="{{36}}" color="$text-light" />

@@ -8,6 +8,7 @@ import { getMemberCount } from "@/lib/group-utils";
 import { archiveOldRecords, buildDrawCards, cardsToResults, loadEnabledDishes, loadTodayRecords, type DrawCard } from "@/pages/index/lib/helpers";
 import { userStore } from "@/stores/user-store";
 import { groupStore } from "@/stores/group-store";
+import { HOME_PREFETCH_KEY } from "@/constants/storage-keys";
 
 Page({
   data: {
@@ -35,6 +36,7 @@ Page({
   _activeEntries: [] as DrawConfigEntry[],
   _groups: [] as DrawConfigGroup[],
   _categories: [] as Category[],
+  _prefetched: false,
 
   onShow() {
     if (!this._groupId) return;
@@ -46,6 +48,13 @@ Page({
       activeGroupId: groupId,
       memberCount,
     });
+
+    // 数据已从 splash 预取恢复，跳过本次加载
+    if (this._prefetched) {
+      this._prefetched = false;
+      return;
+    }
+
     if (this._groupId !== groupId) {
       this._groupId = groupId;
       this._db = wx.cloud.database();
@@ -61,6 +70,13 @@ Page({
   },
 
   async onLoad() {
+    // 检查 splash 页面是否已完成数据预取
+    const prefetched = wx.getStorageSync(HOME_PREFETCH_KEY) as Record<string, unknown> | undefined;
+    if (prefetched && prefetched.groupId === groupStore.data.groupId) {
+      this._fromPrefetch(prefetched);
+      return;
+    }
+
     this._groupId = groupStore.data.groupId;
     this._db = wx.cloud.database();
     const groups = groupStore.data.groups;
@@ -72,6 +88,38 @@ Page({
     });
     this._loadConfigAndValidate();
     this._loadTodaySummary();
+  },
+
+  /**
+   * 从 splash 预取数据直接恢复页面状态，跳过加载态。
+   */
+  _fromPrefetch(p: Record<string, unknown>) {
+    this._groupId = p.groupId as string;
+    this._db = wx.cloud.database();
+    this._groups = p._groups as DrawConfigGroup[];
+    this._categories = p._categories as Category[];
+    this._activeEntries = p._activeEntries as DrawConfigEntry[];
+    this._dishPool = p._dishPool as Dish[];
+
+    const groups = groupStore.data.groups;
+    this.setData({
+      openid: getApp<{ globalData: { openid: string } }>().globalData.openid,
+      groups,
+      activeGroupId: groupStore.data.groupId,
+      memberCount: p.memberCount as number,
+      phase: p.phase as "" | "idle" | "drawing" | "allRevealed",
+      validationError: p.validationError as string,
+      totalCards: p.totalCards as number,
+      activeConfigName: p.activeConfigName as string,
+      configGroupNames: p.configGroupNames as Array<{ id: string; name: string }>,
+      todaySummary: p.todaySummary as string,
+      todayRecords: p.todayRecords as DrawHistoryRecord[],
+      loadingConfig: false,
+    });
+
+    // 清除预取缓存，标记已预取（防止 onShow 重复加载）
+    wx.removeStorageSync(HOME_PREFETCH_KEY);
+    this._prefetched = true;
   },
 
   onGroupChange(e: WechatMiniprogram.CustomEvent<{ groupId: string }>) {
@@ -115,7 +163,7 @@ Page({
         .get();
 
       if (configRes.data.length === 0) {
-        this.setData({ loadingConfig: false, phase: "idle", validationError: "配置加载失败" });
+        this.setData({ loadingConfig: false, phase: "idle", validationError: "出了点问题" });
         return;
       }
 
@@ -138,13 +186,13 @@ Page({
       }
 
       if (!effectiveId) {
-        this.setData({ loadingConfig: false, phase: "idle", validationError: "暂无抽取方案" });
+        this.setData({ loadingConfig: false, phase: "idle", validationError: "还没设抽签规则" });
         return;
       }
 
       const activeGroup = config.drawConfigGroups.find((g) => g.id === effectiveId);
       if (!activeGroup || activeGroup.entries.length === 0) {
-        this.setData({ loadingConfig: false, phase: "idle", validationError: "当前方案无抽取项" });
+        this.setData({ loadingConfig: false, phase: "idle", validationError: "规则里还没加分类" });
         return;
       }
 
@@ -175,7 +223,7 @@ Page({
         this.setData({
           loadingConfig: false,
           phase: "idle",
-          validationError: validation.reason ?? "菜品不足",
+          validationError: validation.reason ?? "菜品不太够",
           totalCards: 0,
           activeConfigName: activeGroup.name,
           configGroupNames,
@@ -183,14 +231,14 @@ Page({
       }
     } catch (err) {
       console.error("[index] load config failed", err);
-      this.setData({ loadingConfig: false, phase: "idle", validationError: "加载失败，请重试" });
+      this.setData({ loadingConfig: false, phase: "idle", validationError: "出了点问题，再试一下？" });
     }
   },
 
   async onBackToIdle() {
     const confirmed = await showConfirm({
-      title: "返回首页",
-      content: "返回后当前抽取结果将不会保留",
+      title: "不抽了",
+      content: "结果还没保存呢，确定走吗？",
     });
     if (confirmed) {
       this.setData({ phase: "idle", drawCards: [], flippedCount: 0, autoFlipping: false });
@@ -234,13 +282,13 @@ Page({
     );
 
     if (!effectiveId) {
-      this.setData({ phase: "idle", validationError: "暂无抽取方案" });
+      this.setData({ phase: "idle", validationError: "还没设抽签规则" });
       return;
     }
 
     const activeGroup = this._groups.find((g) => g.id === effectiveId);
     if (!activeGroup || activeGroup.entries.length === 0) {
-      this.setData({ phase: "idle", validationError: "当前方案无抽取项" });
+      this.setData({ phase: "idle", validationError: "规则里还没加分类" });
       return;
     }
 
@@ -261,7 +309,7 @@ Page({
     } else {
       this.setData({
         phase: "idle",
-        validationError: validation.reason ?? "菜品不足",
+        validationError: validation.reason ?? "菜品不太够",
         totalCards: 0,
         activeConfigName: activeGroup.name,
       });
@@ -360,7 +408,7 @@ Page({
     );
 
     if (available.length === 0) {
-      wx.showToast({ title: `${card.categoryName}中无其他可用菜品`, icon: "none" });
+      wx.showToast({ title: `${card.categoryName}里没有别的菜了`, icon: "none" });
       return;
     }
 
@@ -394,7 +442,7 @@ Page({
   },
 
   async _saveDrawHistory(cards: DrawCard[]) {
-    wx.showLoading({ title: "记录中…" });
+    wx.showLoading({ title: "记下来…" });
     try {
       const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
 
@@ -417,7 +465,7 @@ Page({
       await this._archiveOldRecords();
 
       wx.hideLoading();
-      wx.showToast({ title: "记录成功", icon: "success" });
+      wx.showToast({ title: "记好啦", icon: "success" });
 
       this.setData({
         phase: "idle",
@@ -429,7 +477,7 @@ Page({
     } catch (err) {
       console.error("[index] save draw history failed", err);
       wx.hideLoading();
-      wx.showToast({ title: "记录失败，请重试", icon: "none" });
+      wx.showToast({ title: "没记上，再试一下？", icon: "none" });
     }
   },
 

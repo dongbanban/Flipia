@@ -1,0 +1,48 @@
+/* ── 3D Flip Card ──────────────────────────────────────────── */
+
+.card-container {
+  perspective: 1200rpx;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.card-inner--redrawing {
+  transition: transform 0.3s ease;
+}
+
+.card-inner--flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+/* 背面：默认可见，渐变背景 */
+.card-back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #c8815e 0%, #d9a98c 100%);
+  gap: 16rpx;
+}
+
+/* 正面：预旋转 180°，翻牌后可见 */
+.card-front {
+  transform: rotateY(180deg);
+  background-color: var(--color-primary-light);
+  border: 2rpx solid var(--color-primary);
+  display: flex;
+  flex-direction: column;
+}

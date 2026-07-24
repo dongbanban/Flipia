@@ -1,7 +1,7 @@
 <view class="page">
   <view class="content">
     <!-- 引导文案 -->
-    <text class="intro">创建你的账号，快点加入 Flipia 吧！</text>
+    <text class="intro">先认识一下你吧～</text>
 
     <!-- 头像展示区（点击使用相机/相册自定义上传） -->
     <view class="avatar-display" bindtap="onTapAvatarDisplay">
@@ -21,7 +21,7 @@
         class="nickname-input"
         type="nickname"
         value="{{nickName}}"
-        placeholder="请输入昵称"
+        placeholder="怎么称呼你"
         placeholder-class="nickname-placeholder"
         maxlength="20"
         focus="{{nicknameFocus}}"
@@ -36,8 +36,8 @@
         class="btn btn--wechat"
         open-type="chooseAvatar"
         bindchooseavatar="onChooseAvatar"
-      >使用微信信息</button>
-      <button class="btn btn--confirm" bindtap="onConfirm" disabled="{{!canConfirm}}">创建</button>
+      >用微信信息就行</button>
+      <button class="btn btn--confirm" bindtap="onConfirm" disabled="{{!canConfirm}}">就这样</button>
     </view>
   </view>
 </view>

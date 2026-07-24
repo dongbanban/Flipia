@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "flip-card": "/components/flip-card/index",
+    "app-icon": "/components/app-icon/index",
+    "empty-state": "/components/empty-state/index",
+    "loading-card": "/components/loading/index"
+  },
+  "navigationBarTitleText": "更多功能"
+}

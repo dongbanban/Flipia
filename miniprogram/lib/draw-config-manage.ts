@@ -55,10 +55,10 @@ export function validateGroupName(
   excludeName?: string,
 ): { value: string; error: string | null } {
   const trimmed = raw.trim();
-  if (!trimmed) return { value: "", error: "方案名不能为空" };
+  if (!trimmed) return { value: "", error: "得有个名字" };
   const value = trimmed.slice(0, LIMITS.DRAW_CONFIG_NAME_MAX);
   if (existingNames.some((n) => n !== excludeName && n === value)) {
-    return { value, error: "方案名已存在" };
+    return { value, error: "这个名字用过了" };
   }
   return { value, error: null };
 }

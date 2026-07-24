@@ -9,15 +9,16 @@
     "pages/category-manage/index",
     "pages/draw-config-manage/index",
     "pages/group-create/index",
-    "pages/group-manage/index"
+    "pages/group-manage/index",
+    "pages/plugin-manage/index"
   ],
   "tabBar": {
     "color": "#888888",
     "selectedColor": "#c8815e",
     "list": [
-      { "pagePath": "pages/index/index", "text": "首页" },
-      { "pagePath": "pages/dish-pool/index", "text": "菜品" },
-      { "pagePath": "pages/history/index", "text": "历史" },
+      { "pagePath": "pages/index/index", "text": "Flipia" },
+      { "pagePath": "pages/dish-pool/index", "text": "菜篮" },
+      { "pagePath": "pages/history/index", "text": "时刻" },
       { "pagePath": "pages/mine/index", "text": "我的" }
     ]
   },

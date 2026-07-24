@@ -94,15 +94,6 @@
   margin-bottom: 32rpx;
 }
 
-.loading-row {
-  padding: 16rpx 0;
-}
-
-.loading-hint {
-  font-size: 26rpx;
-  color: var(--color-text-secondary);
-}
-
 .category-grid {
   display: flex;
   flex-wrap: wrap;

@@ -1,17 +1,3 @@
 <view class="splash">
-  <view class="card-stage">
-    <view class="card {{flipping ? 'flip' : ''}}">
-      <view class="card-face card-front">
-        <text class="logo">Flipia</text>
-        <text class="tagline">让做饭不再纠结～</text>
-      </view>
-      <view class="card-face card-back">
-        <view class="dot-pulse">
-          <view class="dot"></view>
-          <view class="dot"></view>
-          <view class="dot"></view>
-        </view>
-      </view>
-    </view>
-  </view>
+  <loading-card loading="{{true}}" />
 </view>

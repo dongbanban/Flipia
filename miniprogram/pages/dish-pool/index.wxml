@@ -6,7 +6,7 @@
       <input
         class="search-bar__input"
         type="text"
-        placeholder="搜索菜品…"
+        placeholder="搜一下…"
         value="{{searchKeyword}}"
         bind:input="onSearchInput"
       />
@@ -61,7 +61,7 @@
           <text
             wx:if="{{memberCount > 1 && item.creatorName}}"
             class="dish-creator"
-          >大厨：{{item.creatorName}}</text>
+          >出品人：{{item.creatorName}}</text>
         </view>
         <view class="dish-card-actions">
           <view
@@ -69,18 +69,18 @@
             data-dish="{{item}}"
             data-idx="{{index}}"
             catchtap="onToggleEnabled"
-          >{{item.enabled ? '今日供应' : '今日停供'}}</view>
+          >{{item.enabled ? '今天备着' : '今天不备'}}</view>
           <view
             class="dish-delete-btn"
             data-dish="{{item}}"
             catchtap="onCardDeleteDish"
-          >下架</view>
+          >去掉</view>
         </view>
       </view>
     </scroll-view>
 
     <!-- 搜索模式：空状态 -->
-    <empty-state wx:elif="{{searchKeyword && !loading && searchResults.length === 0}}" text="没有找到相关菜品" />
+    <empty-state wx:elif="{{searchKeyword && !loading && searchResults.length === 0}}" text="没找到呢" />
 
     <!-- 普通模式：加载骨架屏 -->
     <view wx:elif="{{loading}}" class="skeleton-list">
@@ -109,7 +109,7 @@
           <text
             wx:if="{{memberCount > 1 && item.creatorName}}"
             class="dish-creator"
-          >大厨：{{item.creatorName}}</text>
+          >出品人：{{item.creatorName}}</text>
         </view>
         <view class="dish-card-actions">
           <view
@@ -117,12 +117,12 @@
             data-dish="{{item}}"
             data-idx="{{index}}"
             catchtap="onToggleEnabled"
-          >{{item.enabled ? '今日供应' : '今日停供'}}</view>
+          >{{item.enabled ? '今天备着' : '今天不备'}}</view>
           <view
             class="dish-delete-btn"
             data-dish="{{item}}"
             catchtap="onCardDeleteDish"
-          >下架</view>
+          >去掉</view>
         </view>
       </view>
     </scroll-view>
@@ -130,13 +130,13 @@
     <!-- 普通模式：空状态（有分类） -->
     <empty-state
       wx:elif="{{categories.length > 0}}"
-      text="还没有菜品，快去添加吧~"
-      actionText="添加菜品"
+      text="还没加菜呢，来添几道吧～"
+      actionText="来添一道"
       bind:action="onOpenAdd"
     />
 
     <!-- 普通模式：空状态（无分类） -->
-    <empty-state wx:else text="暂无分类" />
+    <empty-state wx:else text="还没有分类" />
   </view>
 
   <!-- 浮动添加按钮 — 搜索时隐藏 -->
@@ -145,7 +145,7 @@
   <!-- 添加/编辑表单弹层 -->
   <modal
     show="{{formVisible}}"
-    title="{{formMode === 'add' ? '添加菜品' : '编辑菜品'}}"
+    title="{{formMode === 'add' ? '添一道菜' : '改一下'}}"
     bind:close="onCloseForm"
   >
     <view class="form-content">
@@ -155,12 +155,12 @@
           class="form-tab {{formTab === 'manual' ? 'form-tab--active' : ''}}"
           data-tab="manual"
           bind:tap="onFormTabChange"
-        >手动添加</view>
+        >自己添加</view>
         <view
           class="form-tab {{formTab === 'batch' ? 'form-tab--active' : ''}}"
           data-tab="batch"
           bind:tap="onFormTabChange"
-        >批量导入</view>
+        >从别的厨房搬来</view>
       </view>
 
       <!-- 手动添加标签页 / 编辑模式 -->
@@ -171,11 +171,11 @@
             <!-- 菜品名 + 分类 -->
             <view class="form-field form-field--row">
               <view class="form-field-col form-field-col--name">
-                <text class="form-label">菜品名</text>
+                <text class="form-label">叫什么</text>
                 <input
                   class="form-input {{formNameError ? 'form-input--error' : ''}}"
                   value="{{formData.name}}"
-                  placeholder="最多 20 字"
+                  placeholder="20 字以内"
                   maxlength="20"
                   bind:input="onFormNameInput"
                 />
@@ -220,11 +220,11 @@
 
             <!-- 烹饪描述 -->
             <view class="form-field">
-              <text class="form-label">烹饪描述</text>
+              <text class="form-label">做法 & 备注</text>
               <textarea
                 class="form-textarea"
                 value="{{formData.cookingDescription}}"
-                placeholder="烹饪要点、备注…"
+                placeholder="加点备注什么的…"
                 maxlength="200"
                 bind:input="onCookingDescriptionInput"
               />
@@ -237,8 +237,8 @@
               <view
                 class="form-toggle-btn {{formData.enabled ? 'form-toggle-btn--on' : 'form-toggle-btn--off'}}"
                 bind:tap="onFormToggleEnabled"
-              ><view class="form-toggle-icon"><app-icon wx:if="{{formData.enabled}}" name="TOGGLE_ON" size="{{28}}" color="$green" /><app-icon wx:else name="TOGGLE_OFF" size="{{28}}" color="$text-secondary" /></view><view class="form-toggle-label">{{formData.enabled ? '今日供应' : '今日停供'}}</view></view>
-              <view class="form-delete-btn" bind:tap="onFormDeleteDish">下架菜品</view>
+              ><view class="form-toggle-icon"><app-icon wx:if="{{formData.enabled}}" name="TOGGLE_ON" size="{{28}}" color="$green" /><app-icon wx:else name="TOGGLE_OFF" size="{{28}}" color="$text-secondary" /></view><view class="form-toggle-label">{{formData.enabled ? '今天备着' : '今天不备'}}</view></view>
+              <view class="form-delete-btn" bind:tap="onFormDeleteDish">删掉这道菜</view>
             </view>
           </view>
         </view>
@@ -248,11 +248,11 @@
           <!-- 菜品名 + 分类 -->
           <view class="form-field form-field--row">
             <view class="form-field-col form-field-col--name">
-              <text class="form-label">菜品名</text>
+              <text class="form-label">叫什么</text>
               <input
                 class="form-input {{formNameError ? 'form-input--error' : ''}}"
                 value="{{formData.name}}"
-                placeholder="最多 20 字"
+                placeholder="20 字以内"
                 maxlength="20"
                 bind:input="onFormNameInput"
               />
@@ -363,7 +363,7 @@
           <view class="import-actions">
             <view class="import-prev-btn" bind:tap="onImportPrevStep">返回选择</view>
             <view class="import-confirm-btn {{importing ? 'import-confirm-btn--loading' : ''}}" bind:tap="onConfirmImport">
-              <text wx:if="{{importing}}">导入中…</text>
+              <text wx:if="{{importing}}">搬菜中…</text>
               <text wx:else>确认导入</text>
             </view>
           </view>

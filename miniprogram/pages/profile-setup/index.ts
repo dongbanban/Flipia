@@ -61,11 +61,11 @@ Page({
 
     // 校验：昵称必填，头像可选
     if (!trimmedNick) {
-      wx.showToast({ title: "请输入昵称", icon: "none" });
+      wx.showToast({ title: "怎么称呼你", icon: "none" });
       return;
     }
 
-    wx.showLoading({ title: "创建中…" });
+    wx.showLoading({ title: "准备中…" });
 
     try {
       let finalAvatarUrl = "";
@@ -77,7 +77,7 @@ Page({
         if (!checkResult.pass) {
           wx.hideLoading();
           wx.showToast({
-            title: checkResult.reason || "图片未通过安全检测",
+            title: checkResult.reason || "这张图用不了，换一张？",
             icon: "none",
           });
           return;
@@ -130,14 +130,14 @@ Page({
       }
 
       wx.hideLoading();
-      wx.showToast({ title: "创建成功", icon: "success" });
+      wx.showToast({ title: "好啦，开始吧", icon: "success" });
       setTimeout(() => {
         wx.switchTab({ url: "/pages/index/index" });
       }, 800);
     } catch (err) {
       wx.hideLoading();
       console.error("[profile-setup] save failed", err);
-      wx.showToast({ title: "创建失败，请重试", icon: "none" });
+      wx.showToast({ title: "没成，再试一下？", icon: "none" });
     }
   },
 

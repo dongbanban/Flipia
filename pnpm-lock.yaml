@@ -52,6 +52,12 @@ importers:
         specifier: ^26.1.1
         version: 26.1.1
 
+  cloudfunctions/plugin-manage:
+    dependencies:
+      wx-server-sdk:
+        specifier: ~2.6.3
+        version: 2.6.3(typescript@6.0.3)
+
   miniprogram:
     dependencies:
       '@mp-svg-icons/wechat':

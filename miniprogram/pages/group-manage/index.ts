@@ -63,9 +63,9 @@ Page({
         if (res.data.length === 0) {
           this.setData({
             showJoinPrompt: true,
-            joinPromptGroupName: "未知厨房",
-            joinBtnText: "邀请码无效",
-            joinError: "邀请码无效或已过期",
+            joinPromptGroupName: "找不到这个厨房",
+            joinBtnText: "邀请码不对",
+            joinError: "邀请码不对或过期了",
             joining: false,
           });
           return;
@@ -79,7 +79,7 @@ Page({
         );
         if (alreadyInGroup) {
           groupStore.switchGroup(group._id);
-          wx.showToast({ title: "你已在该厨房中", icon: "none" });
+          wx.showToast({ title: "你已经在里面了", icon: "none" });
           setTimeout(() => wx.navigateBack(), 1200);
           return;
         }
@@ -93,8 +93,8 @@ Page({
         console.error("[group-manage] load join group failed", err);
         this.setData({
           showJoinPrompt: true,
-          joinPromptGroupName: "加载失败",
-          joinError: "网络异常，请重试",
+          joinPromptGroupName: "出了点问题",
+          joinError: "网络不太好，再试一下",
           joining: false,
         });
       }
@@ -105,7 +105,7 @@ Page({
     const groups = groupStore.data.groups as GroupInfo[];
     const group = groups.find((g) => g._id === groupId);
     if (!group) {
-      wx.showToast({ title: "厨房不存在", icon: "none" });
+      wx.showToast({ title: "厨房找不到了", icon: "none" });
       setTimeout(() => wx.navigateBack(), 1200);
       return;
     }
@@ -228,7 +228,7 @@ Page({
       };
 
       if (!result.ok) {
-        this.setData({ joinError: result.error || "加入失败", joining: false });
+        this.setData({ joinError: result.error || "没加成，再试一下？", joining: false });
         return;
       }
 
@@ -242,14 +242,14 @@ Page({
       groupStore.setGroups([...groupStore.data.groups as GroupInfo[], newGroup]);
       groupStore.switchGroup(result.groupId!);
 
-      wx.showToast({ title: "加入成功", icon: "success" });
+      wx.showToast({ title: "加入啦", icon: "success" });
       setTimeout(() => {
         wx.switchTab({ url: "/pages/index/index" });
       }, 800);
     } catch (err) {
       console.error("[group-manage] join failed", err);
       this.setData({
-        joinError: "网络异常，请重试",
+        joinError: "网络不太好，再试一下",
         joining: false,
       });
     }
@@ -274,8 +274,8 @@ Page({
     }
 
     const confirmed = await showConfirm({
-      title: "修改厨房名",
-      content: `确定将厨房名改为「${name}」？`,
+      title: "改个名",
+      content: `确定改成「${name}」？`,
     });
     if (!confirmed) {
       // 保持编辑状态打开，以便用户修改
@@ -302,7 +302,7 @@ Page({
         name?: string;
       };
       if (!result.ok) {
-        wx.showToast({ title: result.error || "保存失败", icon: "none" });
+        wx.showToast({ title: result.error || "没存上，再试一下？", icon: "none" });
         return;
       }
 
@@ -315,7 +315,7 @@ Page({
       wx.showToast({ title: "已保存", icon: "success" });
     } catch (err) {
       console.error("[group-manage] rename failed", err);
-      wx.showToast({ title: "保存失败", icon: "none" });
+      wx.showToast({ title: "没存上，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -330,12 +330,12 @@ Page({
     const name = (e.currentTarget.dataset as { name: string }).name;
 
     const confirmed = await showConfirm({
-      title: "踢出成员",
-      content: `确认将「${name}」移出厨房？`,
+      title: "请出厨房",
+      content: `确定请「${name}」出去？`,
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "移除中…" });
+    wx.showLoading({ title: "请出中…" });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
@@ -348,7 +348,7 @@ Page({
 
       const result = res.result as { ok: boolean; error?: string };
       if (!result.ok) {
-        wx.showToast({ title: result.error || "移除失败", icon: "none" });
+        wx.showToast({ title: result.error || "没请成，再试一下？", icon: "none" });
         return;
       }
 
@@ -362,10 +362,10 @@ Page({
       ) as GroupInfo[];
       groupStore.setGroups(groups);
 
-      wx.showToast({ title: "已移除", icon: "success" });
+      wx.showToast({ title: "已请出", icon: "success" });
     } catch (err) {
       console.error("[group-manage] kick failed", err);
-      wx.showToast({ title: "操作失败", icon: "none" });
+      wx.showToast({ title: "没成，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -376,7 +376,7 @@ Page({
       await this._ensureJoinCode();
     }
     return {
-      title: `邀请你加入「${this.data.groupName}」`,
+      title: `来「${this.data.groupName}」一起做饭吧`,
       path: `/pages/group-manage/index?joinCode=${this.data.joinCode || ""}`,
       imageUrl: "",
     };
@@ -384,12 +384,12 @@ Page({
 
   async onLeave() {
     const confirmed = await showConfirm({
-      title: "退出厨房",
-      content: "退出后将从你的厨房列表中移除该厨房，厨房数据不受影响。",
+      title: "离开厨房",
+      content: "离开了这个厨房，你的菜还在哦。",
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "退出中…" });
+    wx.showLoading({ title: "离开中…" });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
@@ -403,19 +403,19 @@ Page({
       };
 
       if (!result.ok) {
-        wx.showToast({ title: result.error || "操作失败", icon: "none" });
+        wx.showToast({ title: result.error || "没成，再试一下？", icon: "none" });
         return;
       }
 
       this._removeFromLocal();
-      wx.showToast({ title: "已退出厨房", icon: "success" });
+      wx.showToast({ title: "已离开", icon: "success" });
 
       setTimeout(() => {
         wx.switchTab({ url: "/pages/index/index" });
       }, 800);
     } catch (err) {
       console.error("[group-manage] leave failed", err);
-      wx.showToast({ title: "操作失败", icon: "none" });
+      wx.showToast({ title: "没成，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -427,12 +427,12 @@ Page({
 
   async _doDissolve() {
     const confirmed = await showConfirm({
-      title: "解散厨房",
-      content: "解散后厨房及所有数据将被永久删除，不可恢复。",
+      title: "关掉厨房",
+      content: "关掉后所有菜和记录都会消失，找不回的。",
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "解散中…" });
+    wx.showLoading({ title: "关掉中…" });
     try {
       const res = await wx.cloud.callFunction({
         name: "group-manage",
@@ -441,19 +441,19 @@ Page({
 
       const result = res.result as { ok: boolean; error?: string };
       if (!result.ok) {
-        wx.showToast({ title: result.error || "操作失败", icon: "none" });
+        wx.showToast({ title: result.error || "没成，再试一下？", icon: "none" });
         return;
       }
 
       this._removeFromLocal();
-      wx.showToast({ title: "厨房已解散", icon: "success" });
+      wx.showToast({ title: "厨房已关掉", icon: "success" });
 
       setTimeout(() => {
         wx.switchTab({ url: "/pages/index/index" });
       }, 800);
     } catch (err) {
       console.error("[group-manage] dissolve failed", err);
-      wx.showToast({ title: "操作失败", icon: "none" });
+      wx.showToast({ title: "没成，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }

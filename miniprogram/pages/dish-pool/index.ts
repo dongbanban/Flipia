@@ -133,7 +133,7 @@ Page({
     } catch (err) {
       console.error("[dish-pool] init failed", err);
       this.setData({ loading: false });
-      wx.showToast({ title: "加载失败，请重试", icon: "none" });
+      wx.showToast({ title: "出了点问题，再试一下？", icon: "none" });
     }
   },
 
@@ -287,7 +287,7 @@ Page({
     this._uploadedFileIDs = [];
     const pickerCats: Array<{ id: string; name: string }> = [
       ...categories,
-      { id: "__new__", name: "+ 新建分类" },
+      { id: "__new__", name: "+ 新分类" },
     ];
     this.setData({
       formVisible: true,
@@ -437,7 +437,7 @@ Page({
 
       const pickerCats: Array<{ id: string; name: string }> = [
         ...newCategories,
-        { id: "__new__", name: "+ 新建分类" },
+        { id: "__new__", name: "+ 新分类" },
       ];
 
       this.setData({
@@ -450,10 +450,10 @@ Page({
         newCategoryError: "",
         formDirty: true,
       });
-      wx.showToast({ title: "分类已添加", icon: "success" });
+      wx.showToast({ title: "分类加好啦", icon: "success" });
     } catch (err) {
       console.error("[dish-pool] create category failed", err);
-      wx.showToast({ title: "创建失败，请重试", icon: "none" });
+      wx.showToast({ title: "没建成，再试一下？", icon: "none" });
     } finally {
       this.setData({ creatingCategory: false });
     }
@@ -512,7 +512,7 @@ Page({
   async onSaveDish() {
     if (!this.data.formDirty) return;
     if (this.data.formUploading) {
-      wx.showToast({ title: "图片上传中，请稍候", icon: "none" });
+      wx.showToast({ title: "传图中…", icon: "none" });
       return;
     }
     const form = this.data.formData as FormData;
@@ -598,7 +598,7 @@ Page({
       this.setData({ formVisible: false });
     } catch (err) {
       console.error("[dish-pool] save failed", err);
-      wx.showToast({ title: "保存失败，请重试", icon: "none" });
+      wx.showToast({ title: "没存上，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -632,12 +632,12 @@ Page({
 
   async _confirmDelete(dish: DishRecord) {
     const confirmed = await showConfirm({
-      title: "下架菜品",
-      content: `确认下架「${dish.name}」？`,
+      title: "删掉这道菜",
+      content: `确定去掉「${dish.name}」？`,
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "下架中…" });
+    wx.showLoading({ title: "去掉中…" });
     try {
       if (dish.images && dish.images.length > 0) {
         await wx.cloud.deleteFile({ fileList: dish.images });
@@ -649,7 +649,7 @@ Page({
       this.setData({ dishes });
     } catch (err) {
       console.error("[dish-pool] delete failed", err);
-      wx.showToast({ title: "删除失败，请重试", icon: "none" });
+      wx.showToast({ title: "没删掉，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -660,7 +660,7 @@ Page({
   _initImportForm() {
     const sources = getImportSources(groupStore.data.groups, this._groupId);
     if (sources.length === 0) {
-      wx.showToast({ title: "没有可导入的厨房", icon: "none" });
+      wx.showToast({ title: "还没有别的厨房呢", icon: "none" });
       this.setData({ formTab: "manual" });
       return;
     }
@@ -688,7 +688,7 @@ Page({
     try {
       const cats = await loadSourceCategories({ db: this._db!, groupId: this._groupId }, sourceGroupId);
       if (cats.length === 0) {
-        wx.showToast({ title: "源厨房无数据", icon: "none" });
+        wx.showToast({ title: "那个厨房还没加菜", icon: "none" });
         this.setData({ importLoadingCategories: false });
         return;
       }
@@ -696,7 +696,7 @@ Page({
     } catch (err) {
       console.error("[dish-pool] load source categories failed", err);
       this.setData({ importLoadingCategories: false });
-      wx.showToast({ title: "加载失败，请重试", icon: "none" });
+      wx.showToast({ title: "出了点问题，再试一下？", icon: "none" });
     }
   },
 
@@ -720,14 +720,14 @@ Page({
     const cats = this.data.importSourceCategories as ImportSourceCategory[];
     const checked = cats.filter((c) => c.checked);
     if (checked.length === 0) {
-      wx.showToast({ title: "请至少勾选一个分类", icon: "none" });
+      wx.showToast({ title: "至少选一个分类吧", icon: "none" });
       return;
     }
 
     const totalDishes = checked.reduce((sum, c) => sum + c.dishCount, 0);
     const confirmed = await showConfirm({
       title: "确认导入",
-      content: `将从源厨房导入 ${checked.length} 个分类共 ${totalDishes} 道菜品`,
+      content: `搬来 ${checked.length} 个分类，一共 ${totalDishes} 道菜`,
     });
     if (!confirmed) return;
 
@@ -762,7 +762,7 @@ Page({
       }
 
       this.setData({ formVisible: false, importing: false });
-      wx.showToast({ title: "导入完成", icon: "success" });
+      wx.showToast({ title: "搬好啦", icon: "success" });
 
       if (this.data.categories.length > 0) {
         const activeCat = (this.data.categories as Category[])[this.data.activeTab] as Category;
@@ -771,7 +771,7 @@ Page({
     } catch (err) {
       console.error("[dish-pool] import failed", err);
       this.setData({ importing: false });
-      wx.showToast({ title: "导入失败，请重试", icon: "none" });
+      wx.showToast({ title: "没搬成，再试一下？", icon: "none" });
     }
   },
 
@@ -795,7 +795,7 @@ Page({
     } catch (err) {
       this.setData({ [`dishes[${idx}].enabled`]: dish.enabled });
       console.error("[dish-pool] toggle failed", err);
-      wx.showToast({ title: "操作失败，请重试", icon: "none" });
+      wx.showToast({ title: "没成，再试一下？", icon: "none" });
     }
   },
 });

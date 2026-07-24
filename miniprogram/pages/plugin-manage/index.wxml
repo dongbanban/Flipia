@@ -1,0 +1,70 @@
+<view class="page">
+  <!-- 加载中 -->
+  <loading-card loading="{{loading}}" />
+
+  <!-- 加载出错 -->
+  <view wx:if="{{!loading && error}}" class="error-state">
+    <empty-state text="{{error}}" actionText="再试一下" bind:action="_fetchPlugins" />
+  </view>
+
+  <!-- 正常内容 -->
+  <view wx:if="{{!loading && !error}}" class="content">
+    <!-- 空列表 -->
+    <empty-state wx:if="{{plugins.length === 0}}" text="还没有功能" />
+
+    <!-- 2 列网格 -->
+    <view wx:else class="plugin-grid">
+      <view
+        wx:for="{{plugins}}"
+        wx:key="id"
+        class="plugin-grid-item"
+      >
+        <flip-card
+          flipped="{{item.flipped}}"
+          width="100%"
+          height="380rpx"
+        >
+          <!-- ── 背面：锁定状态 ── -->
+          <view slot="back" class="back-content">
+            <text class="back-name">{{item.name}}</text>
+
+            <view
+              class="back-ring"
+              style="--p: {{item.target > 0 ? item.current / item.target : 0}}"
+            >
+              <view class="back-ring-inner">
+                <text class="back-ring-pct">{{item.percent}}%</text>
+              </view>
+            </view>
+
+            <text class="back-desc">{{item.progressHint}}</text>
+
+            <button
+              class="unlock-btn {{item.current >= item.target ? '' : 'unlock-btn--disabled'}}"
+              disabled="{{item.current < item.target}}"
+              data-id="{{item.id}}"
+              bind:tap="onUnlock"
+            >解锁</button>
+          </view>
+
+          <!-- ── 正面：已解锁状态 ── -->
+          <view slot="front" class="front-content">
+            <text class="front-name">{{item.name}}</text>
+            <text class="front-desc">{{item.description}}</text>
+
+            <view class="front-toggle">
+              <text class="front-toggle-label">{{item.enabled ? '已开启' : '已关闭'}}</text>
+              <switch
+                checked="{{item.enabled}}"
+                disabled="{{item.toggling}}"
+                color="#c8815e"
+                data-id="{{item.id}}"
+                bindchange="onToggle"
+              />
+            </view>
+          </view>
+        </flip-card>
+      </view>
+    </view>
+  </view>
+</view>

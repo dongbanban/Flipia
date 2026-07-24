@@ -45,7 +45,7 @@ Page({
         .get();
 
       if (res.data.length === 0) {
-        wx.showToast({ title: "加载失败", icon: "none" });
+        wx.showToast({ title: "出了点问题", icon: "none" });
         return;
       }
 
@@ -65,7 +65,7 @@ Page({
       });
     } catch (err) {
       console.error("[category-manage] load failed", err);
-      wx.showToast({ title: "加载失败", icon: "none" });
+      wx.showToast({ title: "出了点问题", icon: "none" });
     } finally {
       this.setData({ loading: false });
     }
@@ -123,7 +123,7 @@ Page({
       this.setData({ adding: false, addValue: "", addError: "" });
     } catch (err) {
       console.error("[category-manage] add failed", err);
-      wx.showToast({ title: "保存失败", icon: "none" });
+      wx.showToast({ title: "没存上，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -191,7 +191,7 @@ Page({
       this.setData({ editingId: "", editValue: "", editError: "" });
     } catch (err) {
       console.error("[category-manage] rename failed", err);
-      wx.showToast({ title: "保存失败", icon: "none" });
+      wx.showToast({ title: "没存上，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -203,12 +203,12 @@ Page({
     if (!cat) return;
 
     const confirmed = await showConfirm({
-      title: "删除分类",
-      content: `确认删除「${cat.name}」？该分类下的所有菜品也将被一并删除，且抽取配置中的对应条目将被移除。`,
+      title: "删掉分类",
+      content: `确定删掉「${cat.name}」？底下的菜也一起没了。`,
     });
     if (!confirmed) return;
 
-    wx.showLoading({ title: "删除中…" });
+    wx.showLoading({ title: "删掉中…" });
     try {
       const result = deleteCategory(
         this.data.categories as Category[],
@@ -240,7 +240,7 @@ Page({
       }
     } catch (err) {
       console.error("[category-manage] delete failed", err);
-      wx.showToast({ title: "删除失败", icon: "none" });
+      wx.showToast({ title: "没删成，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }

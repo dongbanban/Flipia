@@ -1,7 +1,8 @@
 {
   "usingComponents": {
     "modal": "/components/modal/index",
-    "app-icon": "/components/app-icon/index"
+    "app-icon": "/components/app-icon/index",
+    "loading-card": "/components/loading/index"
   },
-  "navigationBarTitleText": "方案配置"
+  "navigationBarTitleText": "抽签规则"
 }

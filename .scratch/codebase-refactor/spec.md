@@ -367,3 +367,76 @@ pnpm test
 - config.ts 中不包含需要运行时动态计算的值（如从云函数获取的 appid 等）
 - 所有函数签名遵循项目已有的 TypeScript 规范（`CODING_STANDARDS.md`）
 - 本次重构产生的所有改动应在一次代码审查中审视，分阶段实施但合并为一个功能分支
+
+---
+
+## Loading UX 重构（#11–#13）
+
+### Problem Statement
+
+当前所有页面使用内联 `<text>加载中…</text>` 作为加载态，视觉效果单调；splash 页面有卡片翻转动画但代码无法复用；plugin-manage 页面同时显示系统弹窗 `wx.showLoading` 和内联加载文字，冗余。
+
+### Solution
+
+1. 从 splash 页面提取卡片翻转动画为可复用组件 `<loading-card>`，支持可选文案（默认 splash 品牌文案）
+2. 全部 5 个页面替换内联加载文字为组件
+3. Splash 页面自身也改用组件，消除 ~98 行重复 CSS
+
+### 组件接口
+
+```
+<loading-card
+  loading="{{Boolean}}"   // 显隐控制
+  text="Flipia"           // 正面主文案，默认 "Flipia"
+  subtext="让做饭不再纠结～" // 正面副文案，默认 "让做饭不再纠结～"
+/>
+```
+
+### 实施
+
+| Ticket | 内容 | 依赖 |
+|--------|------|------|
+| #11 | 创建 `loading-card` 组件 | 无 |
+| #12 | 替换 5 个页面的内联加载态 + 移除 plugin-manage 冗余 toast | #11 |
+| #13 | Splash 页面改用组件 | #11 |
+| #14 | Splash 预取首页数据，消除过渡空白 | #13 |
+
+### 涉及页面
+
+- `category-manage`、`draw-config-manage`、`history`、`plugin-manage`、`index` — 替换内联 `loading-state`/`loading-hint`
+- `splash` — 删除内联卡片动画，委托给组件
+- plugin-manage — 额外移除 `wx.showLoading("加载中…")` 系统弹窗
+
+### 验证
+
+- 所有页面加载时展示统一卡片翻转动画，无文字闪烁
+- Splash 启动视觉与改动前一致
+- 无 `wx:else`/`wx:elif` 孤儿条件链错误
+- 各页面 WXSS 中 `.loading-state`/`.loading-hint` 已清除
+
+## Splash 预取首页数据（#14）
+
+### Problem Statement
+
+Splash → 首页的过渡链路存在四段视觉跳跃：splash loading → 首页空白 → 首页 loading-card → 首页内容。空白段来自 `switchTab` 后首页 `onLoad`/`onShow` 执行期间 `<loading-card>` 组件尚未完成首次渲染，短暂露出纯底页面。
+
+### Solution
+
+在 splash 的 1s 品牌延迟期间，并行预取首页所需的云端数据（`user_config` + `dishes` + `draw_history`），预取结果通过 `wx.setStorageSync(HOME_PREFETCH_KEY)` 传递给首页。首页 `onLoad` 检测到预取数据后直接恢复完整页面状态（`loadingConfig: false`），跳过加载态。
+
+预取失败时静默降级：首页走原有自加载流程。
+
+### 改动
+
+| 文件 | 改动 |
+|------|------|
+| `constants/storage-keys.ts` | 新增 `HOME_PREFETCH_KEY` 键名 |
+| `pages/splash/index.ts` | `onShow` 中并发预取首页数据，与 1s 延迟并行；预取结果 `setStorageSync` |
+| `pages/index/index.ts` | `onLoad` 检查 storage 预取数据，命中则直接恢复状态；`onShow` 通过 `_prefetched` 标志跳过重复加载 |
+
+### 验证
+
+- Splash 期间静默预取，跳转到首页后直接展示内容
+- 预取失败时首页自行加载
+- 直接进入首页（非 splash 路由）不受影响
+- 不污染 `globalData`，使用 `wx.*StorageSync` 传递

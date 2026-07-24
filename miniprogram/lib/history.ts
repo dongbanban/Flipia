@@ -105,7 +105,7 @@ export function getTodaySummary(
   if (count === 0) return "";
 
   if (memberCount <= 1) {
-    return `今天抽了 ${count} 次`;
+    return `今天抽了 ${count} 次啦～`;
   }
 
   const seen = new Set<string>();
@@ -113,7 +113,7 @@ export function getTodaySummary(
     .map((r) => r.drawerName ?? "")
     .filter((n) => n && !seen.has(n) && seen.add(n));
 
-  if (ordered.length === 0) return `今天抽了 ${count} 次`;
+  if (ordered.length === 0) return `今天抽了 ${count} 次啦～`;
 
   const names = ordered;
   const drawerStr =
@@ -122,5 +122,5 @@ export function getTodaySummary(
       : names.slice(0, 3).join("、") +
         (names.length > 3 ? "等人" : "");
 
-  return `${drawerStr} 今天抽了 ${count} 次`;
+  return `${drawerStr} 今天抽了 ${count} 次啦～`;
 }

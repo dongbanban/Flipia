@@ -5,7 +5,7 @@ import { groupStore } from "@/stores/group-store";
 Page({
   data: {
     openid: "",
-    nickName: "微信用户",
+    nickName: "Flipia 居民",
     avatarUrl: "",
     activeGroupName: "",
   },
@@ -18,7 +18,7 @@ Page({
     const activeGroup = groups.find((g: { _id: string; name: string }) => g._id === activeGroupId);
     this.setData({
       openid,
-      nickName: nickName || "微信用户",
+      nickName: nickName || "Flipia 居民",
       avatarUrl: avatarUrl || "",
       activeGroupName: activeGroup ? activeGroup.name : "",
     });
@@ -31,11 +31,11 @@ Page({
     const checkResult = await checkImage(avatarUrl);
     if (!checkResult.pass) {
       wx.hideLoading();
-      wx.showToast({ title: checkResult.reason || "图片未通过安全检测", icon: "none" });
+      wx.showToast({ title: checkResult.reason || "这张图用不了，换一张？", icon: "none" });
       return;
     }
 
-    wx.showLoading({ title: "正在保存…" });
+    wx.showLoading({ title: "更新中…" });
 
     try {
       const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
@@ -69,11 +69,11 @@ Page({
 
       this.setData({ avatarUrl: fileID });
       wx.hideLoading();
-      wx.showToast({ title: "头像已更新", icon: "success" });
+      wx.showToast({ title: "换好啦", icon: "success" });
     } catch (err) {
       wx.hideLoading();
       console.error("[mine] avatar update failed", err);
-      wx.showToast({ title: "更新失败", icon: "none" });
+      wx.showToast({ title: "没换成，再试一下？", icon: "none" });
     }
   },
 
@@ -104,6 +104,10 @@ Page({
     } catch (err) {
       console.error("[mine] nickname update failed", err);
     }
+  },
+
+  onTapPluginManage() {
+    wx.navigateTo({ url: "/pages/plugin-manage/index" });
   },
 
   onTapGroupManage() {
