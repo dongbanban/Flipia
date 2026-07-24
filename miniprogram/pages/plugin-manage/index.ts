@@ -82,9 +82,9 @@ Page({
       console.error("[plugin-manage] 加载插件列表失败", err);
       this.setData({
         loading: false,
-        error: "加载失败，请下拉刷新重试",
+        error: "出了点问题，下拉刷新一下？",
       });
-      wx.showToast({ title: "加载失败", icon: "none" });
+      wx.showToast({ title: "出了点问题", icon: "none" });
     }
   },
 
@@ -114,18 +114,18 @@ Page({
       };
 
       if (!result.ok) {
-        throw new Error(result.error || "解锁检查失败");
+        throw new Error(result.error || "还没达到条件");
       }
 
       // 已解锁（本次达标 或 历史已解锁）→ 翻转卡片
       if (result.unlocked || result.alreadyUnlocked) {
         this._updatePluginUnlock(pluginId);
-        wx.showToast({ title: "已解锁", icon: "success" });
+        wx.showToast({ title: "解锁啦", icon: "success" });
         return;
       }
     } catch (err) {
       console.error("[plugin-manage] 解锁失败", err);
-      wx.showToast({ title: "操作失败，请重试", icon: "none" });
+      wx.showToast({ title: "没成，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -162,7 +162,7 @@ Page({
       };
 
       if (!result.ok) {
-        throw new Error(result.error || "切换失败");
+        throw new Error(result.error || "没切过来，再试一下？");
       }
 
       // 成功后更新卡片状态
@@ -175,7 +175,7 @@ Page({
 
       // 回滚 switch 视觉状态
       this._updatePluginEnabled(pluginId, !enabled);
-      wx.showToast({ title: "操作失败，请重试", icon: "none" });
+      wx.showToast({ title: "没成，再试一下？", icon: "none" });
     } finally {
       this._setPluginToggling(pluginId, false);
     }

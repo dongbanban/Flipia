@@ -93,7 +93,7 @@ Page({
       });
     } catch (err) {
       console.error("[group-create] load source categories failed", err);
-      wx.showToast({ title: "加载分类失败", icon: "none" });
+      wx.showToast({ title: "出了点问题", icon: "none" });
       this.setData({ sourceLoading: false });
     }
   },
@@ -131,7 +131,7 @@ Page({
       (g) => g.name === name,
     );
     if (duplicate) {
-      this.setData({ nameError: "已有同名厨房" });
+      this.setData({ nameError: "这个名字用过了" });
       return;
     }
 
@@ -143,17 +143,17 @@ Page({
     if (!valid) return;
 
     if (this.data.importEnabled && this.data.sourceGroupIdx < 0) {
-      wx.showToast({ title: "请选择源厨房", icon: "none" });
+      wx.showToast({ title: "选一个厨房吧", icon: "none" });
       return;
     }
 
     if (this.data.importEnabled && this.data.selectedCategoryIds.length === 0) {
-      wx.showToast({ title: "请至少选择一项分类", icon: "none" });
+      wx.showToast({ title: "至少选一个分类吧", icon: "none" });
       return;
     }
 
     this.setData({ submitting: true });
-    wx.showLoading({ title: "创建中…" });
+    wx.showLoading({ title: "准备中…" });
 
     try {
       const db = this._db!;
@@ -181,13 +181,13 @@ Page({
       ]);
       groupStore.switchGroup(newGroupId);
 
-      wx.showToast({ title: "创建成功", icon: "success" });
+      wx.showToast({ title: "建好啦", icon: "success" });
       setTimeout(() => {
         wx.switchTab({ url: "/pages/index/index" });
       }, 600);
     } catch (err) {
       console.error("[group-create] create failed", err);
-      wx.showToast({ title: "创建失败，请重试", icon: "none" });
+      wx.showToast({ title: "没建成，再试一下？", icon: "none" });
     } finally {
       this.setData({ submitting: false });
       wx.hideLoading();

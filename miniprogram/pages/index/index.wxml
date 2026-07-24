@@ -10,15 +10,15 @@
     <loading-card loading="{{loadingConfig}}" />
     <block wx:if="{{!loadingConfig}}">
       <view wx:if="{{activeConfigName}}" class="config-switcher" bind:tap="onSwitchConfig">
-        <text class="config-label">抽取方案:</text>
-        <text class="config-name">{{activeConfigName}}</text>
+        <text class="config-label">今天用「</text>
+        <text class="config-name">{{activeConfigName}}」</text>
         <app-icon wx:if="{{configGroupNames.length > 1}}" name="CHEVRON_RIGHT" size="{{26}}" color="$primary" />
       </view>
       <button
         class="draw-btn {{validationError ? 'draw-btn--disabled' : ''}}"
         disabled="{{!!validationError}}"
         bind:tap="onStartDraw"
-      >开始抽取</button>
+      >今天吃什么？</button>
       <text wx:if="{{validationError}}" class="validation-error">{{validationError}}</text>
     </block>
   </view>
@@ -29,7 +29,7 @@
         class="auto-flip-btn {{(autoFlipping || flippedCount === drawCards.length) ? 'auto-flip-btn--disabled' : ''}}"
         disabled="{{autoFlipping || flippedCount === drawCards.length}}"
         bind:tap="onAutoFlip"
-      >一键翻牌</button>
+      >翻开看看</button>
     </view>
     <view class="cards-grid">
       <view
@@ -65,7 +65,7 @@
               data-idx="{{index}}"
               catch:tap="onRedrawCard"
             >
-              <text class="redraw-text">换一道</text>
+              <text class="redraw-text">换一个</text>
             </view>
           </view>
         </flip-card>
@@ -73,14 +73,14 @@
     </view>
 
     <view class="drawing-actions">
-      <text class="back-btn" bind:tap="onBackToIdle">返回</text>
+      <text class="back-btn" bind:tap="onBackToIdle">不抽了</text>
       <view class="drawing-actions-right">
-        <button class="redraw-all-btn {{flippedCount > 0 ? '' : 'redraw-all-btn--disabled'}}" disabled="{{flippedCount === 0}}" bind:tap="onStartDraw">重抽</button>
+        <button class="redraw-all-btn {{flippedCount > 0 ? '' : 'redraw-all-btn--disabled'}}" disabled="{{flippedCount === 0}}" bind:tap="onStartDraw">再来一次</button>
         <button
           class="confirm-btn {{flippedCount === drawCards.length ? '' : 'confirm-btn--disabled'}}"
           disabled="{{flippedCount < drawCards.length}}"
           bind:tap="onConfirmDraw"
-        >就吃这个</button>
+        >就它了</button>
       </view>
     </view>
   </view>

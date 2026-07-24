@@ -5,5 +5,5 @@
     "app-icon": "/components/app-icon/index",
     "loading-card": "/components/loading/index"
   },
-  "navigationBarTitleText": "分类配置"
+  "navigationBarTitleText": "分类整理"
 }

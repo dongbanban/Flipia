@@ -163,7 +163,7 @@ Page({
         .get();
 
       if (configRes.data.length === 0) {
-        this.setData({ loadingConfig: false, phase: "idle", validationError: "配置加载失败" });
+        this.setData({ loadingConfig: false, phase: "idle", validationError: "出了点问题" });
         return;
       }
 
@@ -186,13 +186,13 @@ Page({
       }
 
       if (!effectiveId) {
-        this.setData({ loadingConfig: false, phase: "idle", validationError: "暂无抽取方案" });
+        this.setData({ loadingConfig: false, phase: "idle", validationError: "还没设抽签规则" });
         return;
       }
 
       const activeGroup = config.drawConfigGroups.find((g) => g.id === effectiveId);
       if (!activeGroup || activeGroup.entries.length === 0) {
-        this.setData({ loadingConfig: false, phase: "idle", validationError: "当前方案无抽取项" });
+        this.setData({ loadingConfig: false, phase: "idle", validationError: "规则里还没加分类" });
         return;
       }
 
@@ -223,7 +223,7 @@ Page({
         this.setData({
           loadingConfig: false,
           phase: "idle",
-          validationError: validation.reason ?? "菜品不足",
+          validationError: validation.reason ?? "菜品不太够",
           totalCards: 0,
           activeConfigName: activeGroup.name,
           configGroupNames,
@@ -231,14 +231,14 @@ Page({
       }
     } catch (err) {
       console.error("[index] load config failed", err);
-      this.setData({ loadingConfig: false, phase: "idle", validationError: "加载失败，请重试" });
+      this.setData({ loadingConfig: false, phase: "idle", validationError: "出了点问题，再试一下？" });
     }
   },
 
   async onBackToIdle() {
     const confirmed = await showConfirm({
-      title: "返回首页",
-      content: "返回后当前抽取结果将不会保留",
+      title: "不抽了",
+      content: "结果还没保存呢，确定走吗？",
     });
     if (confirmed) {
       this.setData({ phase: "idle", drawCards: [], flippedCount: 0, autoFlipping: false });
@@ -282,13 +282,13 @@ Page({
     );
 
     if (!effectiveId) {
-      this.setData({ phase: "idle", validationError: "暂无抽取方案" });
+      this.setData({ phase: "idle", validationError: "还没设抽签规则" });
       return;
     }
 
     const activeGroup = this._groups.find((g) => g.id === effectiveId);
     if (!activeGroup || activeGroup.entries.length === 0) {
-      this.setData({ phase: "idle", validationError: "当前方案无抽取项" });
+      this.setData({ phase: "idle", validationError: "规则里还没加分类" });
       return;
     }
 
@@ -309,7 +309,7 @@ Page({
     } else {
       this.setData({
         phase: "idle",
-        validationError: validation.reason ?? "菜品不足",
+        validationError: validation.reason ?? "菜品不太够",
         totalCards: 0,
         activeConfigName: activeGroup.name,
       });
@@ -408,7 +408,7 @@ Page({
     );
 
     if (available.length === 0) {
-      wx.showToast({ title: `${card.categoryName}中无其他可用菜品`, icon: "none" });
+      wx.showToast({ title: `${card.categoryName}里没有别的菜了`, icon: "none" });
       return;
     }
 
@@ -442,7 +442,7 @@ Page({
   },
 
   async _saveDrawHistory(cards: DrawCard[]) {
-    wx.showLoading({ title: "记录中…" });
+    wx.showLoading({ title: "记下来…" });
     try {
       const openid = getApp<{ globalData: { openid: string } }>().globalData.openid;
 
@@ -465,7 +465,7 @@ Page({
       await this._archiveOldRecords();
 
       wx.hideLoading();
-      wx.showToast({ title: "记录成功", icon: "success" });
+      wx.showToast({ title: "记好啦", icon: "success" });
 
       this.setData({
         phase: "idle",
@@ -477,7 +477,7 @@ Page({
     } catch (err) {
       console.error("[index] save draw history failed", err);
       wx.hideLoading();
-      wx.showToast({ title: "记录失败，请重试", icon: "none" });
+      wx.showToast({ title: "没记上，再试一下？", icon: "none" });
     }
   },
 

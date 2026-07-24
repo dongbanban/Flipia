@@ -5,5 +5,5 @@
     "empty-state": "/components/empty-state/index",
     "loading-card": "/components/loading/index"
   },
-  "navigationBarTitleText": "插件管理"
+  "navigationBarTitleText": "更多功能"
 }

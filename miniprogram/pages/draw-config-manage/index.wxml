@@ -2,7 +2,7 @@
   <loading-card loading="{{loading}}" />
 
   <view wx:if="{{!loading}}" class="content">
-    <view class="section-title">抽取方案（{{drawConfigGroups.length}}/10）</view>
+    <view class="section-title">抽签规则（{{drawConfigGroups.length}}/10）</view>
 
     <view class="group-grid">
       <block wx:for="{{drawConfigGroups}}" wx:key="id">
@@ -14,19 +14,19 @@
           </view>
 
           <view wx:if="{{item.id === activeDrawConfigGroupId}}" class="card-active-row">
-            <text class="group-active-badge">生效中</text>
+            <text class="group-active-badge">使用中</text>
             <text
               class="card-cancel-btn"
               data-id="{{item.id}}"
               catch:tap="onUnsetActive"
-            >取消</text>
+            >不用了</text>
           </view>
           <text
             wx:else
             class="card-set-btn"
             data-id="{{item.id}}"
             catch:tap="onSetActive"
-          >设为当前</text>
+          >用这个</text>
 
           <view
             wx:if="{{drawConfigGroups.length > 1}}"
@@ -41,7 +41,7 @@
     <!-- 添加 -->
     <view wx:if="{{drawConfigGroups.length < 10}}" class="add-row" bind:tap="onStartAdd">
       <app-icon name="ADD" size="{{48}}" color="$primary" />
-      <text class="add-label">新建方案</text>
+      <text class="add-label">新建规则</text>
     </view>
 
     <modal
@@ -52,7 +52,7 @@
       bind:close="onCloseModal"
     >
       <view class="modal-field">
-        <text class="modal-label">方案名称</text>
+        <text class="modal-label">规则名</text>
         <input
           class="modal-input {{modalNameError ? 'modal-input--error' : ''}}"
           value="{{modalName}}"
@@ -65,7 +65,7 @@
       <view class="modal-divider"></view>
 
       <view class="modal-field">
-        <text class="modal-label">分类数量配置</text>
+        <text class="modal-label">每类抽几道</text>
       </view>
 
       <view wx:if="{{modalEntries.length > 0}}" class="modal-entries">
@@ -95,15 +95,15 @@
 
       <view wx:if="{{modalAvailable.length > 0}}" class="modal-add-entry" bind:tap="onModalAdd">
         <app-icon name="ADD" size="{{48}}" color="$primary" />
-        <text class="modal-add-text">添加分类</text>
+        <text class="modal-add-text">+ 加一类</text>
       </view>
 
       <view class="modal-footer">
         <view wx:if="{{!modalIsActive}}" class="modal-btn modal-btn--primary" bind:tap="onModalSetActive">
-          设为当前
+          用这个
         </view>
         <view wx:else class="modal-btn modal-btn--muted" bind:tap="onModalUnsetActive">
-          取消生效
+          不用这个了
         </view>
       </view>
     </modal>

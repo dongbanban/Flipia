@@ -5,7 +5,7 @@
 
   <block wx:elif="{{showJoinPrompt}}">
     <view class="join-card">
-      <text class="join-card__title">你被邀请加入</text>
+      <text class="join-card__title">有人邀请你来</text>
       <text class="join-card__name">{{joinPromptGroupName}}</text>
       <text class="join-card__desc">邀请码：{{joinCode}}</text>
       <view class="btn btn--primary" bind:tap="onConfirmJoin">
@@ -49,7 +49,7 @@
 
     <view class="section">
       <view class="section-title">
-        <text>成员 · {{members.length}}/5</text>
+        <text>成员（{{members.length}}/5）</text>
       </view>
       <view wx:for="{{members}}" wx:key="openid" class="member-row">
         <view class="member-avatar">
@@ -71,16 +71,16 @@
 
     <view class="section">
       <button class="action-btn action-btn--invite" open-type="share">
-        邀请成员
+        拉人进来
       </button>
     </view>
 
     <view class="section section--danger">
       <view wx:if="{{!isOwner}}" class="action-btn action-btn--leave" bind:tap="onLeave">
-        <text>退出厨房</text>
+        <text>离开厨房</text>
       </view>
       <view wx:if="{{isOwner}}" class="action-btn action-btn--dissolve" bind:tap="onDissolve">
-        <text>解散厨房</text>
+        <text>关掉厨房</text>
       </view>
     </view>
   </block>

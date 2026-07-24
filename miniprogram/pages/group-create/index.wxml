@@ -18,12 +18,12 @@
       <view class="toggle-box {{importEnabled ? 'toggle-box--checked' : ''}}">
         <app-icon wx:if="{{importEnabled}}" name="TOGGLE_ON" size="{{24}}" color="$white" />
       </view>
-      <text class="toggle-label">从已有厨房导入</text>
+      <text class="toggle-label">从别的厨房搬菜</text>
     </view>
 
     <block wx:if="{{importEnabled}}">
       <view class="form-field">
-        <text class="form-label">选择源厨房</text>
+        <text class="form-label">从哪个厨房搬</text>
         <picker
           mode="selector"
           range="{{sourceGroups}}"
@@ -31,14 +31,14 @@
           bind:change="onSelectSourceGroup"
         >
           <view class="form-picker {{sourceGroupIdx >= 0 ? '' : 'form-picker--placeholder'}}">
-            {{sourceGroupIdx >= 0 ? sourceGroupName : '请选择厨房'}}
+            {{sourceGroupIdx >= 0 ? sourceGroupName : '选一个厨房'}}
           </view>
         </picker>
       </view>
 
       <view wx:if="{{sourceGroupIdx >= 0}}" class="category-section">
-        <text class="form-label">勾选要导入的分类</text>
-        <empty-state wx:if="{{!sourceLoading && sourceCategories.length === 0}}" text="该厨房暂无分类" />
+        <text class="form-label">选要搬的分类</text>
+        <empty-state wx:if="{{!sourceLoading && sourceCategories.length === 0}}" text="那个厨房还没有分类" />
         <view wx:if="{{!sourceLoading && sourceCategories.length > 0}}" class="category-grid">
           <view
             wx:for="{{sourceCategories}}"
@@ -59,6 +59,6 @@
     <view
       class="submit-btn {{submitting ? 'submit-btn--disabled' : ''}}"
       bind:tap="onSubmit"
-    >{{submitting ? '创建中…' : '创建厨房'}}</view>
+    >{{submitting ? '创建中…' : '建一个'}}</view>
   </view>
 </view>

@@ -27,14 +27,14 @@ export async function sanitizeInput(options: SanitizeOptions): Promise<SanitizeR
 
   if (!trimmed) {
     if (showToast) {
-      wx.showToast({ title: `请输入${fieldName}`, icon: "none" });
+      wx.showToast({ title: `给${fieldName}起个名字`, icon: "none" });
     }
     return { valid: false, value: trimmed };
   }
 
   if (trimmed.length > maxLength) {
     if (showToast) {
-      wx.showToast({ title: `${fieldName}最多${maxLength}字`, icon: "none" });
+      wx.showToast({ title: `${fieldName}不超过${maxLength}字`, icon: "none" });
     }
     return { valid: false, value: trimmed };
   }

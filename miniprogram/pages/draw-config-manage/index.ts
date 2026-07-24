@@ -66,7 +66,7 @@ Page({
         .get();
 
       if (res.data.length === 0) {
-        wx.showToast({ title: "加载失败", icon: "none" });
+        wx.showToast({ title: "出了点问题", icon: "none" });
         return;
       }
 
@@ -90,7 +90,7 @@ Page({
       });
     } catch (err) {
       console.error("[draw-config-manage] load failed", err);
-      wx.showToast({ title: "加载失败", icon: "none" });
+      wx.showToast({ title: "出了点问题", icon: "none" });
     } finally {
       this.setData({ loading: false });
     }
@@ -106,7 +106,7 @@ Page({
       this.setData({ drawConfigGroups: groups });
     } catch (err) {
       console.error("[draw-config-manage] save groups failed", err);
-      wx.showToast({ title: "保存失败，请重试", icon: "none" });
+      wx.showToast({ title: "没存上，再试一下？", icon: "none" });
     } finally {
       this._saving = false;
     }
@@ -124,7 +124,7 @@ Page({
 
     this.setData({
       modalVisible: true,
-      modalTitle: "编辑方案",
+      modalTitle: "编辑规则",
       modalGroupId: id,
       modalName: synced.name,
       modalNameError: "",
@@ -196,7 +196,7 @@ Page({
       });
     } catch (err) {
       console.error("[draw-config-manage] save failed", err);
-      wx.showToast({ title: "保存失败", icon: "none" });
+      wx.showToast({ title: "没存上，再试一下？", icon: "none" });
     } finally {
       wx.hideLoading();
     }
@@ -242,7 +242,7 @@ Page({
   onModalAdd() {
     const available = this.data.modalAvailable as Category[];
     if (available.length === 0) {
-      wx.showToast({ title: "所有分类已添加", icon: "none" });
+      wx.showToast({ title: "分类都加完了", icon: "none" });
       return;
     }
     wx.showActionSheet({
@@ -300,7 +300,7 @@ Page({
 
     this.setData({
       modalVisible: true,
-      modalTitle: "新建方案",
+      modalTitle: "新建规则",
       modalGroupId: this._pendingNewGroup.id,
       modalName: "",
       modalNameError: "",
@@ -319,8 +319,8 @@ Page({
     if (this.data.drawConfigGroups.length <= 1) return;
 
     const confirmed = await showConfirm({
-      title: "删除方案",
-      content: `确认删除「${g.name}」？`,
+      title: "删掉规则",
+      content: `确定删掉「${g.name}」？`,
     });
     if (!confirmed) return;
 
@@ -342,7 +342,7 @@ Page({
       }
     } catch (err) {
       console.error("[draw-config-manage] delete failed", err);
-      wx.showToast({ title: "删除失败", icon: "none" });
+      wx.showToast({ title: "没删成，再试一下？", icon: "none" });
     }
   },
 });

@@ -79,7 +79,7 @@ Page({
       };
 
       if (configRes.data.length === 0) {
-        prefetch.validationError = "配置加载失败";
+        prefetch.validationError = "出了点问题";
       } else {
         const config = configRes.data[0] as {
           categories: Category[];
@@ -101,11 +101,11 @@ Page({
         prefetch._dishPool = dishes;
 
         if (!effectiveId) {
-          prefetch.validationError = "暂无抽取方案";
+          prefetch.validationError = "还没设抽签规则";
         } else {
           const activeGroup = config.drawConfigGroups.find((g) => g.id === effectiveId);
           if (!activeGroup || activeGroup.entries.length === 0) {
-            prefetch.validationError = "当前方案无抽取项";
+            prefetch.validationError = "规则里还没加分类";
             prefetch.configGroupNames = config.drawConfigGroups.map((g) => ({ id: g.id, name: g.name }));
           } else {
             const configGroupNames = config.drawConfigGroups.map((g) => ({ id: g.id, name: g.name }));
@@ -118,7 +118,7 @@ Page({
 
             prefetch.configGroupNames = configGroupNames;
             prefetch._activeEntries = syncedEntries;
-            prefetch.validationError = validation.valid ? "" : (validation.reason ?? "菜品不足");
+            prefetch.validationError = validation.valid ? "" : (validation.reason ?? "菜品不太够");
             prefetch.totalCards = validation.valid ? totalCards : 0;
             prefetch.activeConfigName = activeGroup.name;
           }
