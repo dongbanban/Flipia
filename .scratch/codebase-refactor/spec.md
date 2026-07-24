@@ -399,6 +399,7 @@ pnpm test
 | #11 | 创建 `loading-card` 组件 | 无 |
 | #12 | 替换 5 个页面的内联加载态 + 移除 plugin-manage 冗余 toast | #11 |
 | #13 | Splash 页面改用组件 | #11 |
+| #14 | Splash 预取首页数据，消除过渡空白 | #13 |
 
 ### 涉及页面
 
@@ -412,3 +413,30 @@ pnpm test
 - Splash 启动视觉与改动前一致
 - 无 `wx:else`/`wx:elif` 孤儿条件链错误
 - 各页面 WXSS 中 `.loading-state`/`.loading-hint` 已清除
+
+## Splash 预取首页数据（#14）
+
+### Problem Statement
+
+Splash → 首页的过渡链路存在四段视觉跳跃：splash loading → 首页空白 → 首页 loading-card → 首页内容。空白段来自 `switchTab` 后首页 `onLoad`/`onShow` 执行期间 `<loading-card>` 组件尚未完成首次渲染，短暂露出纯底页面。
+
+### Solution
+
+在 splash 的 1s 品牌延迟期间，并行预取首页所需的云端数据（`user_config` + `dishes` + `draw_history`），预取结果通过 `wx.setStorageSync(HOME_PREFETCH_KEY)` 传递给首页。首页 `onLoad` 检测到预取数据后直接恢复完整页面状态（`loadingConfig: false`），跳过加载态。
+
+预取失败时静默降级：首页走原有自加载流程。
+
+### 改动
+
+| 文件 | 改动 |
+|------|------|
+| `constants/storage-keys.ts` | 新增 `HOME_PREFETCH_KEY` 键名 |
+| `pages/splash/index.ts` | `onShow` 中并发预取首页数据，与 1s 延迟并行；预取结果 `setStorageSync` |
+| `pages/index/index.ts` | `onLoad` 检查 storage 预取数据，命中则直接恢复状态；`onShow` 通过 `_prefetched` 标志跳过重复加载 |
+
+### 验证
+
+- Splash 期间静默预取，跳转到首页后直接展示内容
+- 预取失败时首页自行加载
+- 直接进入首页（非 splash 路由）不受影响
+- 不污染 `globalData`，使用 `wx.*StorageSync` 传递
