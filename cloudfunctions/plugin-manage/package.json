@@ -1,0 +1,9 @@
+{
+  "name": "@flipia/cf-plugin-manage",
+  "version": "1.0.0",
+  "description": "插件管理云函数 — 查询插件列表、解锁条件校验、启用/禁用切换",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
