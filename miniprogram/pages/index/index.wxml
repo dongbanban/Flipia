@@ -11,7 +11,8 @@
     <block wx:if="{{!loadingConfig}}">
       <view wx:if="{{activeConfigName}}" class="config-switcher" bind:tap="onSwitchConfig">
         <text class="config-label">今天用「</text>
-        <text class="config-name">{{activeConfigName}}」</text>
+        <text class="config-name">{{activeConfigName}}</text>
+        <text class="config-label">」</text>
         <app-icon wx:if="{{configGroupNames.length > 1}}" name="CHEVRON_RIGHT" size="{{26}}" color="$primary" />
       </view>
       <button
