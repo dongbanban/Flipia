@@ -54,8 +54,8 @@
 }
 
 .plugin-card--unlocked {
-  border-color: #e8c8b0;
-  background-color: #f5e1d2;
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
 }
 
 /* ── 卡片头部 ────────────────────────────────────────────── */
