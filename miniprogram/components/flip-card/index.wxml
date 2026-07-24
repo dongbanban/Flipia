@@ -1,0 +1,15 @@
+<view
+  class="card-container"
+  style="width: {{_width}}; height: {{_height}};"
+>
+  <view
+    class="card-inner {{flipped ? 'card-inner--flipped' : ''}} {{redrawing ? 'card-inner--redrawing' : ''}}"
+  >
+    <view class="card-face card-back">
+      <slot name="back" />
+    </view>
+    <view class="card-face card-front">
+      <slot name="front" />
+    </view>
+  </view>
+</view>

@@ -12,59 +12,58 @@
     <!-- 空列表 -->
     <empty-state wx:if="{{plugins.length === 0}}" text="暂无可用插件" />
 
-    <!-- 插件卡片列表 -->
-    <view wx:else class="plugin-list">
+    <!-- 2 列网格 -->
+    <view wx:else class="plugin-grid">
       <view
         wx:for="{{plugins}}"
         wx:key="id"
-        class="plugin-card {{item.unlocked ? 'plugin-card--unlocked' : ''}}"
+        class="plugin-grid-item"
       >
-        <!-- 插件基本信息 -->
-        <view class="plugin-header">
-          <view class="plugin-info">
-            <text class="plugin-name">{{item.name}}</text>
-            <text class="plugin-desc">{{item.description}}</text>
-          </view>
+        <flip-card
+          flipped="{{item.flipped}}"
+          width="100%"
+          height="380rpx"
+        >
+          <!-- ── 背面：锁定状态 ── -->
+          <view slot="back" class="back-content">
+            <text class="back-name">{{item.name}}</text>
 
-          <!-- 已解锁：绿色标记 -->
-          <view wx:if="{{item.unlocked}}" class="unlocked-badge">
-            <text class="unlocked-badge-text">已解锁</text>
-          </view>
-        </view>
-
-        <!-- 未解锁：环形进度 + 解锁按钮 -->
-        <view wx:if="{{!item.unlocked}}" class="plugin-locked">
-          <view class="locked-row">
             <view
-              class="progress-ring"
+              class="back-ring"
               style="--p: {{item.target > 0 ? item.current / item.target : 0}}"
             >
-              <view class="progress-ring-inner">
-                <text class="progress-ring-text">{{item.current}}/{{item.target}}</text>
+              <view class="back-ring-inner">
+                <text class="back-ring-pct">{{item.percent}}%</text>
               </view>
             </view>
-            <view class="locked-info">
-              <text class="progress-hint">{{item.progressHint}}</text>
-              <button
-                class="unlock-btn"
+
+            <text class="back-desc">{{item.progressHint}}</text>
+
+            <button
+              class="unlock-btn {{item.current >= item.target ? '' : 'unlock-btn--disabled'}}"
+              disabled="{{item.current < item.target}}"
+              data-id="{{item.id}}"
+              bind:tap="onUnlock"
+            >解锁</button>
+          </view>
+
+          <!-- ── 正面：已解锁状态 ── -->
+          <view slot="front" class="front-content">
+            <text class="front-name">{{item.name}}</text>
+            <text class="front-desc">{{item.description}}</text>
+
+            <view class="front-toggle">
+              <text class="front-toggle-label">{{item.enabled ? '已启用' : '已禁用'}}</text>
+              <switch
+                checked="{{item.enabled}}"
+                disabled="{{item.toggling}}"
+                color="#c8815e"
                 data-id="{{item.id}}"
-                bind:tap="onUnlock"
-              >解锁</button>
+                bindchange="onToggle"
+              />
             </view>
           </view>
-        </view>
-
-        <!-- 已解锁：启用/禁用开关 -->
-        <view wx:if="{{item.unlocked}}" class="plugin-toggle">
-          <text class="toggle-label">{{item.enabled ? '已启用' : '已禁用'}}</text>
-          <switch
-            checked="{{item.enabled}}"
-            disabled="{{item.toggling}}"
-            color="#c8815e"
-            data-id="{{item.id}}"
-            bindchange="onToggle"
-          />
-        </view>
+        </flip-card>
       </view>
     </view>
   </view>

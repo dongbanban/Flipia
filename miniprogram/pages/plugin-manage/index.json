@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "modal": "/components/modal/index",
+    "flip-card": "/components/flip-card/index",
     "app-icon": "/components/app-icon/index",
     "empty-state": "/components/empty-state/index",
     "loading-card": "/components/loading/index"

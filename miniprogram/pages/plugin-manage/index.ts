@@ -19,6 +19,10 @@ interface PluginItem {
   target: number;
   /** UI 专用：防止 toggle API 调用期间重复点击开关 */
   toggling: boolean;
+  /** 控制卡片 3D 翻转动画 */
+  flipped: boolean;
+  /** 进度百分比 (0-100)，用于环形中心文字展示 */
+  percent: number;
 }
 
 Page({
@@ -69,6 +73,10 @@ Page({
       const plugins: PluginItem[] = result.plugins.map((p) => ({
         ...p,
         toggling: false,
+        flipped: p.unlocked,                    // 已解锁的直接展示正面
+        percent: p.target > 0
+          ? Math.round((p.current / p.target) * 100)
+          : 0,
       }));
 
       this.setData({ plugins, loading: false });
@@ -79,19 +87,27 @@ Page({
         error: "加载失败，请下拉刷新重试",
       });
       wx.showToast({ title: "加载失败", icon: "none" });
-      // inline loading state already dismissed above
     }
   },
 
   // ── 解锁 ──────────────────────────────────────────────────
 
   /**
-   * 点击解锁按钮。
-   * 调用云函数检查是否达标——达标则立即刷新卡片状态，不达标则弹 toast 告知进度。
+   * 点击解锁按钮（仅 progress 100% 时可触发）。
+   * 调用云函数，达标后立即翻转卡片展示正面。
    */
   async onUnlock(e: WechatMiniprogram.TouchEvent) {
     const pluginId = (e.currentTarget.dataset as { id: string }).id;
     if (!pluginId) return;
+
+    const plugin = this.data.plugins.find((p) => p.id === pluginId);
+    if (!plugin) return;
+
+    // 进度未满 —— 按钮本应 disabled，兜底提示
+    if (plugin.current < plugin.target) {
+      wx.showToast({ title: "条件未满足", icon: "none" });
+      return;
+    }
 
     wx.showLoading({ title: "检查中…" });
 
@@ -105,9 +121,6 @@ Page({
         ok: boolean;
         unlocked?: boolean;
         alreadyUnlocked?: boolean;
-        progressHint?: string;
-        current?: number;
-        target?: number;
         error?: string;
       };
 
@@ -115,31 +128,12 @@ Page({
         throw new Error(result.error || "解锁检查失败");
       }
 
-      // 已解锁（历史已解锁 或 本次达标解锁）
+      // 已解锁（本次达标 或 历史已解锁）→ 翻转卡片
       if (result.unlocked || result.alreadyUnlocked) {
-        const plugins = this.data.plugins.map((p) => {
-          if (p.id === pluginId) {
-            return { ...p, unlocked: true, enabled: true };
-          }
-          return p;
-        });
-        this.setData({ plugins });
+        this._updatePluginUnlock(pluginId);
         wx.showToast({ title: "已解锁", icon: "success" });
         return;
       }
-
-      // 未达标 —— 显示当前进度
-      const hint =
-        result.progressHint || "条件未满足";
-      const detail =
-        result.current !== undefined && result.target !== undefined
-          ? ` (${result.current}/${result.target})`
-          : "";
-      wx.showToast({
-        title: `${hint}${detail}`,
-        icon: "none",
-        duration: 2500,
-      });
     } catch (err) {
       console.error("[plugin-manage] 解锁失败", err);
       wx.showToast({ title: "操作失败，请重试", icon: "none" });
@@ -216,6 +210,17 @@ Page({
     const plugins = this.data.plugins.map((p) => {
       if (p.id === pluginId) {
         return { ...p, enabled };
+      }
+      return p;
+    });
+    this.setData({ plugins });
+  },
+
+  /** 解锁成功后更新状态并翻转卡片 */
+  _updatePluginUnlock(pluginId: string) {
+    const plugins = this.data.plugins.map((p) => {
+      if (p.id === pluginId) {
+        return { ...p, unlocked: true, enabled: true, flipped: true };
       }
       return p;
     });
