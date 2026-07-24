@@ -28,6 +28,10 @@
 
 ## 验证
 
-- [ ] Splash 启动时展示与改动前完全一致的卡片翻转动画
-- [ ] 动画结束后正常跳转到 profile-setup 或首页
-- [ ] `.splash` 渐变背景保持不变
+- [x] Splash 启动时展示与改动前完全一致的卡片翻转动画
+- [x] 动画结束后正常跳转到 profile-setup 或首页
+- [x] `.splash` 渐变背景保持不变
+
+## Comments
+
+`1b3b4ce` — feat: loading-card 组件 + 全局加载态替换。Splash 页面已改用 `<loading-card>` 组件，移除 98 行内联动画 CSS 和 `flipping`/`onReady` 逻辑，`.splash` 渐变背景保留不变。
