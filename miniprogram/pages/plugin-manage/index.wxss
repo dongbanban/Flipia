@@ -47,10 +47,10 @@
 /* ── 插件卡片 ────────────────────────────────────────────── */
 
 .plugin-card {
-  background-color: #fff;
+  background-color: var(--color-primary-light);
   border-radius: var(--radius-card);
   padding: 28rpx;
-  border: 1rpx solid #f0f0f0;
+  border: 1rpx solid #eed9cb;
 }
 
 .plugin-card--unlocked {
@@ -110,7 +110,7 @@
 
 .progress-bar {
   height: 8rpx;
-  background-color: #f0f0f0;
+  background-color: #fff;
   border-radius: 4rpx;
   overflow: hidden;
 }
